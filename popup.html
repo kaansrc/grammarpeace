@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GrammarWise</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .container {
+      background: white;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .header p {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .status-card {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .status-card.configured {
+      background: #d1fae5;
+      border-color: #6ee7b7;
+    }
+
+    .status-card.not-configured {
+      background: #fee2e2;
+      border-color: #fecaca;
+    }
+
+    .status-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-card.configured .status-title {
+      color: #065f46;
+    }
+
+    .status-card.not-configured .status-title {
+      color: #991b1b;
+    }
+
+    .status-description {
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 0;
+    }
+
+    .status-card.configured .status-description {
+      color: #047857;
+    }
+
+    .status-card.not-configured .status-description {
+      color: #b91c1c;
+    }
+
+    .instructions {
+      margin-bottom: 20px;
+    }
+
+    .instructions h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+
+    .instructions ol {
+      margin-left: 20px;
+    }
+
+    .instructions li {
+      font-size: 13px;
+      color: #374151;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    button {
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      font-family: inherit;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: #6366f1;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #4f46e5;
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 16px 0;
+    }
+
+    .footer {
+      padding: 16px 20px;
+      background: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+      text-align: center;
+    }
+
+    .footer p {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .footer a {
+      color: #6366f1;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>GrammarWise</h1>
+      <p>AI-Powered Grammar Checker</p>
+    </div>
+
+    <div class="content">
+      <div id="statusCard" class="status-card">
+        <div class="status-title">
+          <span id="statusIcon">⚙️</span>
+          <span id="statusTitle">Checking configuration...</span>
+        </div>
+        <p id="statusDescription" class="status-description">Please wait...</p>
+      </div>
+
+      <div class="instructions">
+        <h3>How to use:</h3>
+        <ol>
+          <li>Select any text on a webpage</li>
+          <li>Click the GrammarWise icon that appears</li>
+          <li>Choose your preferred tone</li>
+          <li>Get instant grammar corrections!</li>
+        </ol>
+      </div>
+
+      <div class="button-group">
+        <button id="settingsBtn" class="btn-primary">Open Settings</button>
+        <button id="helpBtn" class="btn-secondary">Help & Support</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Powered by Claude AI</p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
