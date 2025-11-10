@@ -144,7 +144,36 @@ yourTone: 'Your tone instruction here.',
 
 Edit the `createPrompt` function in `background.js` to customize how Claude processes the text.
 
+## Known Limitations
+
+### Google Docs and Special Editors
+
+GrammarWise has **limited support for Google Docs** due to its complex canvas-based rendering. On Google Docs:
+- ✅ Right-click context menu works
+- ✅ "Copy" button works
+- ⚠️ Floating button may position incorrectly
+- ❌ "Replace" button doesn't work
+
+**Recommended workflow for Google Docs**:
+1. Select text
+2. Right-click → "Check Grammar with GrammarWise"
+3. Use "Copy" button
+4. Manually paste back into Google Docs
+
+**Where GrammarWise works perfectly**:
+- Gmail, Outlook, standard text inputs
+- Social media (Twitter, LinkedIn, Reddit)
+- WordPress, Medium
+- Most standard websites
+
+See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for complete compatibility information.
+
 ## Troubleshooting
+
+### Floating button doesn't appear or appears at wrong position
+- **Solution 1**: Use the right-click context menu instead
+- **Solution 2**: Check browser console (F12) for errors
+- **Solution 3**: Try refreshing the page
 
 ### Extension icon doesn't appear when selecting text
 - Make sure you're on a webpage (not Chrome settings or extension pages)

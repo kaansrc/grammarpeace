@@ -98,10 +98,14 @@ function createPrompt(text, tone) {
 
   const toneInstruction = toneInstructions[tone] || toneInstructions.professional;
 
-  return `You are a grammar checking assistant. Please check the following text for grammar, spelling, and punctuation errors. ${toneInstruction}
+  return `Fix the grammar, spelling, and punctuation in the following text. ${toneInstruction}
 
-Return ONLY the corrected text without any explanations, comments, or additional formatting. Do not include phrases like "Here's the corrected version" or any markdown formatting.
+CRITICAL: Return ONLY the corrected text. Do NOT add any explanations, comments, notes, or phrases like "Here's the corrected version". Do NOT use markdown formatting. Just return the corrected text exactly as it should be written.
 
-Text to check:
-${text}`;
+If the text seems incomplete or unusual, still return your best correction without any explanation.
+
+Text:
+${text}
+
+Corrected text:`;
 }

@@ -59,13 +59,25 @@ function handleTextSelection(event) {
     try {
       selectionRange = selection.getRangeAt(0);
       const rect = selectionRange.getBoundingClientRect();
-      // Use scrollX/scrollY for absolute positioning
-      const x = rect.left + window.scrollX;
-      const y = rect.bottom + window.scrollY;
+
+      // Calculate position - use mouse position as fallback if rect is at 0,0
+      let x = rect.left + window.scrollX;
+      let y = rect.bottom + window.scrollY;
+
+      // Fallback to mouse event position if rect is invalid (at 0,0)
+      if (rect.left === 0 && rect.top === 0 && rect.right === 0 && rect.bottom === 0) {
+        console.log('GrammarWise: Invalid rect, using mouse position');
+        x = event.pageX;
+        y = event.pageY;
+      }
+
+      console.log('GrammarWise: Rect:', rect);
       console.log('GrammarWise: Showing button at', x, y);
       showFloatingButton(x, y);
     } catch (e) {
       console.error('GrammarWise: Error getting selection range:', e);
+      // Fallback to mouse position
+      showFloatingButton(event.pageX, event.pageY);
     }
   } else {
     hideFloatingButton();
