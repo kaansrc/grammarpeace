@@ -30,7 +30,8 @@ async function checkGrammarWithClaude(text, tone) {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': result.apiKey,
-        'anthropic-version': '2023-06-01'
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5',
