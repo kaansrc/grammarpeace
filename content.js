@@ -218,21 +218,53 @@ function showGrammarPanel(x, y) {
 
   // Position panel with better viewport handling
   const panelWidth = 400;
-  const panelHeight = 300;
+  const padding = 20;
 
-  // Keep panel within viewport
-  let panelX = Math.min(x, window.innerWidth + window.scrollX - panelWidth - 20);
-  let panelY = Math.min(y + 40, window.innerHeight + window.scrollY - panelHeight - 20);
+  // Calculate available space
+  const viewportHeight = window.innerHeight;
+  const viewportWidth = window.innerWidth;
 
-  // Ensure panel is not off-screen on the left or top
-  panelX = Math.max(window.scrollX + 20, panelX);
-  panelY = Math.max(window.scrollY + 20, panelY);
+  // Convert x, y to viewport coordinates if needed
+  let panelX = x - window.scrollX;
+  let panelY = y - window.scrollY;
 
-  grammarPanel.style.left = `${panelX}px`;
-  grammarPanel.style.top = `${panelY}px`;
+  // Position panel to the right of cursor, or left if not enough space
+  if (panelX + panelWidth + padding > viewportWidth) {
+    // Not enough space on right, position to the left
+    panelX = Math.max(padding, panelX - panelWidth - 20);
+  } else {
+    panelX = Math.min(panelX + 20, viewportWidth - panelWidth - padding);
+  }
+
+  // Calculate max height (leave space at bottom for buttons)
+  const maxHeight = viewportHeight - padding * 2;
+  const spaceBelow = viewportHeight - panelY - 40;
+  const spaceAbove = panelY - padding;
+
+  // Position below cursor if enough space, otherwise above
+  if (spaceBelow < 200 && spaceAbove > spaceBelow) {
+    // Not enough space below, position above
+    panelY = Math.max(padding, panelY - Math.min(maxHeight, 400));
+  } else {
+    // Position below
+    panelY = Math.min(panelY + 40, viewportHeight - 200);
+  }
+
+  // Ensure panel stays within viewport
+  panelX = Math.max(padding, Math.min(panelX, viewportWidth - panelWidth - padding));
+  panelY = Math.max(padding, Math.min(panelY, viewportHeight - 200));
+
+  // Apply positioning with fixed position and max-height
+  grammarPanel.style.cssText = `
+    position: fixed !important;
+    left: ${panelX}px !important;
+    top: ${panelY}px !important;
+    max-height: ${maxHeight}px !important;
+    overflow-y: auto !important;
+  `;
 
   document.body.appendChild(grammarPanel);
-  console.log('GrammarWise: Panel added to DOM');
+  console.log('GrammarWise: Panel added to DOM at viewport coords', panelX, panelY);
 
   // Load default tone from settings
   chrome.storage.sync.get(['defaultTone'], (result) => {
