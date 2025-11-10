@@ -1,16 +1,17 @@
 # GrammarWise - AI Grammar Checker Chrome Extension
 
-An AI-powered grammar checking Chrome extension that uses Claude API to provide instant, context-aware grammar corrections with customizable tone settings.
+An AI-powered grammar checking Chrome extension that uses Claude 3.5 Haiku API to provide instant, context-aware grammar corrections with customizable tone settings. Fast, affordable, and privacy-focused.
 
 ## Features
 
-- **Instant Grammar Checking**: Select any text on any webpage and get immediate grammar corrections
+- **Lightning Fast**: Powered by Claude 3.5 Haiku for instant grammar corrections
+- **Super Affordable**: Costs less than a penny per check (see cost estimate below)
 - **Customizable Tone**: Choose from multiple tone options (Professional, Casual, Friendly, Formal, Concise)
 - **Privacy-Focused**: Your API key is stored locally and never shared
-- **Free to Use**: Use your own Claude API key, no subscription required
+- **No Subscription**: Use your own Claude API key, pay only for what you use
 - **Beautiful UI**: Modern, intuitive interface with smooth animations
 - **One-Click Replace**: Replace selected text with corrected version instantly
-- **Copy to Clipboard**: Easily copy corrected text for manual pasting
+- **Works Everywhere**: Use on any webpage, any text field
 
 ## Installation
 
@@ -98,6 +99,18 @@ grammarwise/
 └── README.md              # This file
 ```
 
+## Cost Estimate
+
+GrammarWise uses **Claude 3.5 Haiku**, which is optimized for speed and cost-efficiency:
+
+- **Input**: ~$0.80 per million tokens
+- **Output**: ~$4.00 per million tokens
+- **Typical grammar check**: 100-300 tokens total
+- **Estimated cost per check**: ~$0.0001-0.0003 (less than a penny!)
+- **Example**: 1,000 grammar checks ≈ $0.10-0.30
+
+This makes GrammarWise extremely affordable for personal use compared to subscription services.
+
 ## Customization
 
 ### Changing the Model
@@ -105,10 +118,13 @@ grammarwise/
 To use a different Claude model, edit `background.js` and change the `model` parameter:
 
 ```javascript
-model: 'claude-3-5-sonnet-20241022',  // Change this to your preferred model
+model: 'claude-3-5-haiku-20241022',  // Current default - fast and affordable
 ```
 
-Available models: `claude-3-5-sonnet-20241022`, `claude-3-opus-20240229`, `claude-3-sonnet-20240229`, etc.
+Available models:
+- `claude-3-5-haiku-20241022` (fastest, most affordable - recommended)
+- `claude-3-5-sonnet-20241022` (balanced performance)
+- `claude-3-opus-20240229` (highest quality, most expensive)
 
 ### Adding More Tone Options
 
