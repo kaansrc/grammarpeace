@@ -78,6 +78,48 @@
   color: #111827;
 }
 
+/* Tabs */
+.grammarwise-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e5e7eb;
+  background: white;
+  flex-shrink: 0;
+}
+
+.grammarwise-tab {
+  flex: 1;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.grammarwise-tab:hover {
+  color: #374151;
+  background: #f9fafb;
+}
+
+.grammarwise-tab.active {
+  color: #6366f1;
+  border-bottom-color: #6366f1;
+}
+
+.grammarwise-tab-content {
+  display: none;
+}
+
+.grammarwise-tab-content.active {
+  display: block;
+}
+
 .grammarwise-content {
   padding: 20px;
   overflow-y: auto;

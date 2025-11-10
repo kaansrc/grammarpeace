@@ -5,12 +5,18 @@ document.getElementById('settingsForm').addEventListener('submit', saveSettings)
 document.getElementById('testBtn').addEventListener('click', testAPI);
 
 function loadSettings() {
-  chrome.storage.sync.get(['apiKey', 'defaultTone'], (result) => {
+  chrome.storage.sync.get(['apiKey', 'defaultTone', 'defaultFromLang', 'defaultToLang'], (result) => {
     if (result.apiKey) {
       document.getElementById('apiKey').value = result.apiKey;
     }
     if (result.defaultTone) {
       document.getElementById('defaultTone').value = result.defaultTone;
+    }
+    if (result.defaultFromLang) {
+      document.getElementById('defaultFromLang').value = result.defaultFromLang;
+    }
+    if (result.defaultToLang) {
+      document.getElementById('defaultToLang').value = result.defaultToLang;
     }
   });
 }
@@ -20,6 +26,8 @@ function saveSettings(event) {
 
   const apiKey = document.getElementById('apiKey').value.trim();
   const defaultTone = document.getElementById('defaultTone').value;
+  const defaultFromLang = document.getElementById('defaultFromLang').value;
+  const defaultToLang = document.getElementById('defaultToLang').value;
 
   if (!apiKey) {
     showStatus('Please enter your API key', 'error');
@@ -34,7 +42,9 @@ function saveSettings(event) {
 
   chrome.storage.sync.set({
     apiKey: apiKey,
-    defaultTone: defaultTone
+    defaultTone: defaultTone,
+    defaultFromLang: defaultFromLang,
+    defaultToLang: defaultToLang
   }, () => {
     showStatus('Settings saved successfully!', 'success');
   });

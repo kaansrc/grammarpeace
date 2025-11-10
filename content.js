@@ -189,35 +189,103 @@ function showGrammarPanel(x, y) {
       <h3>GrammarWise</h3>
       <button id="grammarwise-close" class="grammarwise-close-btn">&times;</button>
     </div>
+    <div class="grammarwise-tabs">
+      <button class="grammarwise-tab active" data-tab="grammar">Fix Grammar</button>
+      <button class="grammarwise-tab" data-tab="translate">Translate</button>
+    </div>
     <div class="grammarwise-content">
-      <div class="grammarwise-controls">
-        <label for="grammarwise-tone">Tone:</label>
-        <select id="grammarwise-tone" class="grammarwise-select">
-          <option value="professional">Professional</option>
-          <option value="casual">Casual</option>
-          <option value="friendly">Friendly</option>
-          <option value="formal">Formal</option>
-          <option value="concise">Concise</option>
-        </select>
-        <button id="grammarwise-check" class="grammarwise-btn-primary">Check Grammar</button>
-      </div>
-      <div class="grammarwise-original">
-        <strong>Original:</strong>
-        <div class="grammarwise-text">${escapeHtml(selectedText)}</div>
-      </div>
-      <div id="grammarwise-result" class="grammarwise-result" style="display: none;">
-        <strong>Corrected:</strong>
-        <div id="grammarwise-corrected-text" class="grammarwise-text"></div>
-        <div class="grammarwise-actions">
-          <button id="grammarwise-copy" class="grammarwise-btn">Copy</button>
-          <button id="grammarwise-replace" class="grammarwise-btn-primary">Replace</button>
+      <!-- Grammar Tab -->
+      <div id="grammarwise-tab-grammar" class="grammarwise-tab-content active">
+        <div class="grammarwise-controls">
+          <label for="grammarwise-tone">Tone:</label>
+          <select id="grammarwise-tone" class="grammarwise-select">
+            <option value="professional">Professional</option>
+            <option value="casual">Casual</option>
+            <option value="friendly">Friendly</option>
+            <option value="formal">Formal</option>
+            <option value="concise">Concise</option>
+          </select>
+          <button id="grammarwise-check" class="grammarwise-btn-primary">Check Grammar</button>
         </div>
+        <div class="grammarwise-original">
+          <strong>Original:</strong>
+          <div class="grammarwise-text">${escapeHtml(selectedText)}</div>
+        </div>
+        <div id="grammarwise-result" class="grammarwise-result" style="display: none;">
+          <strong>Corrected:</strong>
+          <div id="grammarwise-corrected-text" class="grammarwise-text"></div>
+          <div class="grammarwise-actions">
+            <button id="grammarwise-copy" class="grammarwise-btn">Copy</button>
+            <button id="grammarwise-replace" class="grammarwise-btn-primary">Replace</button>
+          </div>
+        </div>
+        <div id="grammarwise-loading" class="grammarwise-loading" style="display: none;">
+          <div class="grammarwise-spinner"></div>
+          <p>Checking grammar...</p>
+        </div>
+        <div id="grammarwise-error" class="grammarwise-error" style="display: none;"></div>
       </div>
-      <div id="grammarwise-loading" class="grammarwise-loading" style="display: none;">
-        <div class="grammarwise-spinner"></div>
-        <p>Checking grammar...</p>
+
+      <!-- Translate Tab -->
+      <div id="grammarwise-tab-translate" class="grammarwise-tab-content" style="display: none;">
+        <div class="grammarwise-controls">
+          <label for="grammarwise-from-lang">From:</label>
+          <select id="grammarwise-from-lang" class="grammarwise-select">
+            <option value="auto">Auto-detect</option>
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="ru">Russian</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="zh">Chinese</option>
+            <option value="ar">Arabic</option>
+            <option value="hi">Hindi</option>
+            <option value="tr">Turkish</option>
+            <option value="nl">Dutch</option>
+            <option value="pl">Polish</option>
+          </select>
+          <label for="grammarwise-to-lang">To:</label>
+          <select id="grammarwise-to-lang" class="grammarwise-select">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="ru">Russian</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="zh">Chinese</option>
+            <option value="ar">Arabic</option>
+            <option value="hi">Hindi</option>
+            <option value="tr">Turkish</option>
+            <option value="nl">Dutch</option>
+            <option value="pl">Polish</option>
+          </select>
+          <button id="grammarwise-translate" class="grammarwise-btn-primary">Translate</button>
+        </div>
+        <div class="grammarwise-original">
+          <strong>Original:</strong>
+          <div class="grammarwise-text">${escapeHtml(selectedText)}</div>
+        </div>
+        <div id="grammarwise-translate-result" class="grammarwise-result" style="display: none;">
+          <strong>Translation:</strong>
+          <div id="grammarwise-translated-text" class="grammarwise-text"></div>
+          <div class="grammarwise-actions">
+            <button id="grammarwise-translate-copy" class="grammarwise-btn">Copy</button>
+            <button id="grammarwise-translate-replace" class="grammarwise-btn-primary">Replace</button>
+          </div>
+        </div>
+        <div id="grammarwise-translate-loading" class="grammarwise-loading" style="display: none;">
+          <div class="grammarwise-spinner"></div>
+          <p>Translating...</p>
+        </div>
+        <div id="grammarwise-translate-error" class="grammarwise-error" style="display: none;"></div>
       </div>
-      <div id="grammarwise-error" class="grammarwise-error" style="display: none;"></div>
     </div>
   `;
 
@@ -284,11 +352,37 @@ function showGrammarPanel(x, y) {
   document.body.appendChild(grammarPanel);
   console.log('GrammarWise: Panel added to DOM at viewport coords', panelX, panelY, 'with max-height', maxHeight);
 
-  // Load default tone from settings
-  chrome.storage.sync.get(['defaultTone'], (result) => {
+  // Load default settings
+  chrome.storage.sync.get(['defaultTone', 'defaultFromLang', 'defaultToLang'], (result) => {
     if (result.defaultTone) {
       document.getElementById('grammarwise-tone').value = result.defaultTone;
     }
+    if (result.defaultFromLang) {
+      document.getElementById('grammarwise-from-lang').value = result.defaultFromLang;
+    }
+    if (result.defaultToLang) {
+      document.getElementById('grammarwise-to-lang').value = result.defaultToLang;
+    }
+  });
+
+  // Add tab switching
+  const tabs = grammarPanel.querySelectorAll('.grammarwise-tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      // Remove active class from all tabs and contents
+      grammarPanel.querySelectorAll('.grammarwise-tab').forEach(t => t.classList.remove('active'));
+      grammarPanel.querySelectorAll('.grammarwise-tab-content').forEach(c => c.style.display = 'none');
+
+      // Add active class to clicked tab
+      tab.classList.add('active');
+
+      // Show corresponding content
+      const tabName = tab.getAttribute('data-tab');
+      const content = grammarPanel.querySelector(`#grammarwise-tab-${tabName}`);
+      if (content) {
+        content.style.display = 'block';
+      }
+    });
   });
 
   // Add event listeners
@@ -300,6 +394,7 @@ function showGrammarPanel(x, y) {
     hideGrammarPanel();
   });
 
+  // Grammar tab event listeners
   document.getElementById('grammarwise-check').addEventListener('click', checkGrammar);
 
   const copyBtn = document.getElementById('grammarwise-copy');
@@ -307,6 +402,15 @@ function showGrammarPanel(x, y) {
 
   if (copyBtn) copyBtn.addEventListener('click', copyToClipboard);
   if (replaceBtn) replaceBtn.addEventListener('click', replaceText);
+
+  // Translate tab event listeners
+  document.getElementById('grammarwise-translate').addEventListener('click', translateText);
+
+  const translateCopyBtn = document.getElementById('grammarwise-translate-copy');
+  const translateReplaceBtn = document.getElementById('grammarwise-translate-replace');
+
+  if (translateCopyBtn) translateCopyBtn.addEventListener('click', copyTranslation);
+  if (translateReplaceBtn) translateReplaceBtn.addEventListener('click', replaceWithTranslation);
 
   // Click outside to close (with small delay to prevent immediate closing)
   setTimeout(() => {
@@ -522,6 +626,129 @@ function replaceText() {
     console.log('GrammarWise: All replace strategies failed, copying to clipboard');
     copyToClipboard();
     showError('Text copied to clipboard. Paste it manually in the desired location.');
+  }
+}
+
+async function translateText() {
+  console.log('GrammarWise: Translating text...');
+  const fromLang = document.getElementById('grammarwise-from-lang').value;
+  const toLang = document.getElementById('grammarwise-to-lang').value;
+  const loadingDiv = document.getElementById('grammarwise-translate-loading');
+  const resultDiv = document.getElementById('grammarwise-translate-result');
+  const errorDiv = document.getElementById('grammarwise-translate-error');
+
+  // Show loading
+  loadingDiv.style.display = 'block';
+  resultDiv.style.display = 'none';
+  errorDiv.style.display = 'none';
+
+  try {
+    // Send message to background script
+    const response = await chrome.runtime.sendMessage({
+      action: 'translateText',
+      text: selectedText,
+      fromLang: fromLang,
+      toLang: toLang
+    });
+
+    console.log('GrammarWise: Received translation response:', response);
+    loadingDiv.style.display = 'none';
+
+    if (response.success) {
+      document.getElementById('grammarwise-translated-text').textContent = response.translatedText;
+      resultDiv.style.display = 'block';
+    } else {
+      showTranslateError(response.error || 'Failed to translate');
+    }
+  } catch (error) {
+    console.error('GrammarWise: Error during translation:', error);
+    loadingDiv.style.display = 'none';
+    showTranslateError(error.message || 'An error occurred');
+  }
+}
+
+function showTranslateError(message) {
+  const errorDiv = document.getElementById('grammarwise-translate-error');
+  errorDiv.textContent = message;
+  errorDiv.style.display = 'block';
+}
+
+function copyTranslation() {
+  const translatedText = document.getElementById('grammarwise-translated-text').textContent;
+  navigator.clipboard.writeText(translatedText).then(() => {
+    const btn = document.getElementById('grammarwise-translate-copy');
+    const originalText = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
+  }).catch(err => {
+    console.error('GrammarWise: Failed to copy translation:', err);
+    showTranslateError('Failed to copy to clipboard');
+  });
+}
+
+function replaceWithTranslation() {
+  const translatedText = document.getElementById('grammarwise-translated-text').textContent;
+  console.log('GrammarWise: Attempting to replace with translation');
+
+  // Use the same replace logic as grammar correction
+  let replaced = false;
+
+  // Try using stored originalElement
+  if (originalElement && document.body.contains(originalElement)) {
+    try {
+      originalElement.focus();
+    } catch (e) {
+      console.log('GrammarWise: Could not focus original element');
+    }
+
+    if (originalElement.tagName === 'TEXTAREA' || originalElement.tagName === 'INPUT') {
+      try {
+        const start = originalElement.selectionStart;
+        const end = originalElement.selectionEnd;
+        const text = originalElement.value;
+
+        originalElement.value = text.substring(0, start) + translatedText + text.substring(end);
+        originalElement.selectionStart = originalElement.selectionEnd = start + translatedText.length;
+
+        originalElement.dispatchEvent(new Event('input', { bubbles: true }));
+        originalElement.dispatchEvent(new Event('change', { bubbles: true }));
+
+        console.log('GrammarWise: Successfully replaced with translation');
+        replaced = true;
+        hideGrammarPanel();
+        return;
+      } catch (e) {
+        console.error('GrammarWise: Error replacing with translation:', e);
+      }
+    }
+
+    if (originalElement.isContentEditable) {
+      try {
+        if (selectionRange) {
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(selectionRange);
+        }
+        const success = document.execCommand('insertText', false, translatedText);
+        if (success) {
+          console.log('GrammarWise: Successfully replaced with translation in contentEditable');
+          replaced = true;
+          hideGrammarPanel();
+          return;
+        }
+      } catch (e) {
+        console.error('GrammarWise: Error with execCommand for translation:', e);
+      }
+    }
+  }
+
+  // Fallback to clipboard
+  if (!replaced) {
+    console.log('GrammarWise: Replace failed, copying translation to clipboard');
+    copyTranslation();
+    showTranslateError('Text copied to clipboard. Paste it manually in the desired location.');
   }
 }
 
