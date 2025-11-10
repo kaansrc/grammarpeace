@@ -146,6 +146,9 @@
 .grammarwise-original,
 .grammarwise-result {
   margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .grammarwise-original strong,
@@ -173,6 +176,11 @@
   display: flex;
   gap: 8px;
   margin-top: 12px;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding-top: 8px;
 }
 
 .grammarwise-loading {

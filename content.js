@@ -224,6 +224,7 @@ function showGrammarPanel(x, y) {
   // Position panel with better viewport handling
   const panelWidth = 400;
   const padding = 20;
+  const minHeight = 250; // Minimum height to ensure buttons are visible
 
   // Calculate available space
   const viewportHeight = window.innerHeight;
@@ -241,23 +242,33 @@ function showGrammarPanel(x, y) {
     panelX = Math.min(panelX + 20, viewportWidth - panelWidth - padding);
   }
 
-  // Calculate max height (leave space at bottom for buttons)
-  const maxHeight = viewportHeight - padding * 2;
-  const spaceBelow = viewportHeight - panelY - 40;
+  // Calculate available space below and above
+  const spaceBelow = viewportHeight - panelY - padding;
   const spaceAbove = panelY - padding;
 
-  // Position below cursor if enough space, otherwise above
-  if (spaceBelow < 200 && spaceAbove > spaceBelow) {
-    // Not enough space below, position above
-    panelY = Math.max(padding, panelY - Math.min(maxHeight, 400));
+  // Decide positioning strategy - prioritize having enough space for buttons
+  if (spaceBelow < minHeight) {
+    // Not enough space below, try positioning above
+    if (spaceAbove >= minHeight) {
+      // Position above the cursor
+      const maxHeightAbove = Math.min(spaceAbove, viewportHeight - padding * 2);
+      panelY = Math.max(padding, panelY - maxHeightAbove);
+    } else {
+      // Neither has enough space, position at top of viewport
+      panelY = padding;
+    }
   } else {
-    // Position below
-    panelY = Math.min(panelY + 40, viewportHeight - 200);
+    // Position below cursor
+    panelY = Math.min(panelY + 40, viewportHeight - minHeight);
   }
 
-  // Ensure panel stays within viewport
+  // Calculate final max height
+  const availableHeight = viewportHeight - panelY - padding;
+  const maxHeight = Math.max(minHeight, Math.min(availableHeight, viewportHeight - padding * 2));
+
+  // Ensure panel stays within viewport bounds
   panelX = Math.max(padding, Math.min(panelX, viewportWidth - panelWidth - padding));
-  panelY = Math.max(padding, Math.min(panelY, viewportHeight - 200));
+  panelY = Math.max(padding, Math.min(panelY, viewportHeight - minHeight));
 
   // Apply positioning with fixed position and max-height
   grammarPanel.style.cssText = `
@@ -265,11 +276,13 @@ function showGrammarPanel(x, y) {
     left: ${panelX}px !important;
     top: ${panelY}px !important;
     max-height: ${maxHeight}px !important;
-    overflow-y: auto !important;
+    width: 400px !important;
+    display: flex !important;
+    flex-direction: column !important;
   `;
 
   document.body.appendChild(grammarPanel);
-  console.log('GrammarWise: Panel added to DOM at viewport coords', panelX, panelY);
+  console.log('GrammarWise: Panel added to DOM at viewport coords', panelX, panelY, 'with max-height', maxHeight);
 
   // Load default tone from settings
   chrome.storage.sync.get(['defaultTone'], (result) => {
