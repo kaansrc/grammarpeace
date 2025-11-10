@@ -37,10 +37,13 @@ document.addEventListener('mouseup', handleTextSelection);
 document.addEventListener('selectionchange', handleSelectionChange);
 
 function handleSelectionChange() {
-  const selection = window.getSelection();
-  if (selection.toString().trim().length === 0) {
-    hideFloatingButton();
-  }
+  // Don't hide button immediately - give user time to interact with it
+  setTimeout(() => {
+    const selection = window.getSelection();
+    if (selection.toString().trim().length === 0 && floatingButton) {
+      hideFloatingButton();
+    }
+  }, 100);
 }
 
 function handleTextSelection(event) {
@@ -60,24 +63,25 @@ function handleTextSelection(event) {
       selectionRange = selection.getRangeAt(0);
       const rect = selectionRange.getBoundingClientRect();
 
-      // Calculate position - use mouse position as fallback if rect is at 0,0
-      let x = rect.left + window.scrollX;
-      let y = rect.bottom + window.scrollY;
+      // Use viewport coordinates (for fixed positioning)
+      let x = rect.left;
+      let y = rect.bottom;
 
       // Fallback to mouse event position if rect is invalid (at 0,0)
       if (rect.left === 0 && rect.top === 0 && rect.right === 0 && rect.bottom === 0) {
         console.log('GrammarWise: Invalid rect, using mouse position');
-        x = event.pageX;
-        y = event.pageY;
+        // Convert page coordinates to viewport coordinates
+        x = event.clientX;
+        y = event.clientY;
       }
 
       console.log('GrammarWise: Rect:', rect);
-      console.log('GrammarWise: Showing button at', x, y);
+      console.log('GrammarWise: Showing button at viewport coords', x, y);
       showFloatingButton(x, y);
     } catch (e) {
       console.error('GrammarWise: Error getting selection range:', e);
-      // Fallback to mouse position
-      showFloatingButton(event.pageX, event.pageY);
+      // Fallback to mouse viewport position
+      showFloatingButton(event.clientX, event.clientY);
     }
   } else {
     hideFloatingButton();
@@ -91,25 +95,29 @@ function showFloatingButton(x, y) {
   floatingButton.id = 'grammarwise-floating-button';
 
   // Force inline styles to ensure visibility
+  // Making it EXTRA visible for debugging
   floatingButton.style.cssText = `
     position: fixed !important;
-    left: ${x}px !important;
-    top: ${y}px !important;
+    left: ${x + 10}px !important;
+    top: ${y + 10}px !important;
     z-index: 2147483647 !important;
     background: #6366f1 !important;
     color: white !important;
     border-radius: 50% !important;
-    width: 40px !important;
-    height: 40px !important;
+    width: 50px !important;
+    height: 50px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.8) !important;
-    border: 3px solid white !important;
+    box-shadow: 0 6px 30px rgba(255, 0, 0, 0.8) !important;
+    border: 4px solid #ff0000 !important;
     pointer-events: auto !important;
     opacity: 1 !important;
     visibility: visible !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
   `;
 
   floatingButton.innerHTML = `
@@ -132,19 +140,24 @@ function showFloatingButton(x, y) {
 
   // Verify it's visible
   setTimeout(() => {
-    const computed = window.getComputedStyle(floatingButton);
-    console.log('GrammarWise: Button computed style:', {
-      display: computed.display,
-      opacity: computed.opacity,
-      visibility: computed.visibility,
-      zIndex: computed.zIndex,
-      position: computed.position,
-      left: computed.left,
-      top: computed.top
-    });
-  }, 10);
+    if (floatingButton && document.body.contains(floatingButton)) {
+      const computed = window.getComputedStyle(floatingButton);
+      console.log('GrammarWise: Button computed style:', {
+        display: computed.display,
+        opacity: computed.opacity,
+        visibility: computed.visibility,
+        zIndex: computed.zIndex,
+        position: computed.position,
+        left: computed.left,
+        top: computed.top
+      });
+      console.log('GrammarWise: Button should be visible at these coordinates!');
+    } else {
+      console.log('GrammarWise: Button was removed from DOM before verification');
+    }
+  }, 50);
 
-  console.log('GrammarWise: Floating button added to DOM at', x, y);
+  console.log('GrammarWise: Floating button added to DOM at viewport coordinates', x, y);
 }
 
 function hideFloatingButton() {
