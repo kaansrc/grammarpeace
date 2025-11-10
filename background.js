@@ -102,6 +102,8 @@ function createPrompt(text, tone) {
 
 CRITICAL: Return ONLY the corrected text. Do NOT add any explanations, comments, notes, or phrases like "Here's the corrected version". Do NOT use markdown formatting. Just return the corrected text exactly as it should be written.
 
+IMPORTANT: Do NOT use em dashes (—). Use regular hyphens (-) or commas instead.
+
 If the text seems incomplete or unusual, still return your best correction without any explanation.
 
 Text:
