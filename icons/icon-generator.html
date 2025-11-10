@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GrammarWise Icon Generator</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 600px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      color: #111827;
+      margin-bottom: 12px;
+    }
+    p {
+      color: #6b7280;
+      margin-bottom: 24px;
+    }
+    .preview {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      margin-bottom: 32px;
+      padding: 24px;
+      background: #f9fafb;
+      border-radius: 12px;
+    }
+    canvas {
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+    }
+    button {
+      background: #6366f1;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: #4f46e5;
+      transform: translateY(-1px);
+    }
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 16px;
+      display: none;
+      text-align: center;
+      font-weight: 600;
+    }
+    .info {
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 24px;
+      font-size: 14px;
+      color: #1e40af;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 GrammarWise Icon Generator</h1>
+    <p>Click the button below to automatically generate and download all 4 icon sizes!</p>
+
+    <div class="preview">
+      <canvas id="preview128" width="128" height="128"></canvas>
+      <div>
+        <strong style="color: #111827;">Preview (128x128)</strong><br>
+        <span style="color: #6b7280; font-size: 14px;">Purple gradient with checkmark</span>
+      </div>
+    </div>
+
+    <button onclick="generateAllIcons()">📥 Generate & Download All Icons</button>
+
+    <div class="success" id="success">
+      ✅ All icons generated! Check your downloads folder for:<br>
+      icon16.png, icon32.png, icon48.png, icon128.png
+    </div>
+
+    <div class="info">
+      <strong>What happens next:</strong><br>
+      1. Four PNG files will download automatically<br>
+      2. Move them to the <code>icons/</code> folder in your extension<br>
+      3. Reload your extension in Chrome<br>
+      4. Done! Your extension now has icons 🎉
+    </div>
+  </div>
+
+  <script>
+    // Draw icon on canvas
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+
+      // Create gradient background
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#6366f1');
+      gradient.addColorStop(1, '#4f46e5');
+
+      // Draw rounded rectangle background
+      const radius = size * 0.1875; // 24/128 = 0.1875
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, radius);
+      ctx.fill();
+
+      // Draw checkmark
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = size * 0.078; // 10/128 = 0.078
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(size * 0.28, size * 0.5);
+      ctx.lineTo(size * 0.406, size * 0.625);
+      ctx.lineTo(size * 0.719, size * 0.313);
+      ctx.stroke();
+    }
+
+    // Generate preview
+    const preview = document.getElementById('preview128');
+    drawIcon(preview, 128);
+
+    // Download function
+    function downloadCanvas(canvas, filename) {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // Generate all icons
+    function generateAllIcons() {
+      const sizes = [
+        { size: 16, filename: 'icon16.png' },
+        { size: 32, filename: 'icon32.png' },
+        { size: 48, filename: 'icon48.png' },
+        { size: 128, filename: 'icon128.png' }
+      ];
+
+      sizes.forEach(({ size, filename }, index) => {
+        setTimeout(() => {
+          const canvas = document.createElement('canvas');
+          canvas.width = size;
+          canvas.height = size;
+          drawIcon(canvas, size);
+          downloadCanvas(canvas, filename);
+
+          if (index === sizes.length - 1) {
+            document.getElementById('success').style.display = 'block';
+          }
+        }, index * 500); // Delay each download by 500ms
+      });
+    }
+
+    // Polyfill for roundRect (for older browsers)
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+        this.moveTo(x + radius, y);
+        this.lineTo(x + width - radius, y);
+        this.quadraticCurveTo(x + width, y, x + width, y + radius);
+        this.lineTo(x + width, y + height - radius);
+        this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        this.lineTo(x + radius, y + height);
+        this.quadraticCurveTo(x, y + height, x, y + height - radius);
+        this.lineTo(x, y + radius);
+        this.quadraticCurveTo(x, y, x + radius, y);
+        this.closePath();
+      };
+    }
+  </script>
+</body>
+</html>
