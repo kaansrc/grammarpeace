@@ -1,10 +1,10 @@
 # GrammarWise - AI Grammar Checker Chrome Extension
 
-An AI-powered grammar checking Chrome extension that uses Claude 3.5 Haiku API to provide instant, context-aware grammar corrections with customizable tone settings. Fast, affordable, and privacy-focused.
+An AI-powered grammar checking Chrome extension that uses Claude Haiku 4.5 API to provide instant, context-aware grammar corrections with customizable tone settings. Fast, affordable, and privacy-focused.
 
 ## Features
 
-- **Lightning Fast**: Powered by Claude 3.5 Haiku for instant grammar corrections
+- **Lightning Fast**: Powered by Claude Haiku 4.5 for instant grammar corrections
 - **Super Affordable**: Costs less than a penny per check (see cost estimate below)
 - **Customizable Tone**: Choose from multiple tone options (Professional, Casual, Friendly, Formal, Concise)
 - **Privacy-Focused**: Your API key is stored locally and never shared
@@ -101,7 +101,7 @@ grammarwise/
 
 ## Cost Estimate
 
-GrammarWise uses **Claude 3.5 Haiku**, which is optimized for speed and cost-efficiency:
+GrammarWise uses **Claude Haiku 4.5**, which is optimized for speed and cost-efficiency:
 
 - **Input**: ~$0.80 per million tokens
 - **Output**: ~$4.00 per million tokens
@@ -118,11 +118,11 @@ This makes GrammarWise extremely affordable for personal use compared to subscri
 To use a different Claude model, edit `background.js` and change the `model` parameter:
 
 ```javascript
-model: 'claude-3-5-haiku-20241022',  // Current default - fast and affordable
+model: 'claude-haiku-4-5',  // Current default - fast and affordable
 ```
 
 Available models:
-- `claude-3-5-haiku-20241022` (fastest, most affordable - recommended)
+- `claude-haiku-4-5` (fastest, most affordable - recommended)
 - `claude-3-5-sonnet-20241022` (balanced performance)
 - `claude-3-opus-20240229` (highest quality, most expensive)
 
