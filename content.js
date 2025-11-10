@@ -38,12 +38,17 @@ document.addEventListener('selectionchange', handleSelectionChange);
 
 function handleSelectionChange() {
   // Don't hide button immediately - give user time to interact with it
+  // Increase delay to 2 seconds to give more time to click
   setTimeout(() => {
     const selection = window.getSelection();
+    // Don't hide if mouse is over the button
     if (selection.toString().trim().length === 0 && floatingButton) {
-      hideFloatingButton();
+      // Check if mouse is hovering over button
+      if (!floatingButton.matches(':hover')) {
+        hideFloatingButton();
+      }
     }
-  }, 100);
+  }, 2000);
 }
 
 function handleTextSelection(event) {

@@ -25,10 +25,17 @@
 ## Other Apps with Similar Issues
 
 These apps also use custom text rendering and may have limited support:
+- **ChatGPT / Claude.ai / AI Chatbots** - Often use shadow DOM or complex frameworks
 - Google Sheets
 - Notion (uses custom blocks)
 - Figma (canvas-based)
 - Canva (canvas-based)
+
+**Note on AI Chat Apps**: ChatGPT, Claude.ai, and similar AI chatbots may not work reliably due to:
+- React/complex JS frameworks that intercept events
+- Shadow DOM isolation
+- Continuous re-rendering of the interface
+- **Workaround**: Copy text to a simple text editor, check grammar, then paste back
 
 **Solution**: For these apps, you can:
 1. Write/paste text in a simple text area first
