@@ -197,6 +197,25 @@ function showGrammarPanel(x, y) {
       <!-- Grammar Tab -->
       <div id="grammarwise-tab-grammar" class="grammarwise-tab-content active">
         <div class="grammarwise-controls">
+          <label for="grammarwise-language">Language:</label>
+          <select id="grammarwise-language" class="grammarwise-select">
+            <option value="auto">Auto-detect</option>
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="ru">Russian</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="zh">Chinese</option>
+            <option value="ar">Arabic</option>
+            <option value="hi">Hindi</option>
+            <option value="tr">Turkish</option>
+            <option value="nl">Dutch</option>
+            <option value="pl">Polish</option>
+          </select>
           <label for="grammarwise-tone">Tone:</label>
           <select id="grammarwise-tone" class="grammarwise-select">
             <option value="professional">Professional</option>
@@ -353,7 +372,10 @@ function showGrammarPanel(x, y) {
   console.log('GrammarWise: Panel added to DOM at viewport coords', panelX, panelY, 'with max-height', maxHeight);
 
   // Load default settings
-  chrome.storage.sync.get(['defaultTone', 'defaultFromLang', 'defaultToLang'], (result) => {
+  chrome.storage.sync.get(['defaultTone', 'defaultGrammarLang', 'defaultFromLang', 'defaultToLang'], (result) => {
+    if (result.defaultGrammarLang) {
+      document.getElementById('grammarwise-language').value = result.defaultGrammarLang;
+    }
     if (result.defaultTone) {
       document.getElementById('grammarwise-tone').value = result.defaultTone;
     }
@@ -434,6 +456,7 @@ function hideGrammarPanel() {
 
 async function checkGrammar() {
   console.log('GrammarWise: Checking grammar...');
+  const language = document.getElementById('grammarwise-language').value;
   const tone = document.getElementById('grammarwise-tone').value;
   const loadingDiv = document.getElementById('grammarwise-loading');
   const resultDiv = document.getElementById('grammarwise-result');
@@ -449,6 +472,7 @@ async function checkGrammar() {
     const response = await chrome.runtime.sendMessage({
       action: 'checkGrammar',
       text: selectedText,
+      language: language,
       tone: tone
     });
 

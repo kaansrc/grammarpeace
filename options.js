@@ -5,9 +5,12 @@ document.getElementById('settingsForm').addEventListener('submit', saveSettings)
 document.getElementById('testBtn').addEventListener('click', testAPI);
 
 function loadSettings() {
-  chrome.storage.sync.get(['apiKey', 'defaultTone', 'defaultFromLang', 'defaultToLang'], (result) => {
+  chrome.storage.sync.get(['apiKey', 'defaultGrammarLang', 'defaultTone', 'defaultFromLang', 'defaultToLang'], (result) => {
     if (result.apiKey) {
       document.getElementById('apiKey').value = result.apiKey;
+    }
+    if (result.defaultGrammarLang) {
+      document.getElementById('defaultGrammarLang').value = result.defaultGrammarLang;
     }
     if (result.defaultTone) {
       document.getElementById('defaultTone').value = result.defaultTone;
@@ -25,6 +28,7 @@ function saveSettings(event) {
   event.preventDefault();
 
   const apiKey = document.getElementById('apiKey').value.trim();
+  const defaultGrammarLang = document.getElementById('defaultGrammarLang').value;
   const defaultTone = document.getElementById('defaultTone').value;
   const defaultFromLang = document.getElementById('defaultFromLang').value;
   const defaultToLang = document.getElementById('defaultToLang').value;
@@ -42,6 +46,7 @@ function saveSettings(event) {
 
   chrome.storage.sync.set({
     apiKey: apiKey,
+    defaultGrammarLang: defaultGrammarLang,
     defaultTone: defaultTone,
     defaultFromLang: defaultFromLang,
     defaultToLang: defaultToLang

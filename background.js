@@ -21,7 +21,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'checkGrammar') {
-    checkGrammarWithClaude(request.text, request.tone)
+    checkGrammarWithClaude(request.text, request.language, request.tone)
       .then(result => sendResponse(result))
       .catch(error => sendResponse({ success: false, error: error.message }));
     return true; // Keep the message channel open for async response
@@ -35,7 +35,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-async function checkGrammarWithClaude(text, tone) {
+async function checkGrammarWithClaude(text, language, tone) {
   try {
     // Get API key from storage
     const result = await chrome.storage.sync.get(['apiKey']);
@@ -47,8 +47,8 @@ async function checkGrammarWithClaude(text, tone) {
       };
     }
 
-    // Prepare the prompt based on tone
-    const prompt = createPrompt(text, tone);
+    // Prepare the prompt based on language and tone
+    const prompt = createPrompt(text, language, tone);
 
     // Call Claude API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -94,7 +94,7 @@ async function checkGrammarWithClaude(text, tone) {
   }
 }
 
-function createPrompt(text, tone) {
+function createPrompt(text, language, tone) {
   const toneInstructions = {
     professional: 'Make it professional and business-appropriate.',
     casual: 'Make it casual and conversational.',
@@ -103,11 +103,38 @@ function createPrompt(text, tone) {
     concise: 'Make it concise and to the point.'
   };
 
+  const languageNames = {
+    auto: 'Auto-detect',
+    en: 'English',
+    es: 'Spanish',
+    fr: 'French',
+    de: 'German',
+    it: 'Italian',
+    pt: 'Portuguese',
+    ru: 'Russian',
+    ja: 'Japanese',
+    ko: 'Korean',
+    zh: 'Chinese',
+    ar: 'Arabic',
+    hi: 'Hindi',
+    tr: 'Turkish',
+    nl: 'Dutch',
+    pl: 'Polish'
+  };
+
   const toneInstruction = toneInstructions[tone] || toneInstructions.professional;
+  const languageName = languageNames[language] || 'Auto-detect';
 
-  return `Fix the grammar, spelling, and punctuation in the following text. ${toneInstruction}
+  let languageInstruction = '';
+  if (language === 'auto') {
+    languageInstruction = 'Detect the language of the text and fix the grammar, spelling, and punctuation in that language.';
+  } else {
+    languageInstruction = `Fix the grammar, spelling, and punctuation in ${languageName}.`;
+  }
 
-CRITICAL: Return ONLY the corrected text. Do NOT add any explanations, comments, notes, or phrases like "Here's the corrected version". Do NOT use markdown formatting. Just return the corrected text exactly as it should be written.
+  return `${languageInstruction} ${toneInstruction}
+
+CRITICAL: Return ONLY the corrected text in the same language as the input. Do NOT add any explanations, comments, notes, or phrases like "Here's the corrected version". Do NOT use markdown formatting. Just return the corrected text exactly as it should be written.
 
 IMPORTANT: Do NOT use em dashes (—). Use regular hyphens (-) or commas instead.
 
