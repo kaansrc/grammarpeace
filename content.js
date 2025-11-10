@@ -292,7 +292,14 @@ function showGrammarPanel(x, y) {
   });
 
   // Add event listeners
-  document.getElementById('grammarwise-close').addEventListener('click', hideGrammarPanel);
+  const closeBtn = document.getElementById('grammarwise-close');
+  closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log('GrammarWise: Close button clicked');
+    hideGrammarPanel();
+  });
+
   document.getElementById('grammarwise-check').addEventListener('click', checkGrammar);
 
   const copyBtn = document.getElementById('grammarwise-copy');
