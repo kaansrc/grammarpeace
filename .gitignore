@@ -23,6 +23,9 @@ yarn-error.log*
 
 # Dependencies
 node_modules/
+icons/node_modules/
+icons/package.json
+icons/package-lock.json
 
 # Build
 dist/
