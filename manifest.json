@@ -5,7 +5,8 @@
   "description": "AI-powered grammar checker using Claude API. Select text and get instant corrections with customizable tone.",
   "permissions": [
     "storage",
-    "activeTab"
+    "activeTab",
+    "contextMenus"
   ],
   "host_permissions": [
     "https://api.anthropic.com/*"

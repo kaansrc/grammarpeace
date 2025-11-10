@@ -1,5 +1,24 @@
 // Background service worker for GrammarWise
 
+// Create context menu on installation
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: 'grammarwise-check',
+    title: 'Check Grammar with GrammarWise',
+    contexts: ['selection']
+  });
+});
+
+// Handle context menu clicks
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === 'grammarwise-check' && info.selectionText) {
+    chrome.tabs.sendMessage(tab.id, {
+      action: 'openPanelWithText',
+      text: info.selectionText
+    });
+  }
+});
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'checkGrammar') {
     checkGrammarWithClaude(request.text, request.tone)

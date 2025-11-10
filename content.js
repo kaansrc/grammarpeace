@@ -4,6 +4,34 @@ let grammarPanel = null;
 let selectedText = '';
 let selectionRange = null;
 
+console.log('GrammarWise: Content script loaded successfully');
+
+// Listen for messages from background script (for context menu)
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  console.log('GrammarWise: Received message:', request);
+  if (request.action === 'openPanelWithText' && request.text) {
+    selectedText = request.text;
+    // Get the current selection position or use center of screen
+    const selection = window.getSelection();
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+
+    if (selection && selection.rangeCount > 0) {
+      try {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        x = rect.left + window.scrollX;
+        y = rect.bottom + window.scrollY;
+        selectionRange = range;
+      } catch (e) {
+        console.log('GrammarWise: Could not get selection rect, using center');
+      }
+    }
+
+    showGrammarPanel(x, y);
+  }
+});
+
 // Listen for text selection
 document.addEventListener('mouseup', handleTextSelection);
 document.addEventListener('selectionchange', handleSelectionChange);
@@ -16,13 +44,29 @@ function handleSelectionChange() {
 }
 
 function handleTextSelection(event) {
+  // Don't show button if clicking inside our own UI
+  if (event.target.closest('#grammarwise-floating-button') ||
+      event.target.closest('#grammarwise-panel')) {
+    return;
+  }
+
   const selection = window.getSelection();
   const text = selection.toString().trim();
 
   if (text.length > 0) {
+    console.log('GrammarWise: Text selected:', text.substring(0, 50) + '...');
     selectedText = text;
-    selectionRange = selection.getRangeAt(0);
-    showFloatingButton(event.pageX, event.pageY);
+    try {
+      selectionRange = selection.getRangeAt(0);
+      const rect = selectionRange.getBoundingClientRect();
+      // Use scrollX/scrollY for absolute positioning
+      const x = rect.left + window.scrollX;
+      const y = rect.bottom + window.scrollY;
+      console.log('GrammarWise: Showing button at', x, y);
+      showFloatingButton(x, y);
+    } catch (e) {
+      console.error('GrammarWise: Error getting selection range:', e);
+    }
   } else {
     hideFloatingButton();
   }
@@ -47,10 +91,14 @@ function showFloatingButton(x, y) {
 
   floatingButton.addEventListener('click', (e) => {
     e.stopPropagation();
-    showGrammarPanel(x, y);
+    e.preventDefault();
+    console.log('GrammarWise: Button clicked');
+    const rect = floatingButton.getBoundingClientRect();
+    showGrammarPanel(rect.left + window.scrollX, rect.top + window.scrollY);
   });
 
   document.body.appendChild(floatingButton);
+  console.log('GrammarWise: Floating button added to DOM');
 }
 
 function hideFloatingButton() {
@@ -61,6 +109,7 @@ function hideFloatingButton() {
 }
 
 function showGrammarPanel(x, y) {
+  console.log('GrammarWise: Showing panel at', x, y);
   hideGrammarPanel();
   hideFloatingButton();
 
@@ -103,11 +152,23 @@ function showGrammarPanel(x, y) {
     </div>
   `;
 
-  // Position panel
-  grammarPanel.style.left = `${Math.min(x, window.innerWidth - 400)}px`;
-  grammarPanel.style.top = `${Math.min(y + 40, window.innerHeight - 300)}px`;
+  // Position panel with better viewport handling
+  const panelWidth = 400;
+  const panelHeight = 300;
+
+  // Keep panel within viewport
+  let panelX = Math.min(x, window.innerWidth + window.scrollX - panelWidth - 20);
+  let panelY = Math.min(y + 40, window.innerHeight + window.scrollY - panelHeight - 20);
+
+  // Ensure panel is not off-screen on the left or top
+  panelX = Math.max(window.scrollX + 20, panelX);
+  panelY = Math.max(window.scrollY + 20, panelY);
+
+  grammarPanel.style.left = `${panelX}px`;
+  grammarPanel.style.top = `${panelY}px`;
 
   document.body.appendChild(grammarPanel);
+  console.log('GrammarWise: Panel added to DOM');
 
   // Load default tone from settings
   chrome.storage.sync.get(['defaultTone'], (result) => {
@@ -119,11 +180,17 @@ function showGrammarPanel(x, y) {
   // Add event listeners
   document.getElementById('grammarwise-close').addEventListener('click', hideGrammarPanel);
   document.getElementById('grammarwise-check').addEventListener('click', checkGrammar);
-  document.getElementById('grammarwise-copy').addEventListener('click', copyToClipboard);
-  document.getElementById('grammarwise-replace').addEventListener('click', replaceText);
 
-  // Click outside to close
-  document.addEventListener('click', handleOutsideClick);
+  const copyBtn = document.getElementById('grammarwise-copy');
+  const replaceBtn = document.getElementById('grammarwise-replace');
+
+  if (copyBtn) copyBtn.addEventListener('click', copyToClipboard);
+  if (replaceBtn) replaceBtn.addEventListener('click', replaceText);
+
+  // Click outside to close (with small delay to prevent immediate closing)
+  setTimeout(() => {
+    document.addEventListener('click', handleOutsideClick);
+  }, 100);
 }
 
 function handleOutsideClick(event) {
@@ -141,6 +208,7 @@ function hideGrammarPanel() {
 }
 
 async function checkGrammar() {
+  console.log('GrammarWise: Checking grammar...');
   const tone = document.getElementById('grammarwise-tone').value;
   const loadingDiv = document.getElementById('grammarwise-loading');
   const resultDiv = document.getElementById('grammarwise-result');
@@ -159,6 +227,7 @@ async function checkGrammar() {
       tone: tone
     });
 
+    console.log('GrammarWise: Received response:', response);
     loadingDiv.style.display = 'none';
 
     if (response.success) {
@@ -168,6 +237,7 @@ async function checkGrammar() {
       showError(response.error || 'Failed to check grammar');
     }
   } catch (error) {
+    console.error('GrammarWise: Error during grammar check:', error);
     loadingDiv.style.display = 'none';
     showError(error.message || 'An error occurred');
   }
@@ -188,6 +258,9 @@ function copyToClipboard() {
     setTimeout(() => {
       btn.textContent = originalText;
     }, 2000);
+  }).catch(err => {
+    console.error('GrammarWise: Failed to copy text:', err);
+    showError('Failed to copy to clipboard');
   });
 }
 
