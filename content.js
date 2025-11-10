@@ -3,6 +3,7 @@ let floatingButton = null;
 let grammarPanel = null;
 let selectedText = '';
 let selectionRange = null;
+let originalElement = null; // Store the element that had the selection
 
 console.log('GrammarWise: Content script loaded successfully');
 
@@ -64,6 +65,10 @@ function handleTextSelection(event) {
   if (text.length > 0) {
     console.log('GrammarWise: Text selected:', text.substring(0, 50) + '...');
     selectedText = text;
+
+    // Store the active element for later replacement
+    originalElement = document.activeElement;
+
     try {
       selectionRange = selection.getRangeAt(0);
       const rect = selectionRange.getBoundingClientRect();
@@ -362,36 +367,141 @@ function copyToClipboard() {
 
 function replaceText() {
   const correctedText = document.getElementById('grammarwise-corrected-text').textContent;
+  console.log('GrammarWise: Attempting to replace text');
+  console.log('GrammarWise: Original element:', originalElement);
 
-  if (selectionRange) {
-    // Try to replace the text in the original location
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(selectionRange);
+  // Try multiple strategies to replace text
+  let replaced = false;
 
-    // Check if we're in an editable element
+  // Strategy 1: Use stored originalElement if it's editable
+  if (originalElement && document.body.contains(originalElement)) {
+    console.log('GrammarWise: Trying strategy 1 - stored element');
+
+    // Focus the element first
+    try {
+      originalElement.focus();
+    } catch (e) {
+      console.log('GrammarWise: Could not focus original element');
+    }
+
+    // Check if it's a textarea or input
+    if (originalElement.tagName === 'TEXTAREA' || originalElement.tagName === 'INPUT') {
+      try {
+        const start = originalElement.selectionStart;
+        const end = originalElement.selectionEnd;
+        const text = originalElement.value;
+
+        // Replace the text
+        originalElement.value = text.substring(0, start) + correctedText + text.substring(end);
+        originalElement.selectionStart = originalElement.selectionEnd = start + correctedText.length;
+
+        // Trigger input event for frameworks like React
+        originalElement.dispatchEvent(new Event('input', { bubbles: true }));
+        originalElement.dispatchEvent(new Event('change', { bubbles: true }));
+
+        console.log('GrammarWise: Successfully replaced in textarea/input');
+        replaced = true;
+        hideGrammarPanel();
+        return;
+      } catch (e) {
+        console.error('GrammarWise: Error replacing in textarea/input:', e);
+      }
+    }
+
+    // Check if it's contentEditable
+    if (originalElement.isContentEditable) {
+      try {
+        // Try to restore selection
+        if (selectionRange) {
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(selectionRange);
+        }
+
+        // Use execCommand to insert text
+        const success = document.execCommand('insertText', false, correctedText);
+        if (success) {
+          console.log('GrammarWise: Successfully replaced in contentEditable');
+          replaced = true;
+          hideGrammarPanel();
+          return;
+        }
+      } catch (e) {
+        console.error('GrammarWise: Error with execCommand:', e);
+      }
+    }
+  }
+
+  // Strategy 2: Try current activeElement
+  if (!replaced) {
+    console.log('GrammarWise: Trying strategy 2 - current activeElement');
     const activeElement = document.activeElement;
-    if (activeElement && (activeElement.isContentEditable ||
-        activeElement.tagName === 'TEXTAREA' ||
-        activeElement.tagName === 'INPUT')) {
 
-      if (activeElement.isContentEditable) {
-        document.execCommand('insertText', false, correctedText);
-      } else {
-        // For textarea and input
-        const start = activeElement.selectionStart;
-        const end = activeElement.selectionEnd;
+    if (activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
+      try {
+        const start = activeElement.selectionStart || 0;
+        const end = activeElement.selectionEnd || 0;
         const text = activeElement.value;
+
         activeElement.value = text.substring(0, start) + correctedText + text.substring(end);
         activeElement.selectionStart = activeElement.selectionEnd = start + correctedText.length;
-      }
 
-      hideGrammarPanel();
-    } else {
-      // If not in editable element, just copy to clipboard
-      copyToClipboard();
-      showError('Text copied to clipboard. Paste it manually in the desired location.');
+        activeElement.dispatchEvent(new Event('input', { bubbles: true }));
+        activeElement.dispatchEvent(new Event('change', { bubbles: true }));
+
+        console.log('GrammarWise: Successfully replaced in current activeElement');
+        replaced = true;
+        hideGrammarPanel();
+        return;
+      } catch (e) {
+        console.error('GrammarWise: Error with activeElement:', e);
+      }
     }
+
+    if (activeElement && activeElement.isContentEditable) {
+      try {
+        if (selectionRange) {
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(selectionRange);
+        }
+        document.execCommand('insertText', false, correctedText);
+        console.log('GrammarWise: Successfully replaced in current contentEditable');
+        replaced = true;
+        hideGrammarPanel();
+        return;
+      } catch (e) {
+        console.error('GrammarWise: Error with current contentEditable:', e);
+      }
+    }
+  }
+
+  // Strategy 3: Try using selection range directly
+  if (!replaced && selectionRange) {
+    console.log('GrammarWise: Trying strategy 3 - selection range');
+    try {
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(selectionRange);
+
+      // Try execCommand one more time
+      const success = document.execCommand('insertText', false, correctedText);
+      if (success) {
+        console.log('GrammarWise: Successfully replaced using selection range');
+        replaced = true;
+        hideGrammarPanel();
+        return;
+      }
+    } catch (e) {
+      console.error('GrammarWise: Error with selection range:', e);
+    }
+  }
+
+  // If all strategies failed, fallback to clipboard
+  if (!replaced) {
+    console.log('GrammarWise: All replace strategies failed, copying to clipboard');
+    copyToClipboard();
+    showError('Text copied to clipboard. Paste it manually in the desired location.');
   }
 }
 
