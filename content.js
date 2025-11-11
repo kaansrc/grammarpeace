@@ -340,32 +340,37 @@ function showGrammarPanel(x, y) {
   console.log('GrammarWise: Panel added to DOM at top center', panelX, panelY, 'with max-height', maxHeight);
 
   // Load default settings with error handling
-  chrome.storage.sync.get(['defaultTone', 'defaultGrammarLang', 'defaultFromLang', 'defaultToLang'], (result) => {
-    // Check for chrome.runtime errors
-    if (chrome.runtime.lastError) {
-      console.warn('GrammarWise: Could not load settings:', chrome.runtime.lastError.message);
-      return;
-    }
+  // Check if extension context is valid before accessing storage
+  if (chrome.runtime?.id) {
+    chrome.storage.sync.get(['defaultTone', 'defaultGrammarLang', 'defaultFromLang', 'defaultToLang'], (result) => {
+      // Check for chrome.runtime errors
+      if (chrome.runtime.lastError) {
+        console.warn('GrammarWise: Could not load settings:', chrome.runtime.lastError.message);
+        return;
+      }
 
-    // Safely set values only if elements exist
-    const languageSelect = document.getElementById('grammarwise-language');
-    const toneSelect = document.getElementById('grammarwise-tone');
-    const fromLangSelect = document.getElementById('grammarwise-from-lang');
-    const toLangSelect = document.getElementById('grammarwise-to-lang');
+      // Safely set values only if elements exist
+      const languageSelect = document.getElementById('grammarwise-language');
+      const toneSelect = document.getElementById('grammarwise-tone');
+      const fromLangSelect = document.getElementById('grammarwise-from-lang');
+      const toLangSelect = document.getElementById('grammarwise-to-lang');
 
-    if (result.defaultGrammarLang && languageSelect) {
-      languageSelect.value = result.defaultGrammarLang;
-    }
-    if (result.defaultTone && toneSelect) {
-      toneSelect.value = result.defaultTone;
-    }
-    if (result.defaultFromLang && fromLangSelect) {
-      fromLangSelect.value = result.defaultFromLang;
-    }
-    if (result.defaultToLang && toLangSelect) {
-      toLangSelect.value = result.defaultToLang;
-    }
-  });
+      if (result.defaultGrammarLang && languageSelect) {
+        languageSelect.value = result.defaultGrammarLang;
+      }
+      if (result.defaultTone && toneSelect) {
+        toneSelect.value = result.defaultTone;
+      }
+      if (result.defaultFromLang && fromLangSelect) {
+        fromLangSelect.value = result.defaultFromLang;
+      }
+      if (result.defaultToLang && toLangSelect) {
+        toLangSelect.value = result.defaultToLang;
+      }
+    });
+  } else {
+    console.warn('GrammarWise: Extension context invalidated, using default settings');
+  }
 
   // Add tab switching
   const tabs = grammarPanel.querySelectorAll('.grammarwise-tab');
