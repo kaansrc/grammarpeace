@@ -11,7 +11,19 @@ const isGoogleDocs = window.location.hostname === 'docs.google.com' && window.lo
 
 console.log('GrammarWise: Content script loaded successfully');
 if (isGoogleDocs) {
-  console.log('GrammarWise: Google Docs detected - using special handling');
+  console.log('GrammarWise: Google Docs detected - Right-click menu is the recommended way to use this extension on Google Docs');
+
+  // Show a one-time notification to the user about using right-click
+  if (window === window.top) {
+    setTimeout(() => {
+      chrome.storage.sync.get(['googleDocsNotificationShown'], (result) => {
+        if (!result.googleDocsNotificationShown) {
+          console.log('%cGrammarWise: To use on Google Docs, select text and RIGHT-CLICK, then choose "Check Grammar with GrammarWise"', 'background: #6366f1; color: white; padding: 8px; font-size: 14px; border-radius: 4px;');
+          chrome.storage.sync.set({ googleDocsNotificationShown: true });
+        }
+      });
+    }, 2000);
+  }
 }
 
 // Listen for messages from background script (for context menu)
@@ -19,25 +31,41 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('GrammarWise: Received message:', request);
   if (request.action === 'openPanelWithText' && request.text) {
     selectedText = request.text;
-    // Get the current selection position or use center of screen
+    console.log('GrammarWise: Opening panel with text:', selectedText.substring(0, 50));
+
+    // For Google Docs, use a fixed top-center position since selection API doesn't work
+    if (isGoogleDocs) {
+      console.log('GrammarWise: Using Google Docs positioning');
+      // Position at top center (same as regular panel positioning)
+      showGrammarPanel(0, 0); // Panel has its own positioning logic
+      sendResponse({ success: true });
+      return true;
+    }
+
+    // For other sites, try to get the current selection position
     const selection = window.getSelection();
     let x = window.innerWidth / 2;
-    let y = window.innerHeight / 2;
+    let y = 100;
 
     if (selection && selection.rangeCount > 0) {
       try {
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
-        x = rect.left + window.scrollX;
-        y = rect.bottom + window.scrollY;
-        selectionRange = range;
+        if (rect.width > 0 || rect.height > 0) {
+          x = rect.left;
+          y = rect.bottom;
+          selectionRange = range;
+          originalElement = document.activeElement;
+        }
       } catch (e) {
-        console.log('GrammarWise: Could not get selection rect, using center');
+        console.log('GrammarWise: Could not get selection rect, using default position');
       }
     }
 
     showGrammarPanel(x, y);
+    sendResponse({ success: true });
   }
+  return true;
 });
 
 // Listen for text selection

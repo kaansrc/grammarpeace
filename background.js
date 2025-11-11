@@ -5,16 +5,24 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'grammarwise-check',
     title: 'Check Grammar with GrammarWise',
-    contexts: ['selection']
+    contexts: ['selection'],
+    documentUrlPatterns: ['<all_urls>']
   });
+  console.log('GrammarWise: Context menu created');
 });
 
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
+  console.log('GrammarWise: Context menu clicked', info);
   if (info.menuItemId === 'grammarwise-check' && info.selectionText) {
+    console.log('GrammarWise: Sending message to tab', tab.id, 'with text:', info.selectionText.substring(0, 50));
     chrome.tabs.sendMessage(tab.id, {
       action: 'openPanelWithText',
       text: info.selectionText
+    }).then(() => {
+      console.log('GrammarWise: Message sent successfully');
+    }).catch(err => {
+      console.error('GrammarWise: Error sending message:', err);
     });
   }
 });
