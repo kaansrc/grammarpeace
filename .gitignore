@@ -43,3 +43,5 @@ build/
 # Chrome extension
 *.crx
 *.pem
+*.zip
+grammarwise-package/
