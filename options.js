@@ -172,7 +172,7 @@ async function testOpenAIAPI(apiKey) {
     },
     body: JSON.stringify({
       model: 'gpt-5-nano-2025-08-07',
-      max_tokens: 50,
+      max_completion_tokens: 50,
       messages: [{
         role: 'user',
         content: 'Say "API test successful" if you can read this.'
