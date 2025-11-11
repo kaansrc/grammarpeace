@@ -4,6 +4,7 @@ let grammarPanel = null;
 let selectedText = '';
 let selectionRange = null;
 let originalElement = null; // Store the element that had the selection
+let isProcessing = false; // Prevent multiple simultaneous operations
 
 console.log('GrammarWise: Content script loaded successfully');
 
@@ -338,21 +339,37 @@ function showGrammarPanel(x, y) {
   document.body.appendChild(grammarPanel);
   console.log('GrammarWise: Panel added to DOM at top center', panelX, panelY, 'with max-height', maxHeight);
 
-  // Load default settings
-  chrome.storage.sync.get(['defaultTone', 'defaultGrammarLang', 'defaultFromLang', 'defaultToLang'], (result) => {
-    if (result.defaultGrammarLang) {
-      document.getElementById('grammarwise-language').value = result.defaultGrammarLang;
-    }
-    if (result.defaultTone) {
-      document.getElementById('grammarwise-tone').value = result.defaultTone;
-    }
-    if (result.defaultFromLang) {
-      document.getElementById('grammarwise-from-lang').value = result.defaultFromLang;
-    }
-    if (result.defaultToLang) {
-      document.getElementById('grammarwise-to-lang').value = result.defaultToLang;
-    }
-  });
+  // Load default settings with error handling
+  try {
+    chrome.storage.sync.get(['defaultTone', 'defaultGrammarLang', 'defaultFromLang', 'defaultToLang'], (result) => {
+      // Check for chrome.runtime errors
+      if (chrome.runtime.lastError) {
+        console.warn('GrammarWise: Could not load settings:', chrome.runtime.lastError.message);
+        return;
+      }
+
+      // Safely set values only if elements exist
+      const languageSelect = document.getElementById('grammarwise-language');
+      const toneSelect = document.getElementById('grammarwise-tone');
+      const fromLangSelect = document.getElementById('grammarwise-from-lang');
+      const toLangSelect = document.getElementById('grammarwise-to-lang');
+
+      if (result.defaultGrammarLang && languageSelect) {
+        languageSelect.value = result.defaultGrammarLang;
+      }
+      if (result.defaultTone && toneSelect) {
+        toneSelect.value = result.defaultTone;
+      }
+      if (result.defaultFromLang && fromLangSelect) {
+        fromLangSelect.value = result.defaultFromLang;
+      }
+      if (result.defaultToLang && toLangSelect) {
+        toLangSelect.value = result.defaultToLang;
+      }
+    });
+  } catch (error) {
+    console.warn('GrammarWise: Error loading settings:', error);
+  }
 
   // Add tab switching
   const tabs = grammarPanel.querySelectorAll('.grammarwise-tab');
@@ -418,11 +435,20 @@ function hideGrammarPanel() {
     document.removeEventListener('click', handleOutsideClick);
     grammarPanel.remove();
     grammarPanel = null;
+    isProcessing = false; // Reset processing flag when panel is closed
   }
 }
 
 async function checkGrammar() {
+  // Prevent multiple simultaneous operations
+  if (isProcessing) {
+    console.log('GrammarWise: Already processing, ignoring request');
+    return;
+  }
+
   console.log('GrammarWise: Checking grammar...');
+  isProcessing = true;
+
   const language = document.getElementById('grammarwise-language').value;
   const tone = document.getElementById('grammarwise-tone').value;
   const loadingDiv = document.getElementById('grammarwise-loading');
@@ -456,6 +482,8 @@ async function checkGrammar() {
     console.error('GrammarWise: Error during grammar check:', error);
     loadingDiv.style.display = 'none';
     showError(error.message || 'An error occurred');
+  } finally {
+    isProcessing = false;
   }
 }
 
@@ -621,7 +649,15 @@ function replaceText() {
 }
 
 async function translateText() {
+  // Prevent multiple simultaneous operations
+  if (isProcessing) {
+    console.log('GrammarWise: Already processing, ignoring request');
+    return;
+  }
+
   console.log('GrammarWise: Translating text...');
+  isProcessing = true;
+
   const fromLang = document.getElementById('grammarwise-from-lang').value;
   const toLang = document.getElementById('grammarwise-to-lang').value;
   const loadingDiv = document.getElementById('grammarwise-translate-loading');
@@ -655,6 +691,8 @@ async function translateText() {
     console.error('GrammarWise: Error during translation:', error);
     loadingDiv.style.display = 'none';
     showTranslateError(error.message || 'An error occurred');
+  } finally {
+    isProcessing = false;
   }
 }
 
