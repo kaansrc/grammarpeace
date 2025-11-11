@@ -38,10 +38,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 async function checkGrammar(text, language, tone) {
   try {
     // Get API settings from storage
-    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey']);
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens']);
 
     const provider = result.apiProvider || 'claude';
     const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+    const maxTokens = result.maxTokens || 1024;
 
     if (!apiKey) {
       return {
@@ -56,9 +57,9 @@ async function checkGrammar(text, language, tone) {
     // Call appropriate API
     let correctedText;
     if (provider === 'claude') {
-      correctedText = await callClaudeAPI(apiKey, prompt);
+      correctedText = await callClaudeAPI(apiKey, prompt, maxTokens);
     } else {
-      correctedText = await callOpenAIAPI(apiKey, prompt);
+      correctedText = await callOpenAIAPI(apiKey, prompt, maxTokens);
     }
 
     return {
@@ -78,10 +79,11 @@ async function checkGrammar(text, language, tone) {
 async function translateText(text, fromLang, toLang) {
   try {
     // Get API settings from storage
-    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey']);
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens']);
 
     const provider = result.apiProvider || 'claude';
     const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+    const maxTokens = result.maxTokens || 1024;
 
     if (!apiKey) {
       return {
@@ -96,9 +98,9 @@ async function translateText(text, fromLang, toLang) {
     // Call appropriate API
     let translatedText;
     if (provider === 'claude') {
-      translatedText = await callClaudeAPI(apiKey, prompt);
+      translatedText = await callClaudeAPI(apiKey, prompt, maxTokens);
     } else {
-      translatedText = await callOpenAIAPI(apiKey, prompt);
+      translatedText = await callOpenAIAPI(apiKey, prompt, maxTokens);
     }
 
     return {
@@ -115,7 +117,7 @@ async function translateText(text, fromLang, toLang) {
   }
 }
 
-async function callClaudeAPI(apiKey, prompt) {
+async function callClaudeAPI(apiKey, prompt, maxTokens) {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -126,7 +128,7 @@ async function callClaudeAPI(apiKey, prompt) {
     },
     body: JSON.stringify({
       model: 'claude-haiku-4-5',
-      max_tokens: 1024,
+      max_tokens: maxTokens,
       messages: [{
         role: 'user',
         content: prompt
@@ -148,7 +150,7 @@ async function callClaudeAPI(apiKey, prompt) {
   return data.content[0].text.trim();
 }
 
-async function callOpenAIAPI(apiKey, prompt) {
+async function callOpenAIAPI(apiKey, prompt, maxTokens) {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -157,7 +159,7 @@ async function callOpenAIAPI(apiKey, prompt) {
     },
     body: JSON.stringify({
       model: 'gpt-5-nano-2025-08-07',
-      max_completion_tokens: 1024,
+      max_completion_tokens: maxTokens,
       messages: [{
         role: 'user',
         content: prompt

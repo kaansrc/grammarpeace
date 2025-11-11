@@ -300,11 +300,43 @@
 
         <div class="section">
           <div class="section-title">
+            <span>⚡</span>
+            <span>Response Length</span>
+          </div>
+          <div class="section-description">
+            Control how much text the AI can generate in response. Higher values allow longer corrections/translations but cost more and take longer.
+          </div>
+
+          <div class="form-group">
+            <label for="maxTokens">Max Completion Tokens</label>
+            <input type="number" id="maxTokens" min="512" max="16384" step="512" value="1024">
+            <div class="help-text">
+              Default: 1024 tokens (~750 words). Range: 512-16384 tokens.
+            </div>
+          </div>
+
+          <div class="info-box">
+            <h4>What are tokens?</h4>
+            <p>Tokens are pieces of words that AI models use to process text. Think of them as building blocks:</p>
+            <ul>
+              <li><strong>1024 tokens</strong> ≈ 750-800 words (emails, posts, paragraphs)</li>
+              <li><strong>2048 tokens</strong> ≈ 1,500-1,600 words (articles, long documents)</li>
+              <li><strong>4096 tokens</strong> ≈ 3,000-3,200 words (very long content)</li>
+              <li><strong>8192 tokens</strong> ≈ 6,000-6,400 words (full documents)</li>
+            </ul>
+            <p style="margin-top: 8px;"><strong>Note:</strong> Higher values = more API costs. Increase only if you regularly work with longer text.</p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+          <div class="section-title">
             <span>⚙️</span>
             <span>Default Preferences</span>
           </div>
           <div class="section-description">
-            Set your default tone preference. You can change this for each check.
+            Set your default tone and language preferences. You can change these for each check.
           </div>
 
           <div class="form-group">

@@ -8,7 +8,7 @@ document.getElementById('settingsForm').addEventListener('submit', saveSettings)
 document.getElementById('testBtn').addEventListener('click', testAPI);
 
 function loadSettings() {
-  chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'defaultGrammarLang', 'defaultTone', 'defaultFromLang', 'defaultToLang'], (result) => {
+  chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens', 'defaultGrammarLang', 'defaultTone', 'defaultFromLang', 'defaultToLang'], (result) => {
     // Set provider (default to claude if not set)
     const provider = result.apiProvider || 'claude';
     document.getElementById('apiProvider').value = provider;
@@ -20,6 +20,10 @@ function loadSettings() {
     if (result.openaiApiKey) {
       document.getElementById('openaiApiKey').value = result.openaiApiKey;
     }
+
+    // Load max tokens (default to 1024)
+    const maxTokens = result.maxTokens || 1024;
+    document.getElementById('maxTokens').value = maxTokens;
 
     // Load preferences
     if (result.defaultGrammarLang) {
@@ -68,6 +72,7 @@ function saveSettings(event) {
   const provider = document.getElementById('apiProvider').value;
   const claudeApiKey = document.getElementById('claudeApiKey').value.trim();
   const openaiApiKey = document.getElementById('openaiApiKey').value.trim();
+  const maxTokens = parseInt(document.getElementById('maxTokens').value);
   const defaultGrammarLang = document.getElementById('defaultGrammarLang').value;
   const defaultTone = document.getElementById('defaultTone').value;
   const defaultFromLang = document.getElementById('defaultFromLang').value;
@@ -94,10 +99,17 @@ function saveSettings(event) {
     }
   }
 
+  // Validate max tokens
+  if (isNaN(maxTokens) || maxTokens < 512 || maxTokens > 16384) {
+    showStatus('Max tokens must be between 512 and 16384', 'error');
+    return;
+  }
+
   chrome.storage.sync.set({
     apiProvider: provider,
     claudeApiKey: claudeApiKey,
     openaiApiKey: openaiApiKey,
+    maxTokens: maxTokens,
     defaultGrammarLang: defaultGrammarLang,
     defaultTone: defaultTone,
     defaultFromLang: defaultFromLang,
