@@ -176,12 +176,26 @@ async function callOpenAIAPI(apiKey, prompt, maxTokens) {
   const data = await response.json();
   console.log('OpenAI API response:', data);
 
-  if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+  if (!data.choices || !data.choices[0] || !data.choices[0].message) {
     console.error('Invalid OpenAI response structure:', JSON.stringify(data));
     throw new Error(`Invalid response from OpenAI API. Response: ${JSON.stringify(data).substring(0, 200)}`);
   }
 
-  return data.choices[0].message.content.trim();
+  const message = data.choices[0].message;
+
+  // Check if the model refused to respond
+  if (message.refusal) {
+    console.error('OpenAI refused to respond:', message.refusal);
+    throw new Error(`OpenAI refused to respond: ${message.refusal}`);
+  }
+
+  // Check if content is empty
+  if (!message.content || message.content.trim() === '') {
+    console.error('OpenAI returned empty content:', JSON.stringify(data));
+    throw new Error('OpenAI returned an empty response. Please try again.');
+  }
+
+  return message.content.trim();
 }
 
 function createGrammarPrompt(text, language, tone) {
