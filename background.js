@@ -169,13 +169,16 @@ async function callOpenAIAPI(apiKey, prompt, maxTokens) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    console.error('OpenAI API error response:', errorData);
     throw new Error(errorData.error?.message || `OpenAI API request failed: ${response.status}`);
   }
 
   const data = await response.json();
+  console.log('OpenAI API response:', data);
 
   if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
-    throw new Error('Invalid response from OpenAI API');
+    console.error('Invalid OpenAI response structure:', JSON.stringify(data));
+    throw new Error(`Invalid response from OpenAI API. Response: ${JSON.stringify(data).substring(0, 200)}`);
   }
 
   return data.choices[0].message.content.trim();
