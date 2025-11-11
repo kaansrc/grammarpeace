@@ -183,8 +183,8 @@ async function testOpenAIAPI(apiKey) {
       'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: 'gpt-5-nano-2025-08-07',
-      max_completion_tokens: 50,
+      model: 'gpt-4.1-nano-2025-04-14',
+      max_tokens: 50,
       messages: [{
         role: 'user',
         content: 'Say "API test successful" if you can read this.'
