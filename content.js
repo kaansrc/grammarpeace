@@ -340,36 +340,32 @@ function showGrammarPanel(x, y) {
   console.log('GrammarWise: Panel added to DOM at top center', panelX, panelY, 'with max-height', maxHeight);
 
   // Load default settings with error handling
-  try {
-    chrome.storage.sync.get(['defaultTone', 'defaultGrammarLang', 'defaultFromLang', 'defaultToLang'], (result) => {
-      // Check for chrome.runtime errors
-      if (chrome.runtime.lastError) {
-        console.warn('GrammarWise: Could not load settings:', chrome.runtime.lastError.message);
-        return;
-      }
+  chrome.storage.sync.get(['defaultTone', 'defaultGrammarLang', 'defaultFromLang', 'defaultToLang'], (result) => {
+    // Check for chrome.runtime errors
+    if (chrome.runtime.lastError) {
+      console.warn('GrammarWise: Could not load settings:', chrome.runtime.lastError.message);
+      return;
+    }
 
-      // Safely set values only if elements exist
-      const languageSelect = document.getElementById('grammarwise-language');
-      const toneSelect = document.getElementById('grammarwise-tone');
-      const fromLangSelect = document.getElementById('grammarwise-from-lang');
-      const toLangSelect = document.getElementById('grammarwise-to-lang');
+    // Safely set values only if elements exist
+    const languageSelect = document.getElementById('grammarwise-language');
+    const toneSelect = document.getElementById('grammarwise-tone');
+    const fromLangSelect = document.getElementById('grammarwise-from-lang');
+    const toLangSelect = document.getElementById('grammarwise-to-lang');
 
-      if (result.defaultGrammarLang && languageSelect) {
-        languageSelect.value = result.defaultGrammarLang;
-      }
-      if (result.defaultTone && toneSelect) {
-        toneSelect.value = result.defaultTone;
-      }
-      if (result.defaultFromLang && fromLangSelect) {
-        fromLangSelect.value = result.defaultFromLang;
-      }
-      if (result.defaultToLang && toLangSelect) {
-        toLangSelect.value = result.defaultToLang;
-      }
-    });
-  } catch (error) {
-    console.warn('GrammarWise: Error loading settings:', error);
-  }
+    if (result.defaultGrammarLang && languageSelect) {
+      languageSelect.value = result.defaultGrammarLang;
+    }
+    if (result.defaultTone && toneSelect) {
+      toneSelect.value = result.defaultTone;
+    }
+    if (result.defaultFromLang && fromLangSelect) {
+      fromLangSelect.value = result.defaultFromLang;
+    }
+    if (result.defaultToLang && toLangSelect) {
+      toLangSelect.value = result.defaultToLang;
+    }
+  });
 
   // Add tab switching
   const tabs = grammarPanel.querySelectorAll('.grammarwise-tab');
@@ -461,6 +457,11 @@ async function checkGrammar() {
   errorDiv.style.display = 'none';
 
   try {
+    // Check if extension context is valid
+    if (!chrome.runtime?.id) {
+      throw new Error('Extension context invalidated. Please refresh the page.');
+    }
+
     // Send message to background script
     const response = await chrome.runtime.sendMessage({
       action: 'checkGrammar',
@@ -469,19 +470,30 @@ async function checkGrammar() {
       tone: tone
     });
 
+    // Check for runtime errors after sendMessage
+    if (chrome.runtime.lastError) {
+      throw new Error(chrome.runtime.lastError.message);
+    }
+
     console.log('GrammarWise: Received response:', response);
     loadingDiv.style.display = 'none';
 
-    if (response.success) {
+    if (response && response.success) {
       document.getElementById('grammarwise-corrected-text').textContent = response.correctedText;
       resultDiv.style.display = 'block';
     } else {
-      showError(response.error || 'Failed to check grammar');
+      showError(response?.error || 'Failed to check grammar');
     }
   } catch (error) {
     console.error('GrammarWise: Error during grammar check:', error);
     loadingDiv.style.display = 'none';
-    showError(error.message || 'An error occurred');
+
+    // Handle specific error cases
+    if (error.message.includes('Extension context invalidated')) {
+      showError('Extension was reloaded. Please refresh this page and try again.');
+    } else {
+      showError(error.message || 'An error occurred');
+    }
   } finally {
     isProcessing = false;
   }
@@ -670,6 +682,11 @@ async function translateText() {
   errorDiv.style.display = 'none';
 
   try {
+    // Check if extension context is valid
+    if (!chrome.runtime?.id) {
+      throw new Error('Extension context invalidated. Please refresh the page.');
+    }
+
     // Send message to background script
     const response = await chrome.runtime.sendMessage({
       action: 'translateText',
@@ -678,19 +695,30 @@ async function translateText() {
       toLang: toLang
     });
 
+    // Check for runtime errors after sendMessage
+    if (chrome.runtime.lastError) {
+      throw new Error(chrome.runtime.lastError.message);
+    }
+
     console.log('GrammarWise: Received translation response:', response);
     loadingDiv.style.display = 'none';
 
-    if (response.success) {
+    if (response && response.success) {
       document.getElementById('grammarwise-translated-text').textContent = response.translatedText;
       resultDiv.style.display = 'block';
     } else {
-      showTranslateError(response.error || 'Failed to translate');
+      showTranslateError(response?.error || 'Failed to translate');
     }
   } catch (error) {
     console.error('GrammarWise: Error during translation:', error);
     loadingDiv.style.display = 'none';
-    showTranslateError(error.message || 'An error occurred');
+
+    // Handle specific error cases
+    if (error.message.includes('Extension context invalidated')) {
+      showTranslateError('Extension was reloaded. Please refresh this page and try again.');
+    } else {
+      showTranslateError(error.message || 'An error occurred');
+    }
   } finally {
     isProcessing = false;
   }
