@@ -199,8 +199,8 @@ function showFloatingButton(x, y) {
     left: ${x + 10}px !important;
     top: ${y + 10}px !important;
     z-index: 2147483647 !important;
-    background: #6366f1 !important;
-    color: white !important;
+    background: white !important;
+    color: black !important;
     border-radius: 50% !important;
     width: 28px !important;
     height: 28px !important;
@@ -208,8 +208,8 @@ function showFloatingButton(x, y) {
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
-    border: none !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    border: 2px solid black !important;
     pointer-events: auto !important;
     opacity: 1 !important;
     visibility: visible !important;
