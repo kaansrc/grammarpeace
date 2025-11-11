@@ -220,7 +220,7 @@ function showFloatingButton(x, y) {
     line-height: 1 !important;
   `;
 
-  floatingButton.innerHTML = `🪄`;
+  floatingButton.innerHTML = `✌️`;
 
   floatingButton.addEventListener('click', (e) => {
     e.stopPropagation();
