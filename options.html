@@ -246,25 +246,53 @@
             <span>API Configuration</span>
           </div>
           <div class="section-description">
-            Enter your Claude API key to enable grammar checking. Your key is stored locally and never shared.
+            Choose your AI provider and enter your API key. Your key is stored locally and never shared.
           </div>
 
           <div class="form-group">
-            <label for="apiKey">Claude API Key *</label>
-            <input type="password" id="apiKey" placeholder="sk-ant-..." required>
+            <label for="apiProvider">AI Provider *</label>
+            <select id="apiProvider" required>
+              <option value="claude">Anthropic Claude</option>
+              <option value="openai">OpenAI</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="claudeKeyGroup">
+            <label for="claudeApiKey">Claude API Key *</label>
+            <input type="password" id="claudeApiKey" placeholder="sk-ant-...">
             <div class="help-text">
               Get your API key from <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a>
             </div>
           </div>
 
-          <div class="info-box">
-            <h4>How to get your API key:</h4>
+          <div class="form-group" id="openaiKeyGroup" style="display: none;">
+            <label for="openaiApiKey">OpenAI API Key *</label>
+            <input type="password" id="openaiApiKey" placeholder="sk-proj-...">
+            <div class="help-text">
+              Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
+            </div>
+          </div>
+
+          <div class="info-box" id="claudeInfo">
+            <h4>How to get Claude API key:</h4>
             <ul>
               <li>Visit <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a></li>
               <li>Sign in or create an account</li>
               <li>Navigate to API Keys section</li>
               <li>Create a new API key and copy it here</li>
             </ul>
+            <p style="margin-top: 8px;"><strong>Model used:</strong> Claude Haiku 4.5 (fast and cost-effective)</p>
+          </div>
+
+          <div class="info-box" id="openaiInfo" style="display: none;">
+            <h4>How to get OpenAI API key:</h4>
+            <ul>
+              <li>Visit <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></li>
+              <li>Sign in or create an account</li>
+              <li>Navigate to API Keys section</li>
+              <li>Create a new API key and copy it here</li>
+            </ul>
+            <p style="margin-top: 8px;"><strong>Model used:</strong> GPT-4o Mini (fast and cost-effective)</p>
           </div>
         </div>
 
