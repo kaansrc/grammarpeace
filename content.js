@@ -202,29 +202,25 @@ function showFloatingButton(x, y) {
     background: #6366f1 !important;
     color: white !important;
     border-radius: 50% !important;
-    width: 50px !important;
-    height: 50px !important;
+    width: 28px !important;
+    height: 28px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    box-shadow: 0 6px 30px rgba(255, 0, 0, 0.8) !important;
-    border: 4px solid #ff0000 !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+    border: none !important;
     pointer-events: auto !important;
     opacity: 1 !important;
     visibility: visible !important;
     transform: none !important;
     margin: 0 !important;
     padding: 0 !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
   `;
 
-  floatingButton.innerHTML = `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="pointer-events: none;">
-      <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V5C15 6.10457 14.1046 7 13 7H11C9.89543 7 9 6.10457 9 5V5Z" stroke="currentColor" stroke-width="2"/>
-      <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  `;
+  floatingButton.innerHTML = `🪄`;
 
   floatingButton.addEventListener('click', (e) => {
     e.stopPropagation();
