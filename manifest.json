@@ -24,6 +24,15 @@
       "all_frames": true
     }
   ],
+  "commands": {
+    "check-grammar": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+G",
+        "mac": "Command+Shift+G"
+      },
+      "description": "Check grammar on selected text"
+    }
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

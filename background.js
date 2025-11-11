@@ -9,6 +9,24 @@ chrome.runtime.onInstalled.addListener(() => {
     documentUrlPatterns: ['<all_urls>']
   });
   console.log('GrammarWise: Context menu created');
+  console.log('GrammarWise: Keyboard shortcut: Ctrl+Shift+G (Cmd+Shift+G on Mac)');
+});
+
+// Handle keyboard shortcut command
+chrome.commands.onCommand.addListener((command) => {
+  console.log('GrammarWise: Command received:', command);
+  if (command === 'check-grammar') {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]) {
+        console.log('GrammarWise: Sending keyboard shortcut trigger to tab', tabs[0].id);
+        chrome.tabs.sendMessage(tabs[0].id, {
+          action: 'triggerFromKeyboard'
+        }).catch(err => {
+          console.error('GrammarWise: Error sending keyboard trigger:', err);
+        });
+      }
+    });
+  }
 });
 
 // Handle context menu clicks

@@ -13,12 +13,12 @@ console.log('GrammarWise: Content script loaded successfully');
 if (isGoogleDocs) {
   console.log('GrammarWise: Google Docs detected - Right-click menu is the recommended way to use this extension on Google Docs');
 
-  // Show a one-time notification to the user about using right-click
+  // Show a one-time notification to the user
   if (window === window.top) {
     setTimeout(() => {
       chrome.storage.sync.get(['googleDocsNotificationShown'], (result) => {
         if (!result.googleDocsNotificationShown) {
-          console.log('%cGrammarWise: To use on Google Docs, select text and RIGHT-CLICK, then choose "Check Grammar with GrammarWise"', 'background: #6366f1; color: white; padding: 8px; font-size: 14px; border-radius: 4px;');
+          console.log('%c📝 GrammarWise on Google Docs\n\n✨ Use keyboard shortcut: Ctrl+Shift+G (Cmd+Shift+G on Mac)\n\nOR:\n\n1. Copy your text (Ctrl+C)\n2. Click the GrammarWise extension icon\n3. Paste and check grammar in the popup\n\nNote: Google Docs uses custom text rendering that prevents automatic text extraction.', 'background: #6366f1; color: white; padding: 12px; font-size: 13px; line-height: 1.6; border-radius: 8px;');
           chrome.storage.sync.set({ googleDocsNotificationShown: true });
         }
       });
@@ -26,9 +26,40 @@ if (isGoogleDocs) {
   }
 }
 
-// Listen for messages from background script (for context menu)
+// Listen for messages from background script (for context menu and keyboard shortcut)
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log('GrammarWise: Received message:', request);
+
+  // Handle keyboard shortcut trigger
+  if (request.action === 'triggerFromKeyboard') {
+    console.log('GrammarWise: Keyboard shortcut triggered (Ctrl+Shift+G)');
+
+    // Try to get selected text
+    const selection = window.getSelection();
+    const text = selection ? selection.toString().trim() : '';
+
+    if (!text) {
+      console.log('GrammarWise: No text selected for keyboard shortcut');
+      const message = isGoogleDocs
+        ? 'GrammarWise for Google Docs:\n\n1. Select your text\n2. Press Ctrl+C (or Cmd+C) to copy\n3. Click the GrammarWise extension icon\n4. Paste text into the popup\n\nNote: Google Docs uses custom text handling that prevents direct text extraction.'
+        : 'Please select some text first, then press Ctrl+Shift+G (or Cmd+Shift+G on Mac).';
+      alert(message);
+      sendResponse({ success: false });
+      return true;
+    }
+
+    selectedText = text;
+    selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+    originalElement = document.activeElement;
+    console.log('GrammarWise: Extracted text from keyboard shortcut:', text.substring(0, 50));
+
+    // Show panel at top center
+    showGrammarPanel(0, 0);
+    sendResponse({ success: true });
+    return true;
+  }
+
+  // Handle context menu trigger
   if (request.action === 'openPanelWithText' && request.text) {
     selectedText = request.text;
     console.log('GrammarWise: Opening panel with text:', selectedText.substring(0, 50));
@@ -36,8 +67,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // For Google Docs, use a fixed top-center position since selection API doesn't work
     if (isGoogleDocs) {
       console.log('GrammarWise: Using Google Docs positioning');
-      // Position at top center (same as regular panel positioning)
-      showGrammarPanel(0, 0); // Panel has its own positioning logic
+      showGrammarPanel(0, 0);
       sendResponse({ success: true });
       return true;
     }
@@ -119,13 +149,7 @@ function handleTextSelection(event) {
   const selection = window.getSelection();
   const text = selection.toString().trim();
 
-  if (isGoogleDocs) {
-    console.log('GrammarWise: Google Docs text selection check, length:', text.length);
-    console.log('GrammarWise: Selection:', selection);
-    console.log('GrammarWise: Event target:', event.target);
-    console.log('GrammarWise: Is top frame:', window === window.top);
-  }
-
+  // Only log when text is actually selected (reduce noise)
   if (text.length > 0) {
     console.log('GrammarWise: Text selected:', text.substring(0, 50) + '...');
     selectedText = text;
