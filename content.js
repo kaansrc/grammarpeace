@@ -6,7 +6,13 @@ let selectionRange = null;
 let originalElement = null; // Store the element that had the selection
 let isProcessing = false; // Prevent multiple simultaneous operations
 
+// Detect if we're on Google Docs
+const isGoogleDocs = window.location.hostname === 'docs.google.com' && window.location.pathname.includes('/document/');
+
 console.log('GrammarWise: Content script loaded successfully');
+if (isGoogleDocs) {
+  console.log('GrammarWise: Google Docs detected - using special handling');
+}
 
 // Listen for messages from background script (for context menu)
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -657,11 +663,56 @@ function replaceText() {
     }
   }
 
+  // Strategy 4: Google Docs specific handling
+  if (!replaced && isGoogleDocs) {
+    console.log('GrammarWise: Trying strategy 4 - Google Docs specific');
+    try {
+      // Copy corrected text to clipboard
+      navigator.clipboard.writeText(correctedText).then(() => {
+        console.log('GrammarWise: Text copied, attempting to paste in Google Docs');
+
+        // Try to restore the selection first
+        if (selectionRange) {
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(selectionRange);
+        }
+
+        // Simulate Ctrl+V to paste
+        const pasteEvent = new ClipboardEvent('paste', {
+          bubbles: true,
+          cancelable: true,
+          clipboardData: new DataTransfer()
+        });
+        pasteEvent.clipboardData.setData('text/plain', correctedText);
+
+        // Try to dispatch paste event on the editor
+        const editor = document.querySelector('.kix-canvas-tile-content, [contenteditable="true"]');
+        if (editor) {
+          editor.dispatchEvent(pasteEvent);
+          console.log('GrammarWise: Paste event dispatched to Google Docs editor');
+          replaced = true;
+          hideGrammarPanel();
+          return;
+        }
+      }).catch(err => {
+        console.error('GrammarWise: Clipboard error:', err);
+      });
+    } catch (e) {
+      console.error('GrammarWise: Google Docs paste error:', e);
+    }
+  }
+
   // If all strategies failed, fallback to clipboard
   if (!replaced) {
     console.log('GrammarWise: All replace strategies failed, copying to clipboard');
     copyToClipboard();
-    showError('Text copied to clipboard. Paste it manually in the desired location.');
+
+    if (isGoogleDocs) {
+      showError('Text copied! Press Ctrl+V (or Cmd+V) to paste in Google Docs.');
+    } else {
+      showError('Text copied to clipboard. Paste it manually in the desired location.');
+    }
   }
 }
 
@@ -806,11 +857,52 @@ function replaceWithTranslation() {
     }
   }
 
+  // Google Docs specific handling
+  if (!replaced && isGoogleDocs) {
+    console.log('GrammarWise: Trying Google Docs specific handling for translation');
+    try {
+      navigator.clipboard.writeText(translatedText).then(() => {
+        console.log('GrammarWise: Translation copied, attempting to paste in Google Docs');
+
+        if (selectionRange) {
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(selectionRange);
+        }
+
+        const pasteEvent = new ClipboardEvent('paste', {
+          bubbles: true,
+          cancelable: true,
+          clipboardData: new DataTransfer()
+        });
+        pasteEvent.clipboardData.setData('text/plain', translatedText);
+
+        const editor = document.querySelector('.kix-canvas-tile-content, [contenteditable="true"]');
+        if (editor) {
+          editor.dispatchEvent(pasteEvent);
+          console.log('GrammarWise: Translation paste event dispatched to Google Docs');
+          replaced = true;
+          hideGrammarPanel();
+          return;
+        }
+      }).catch(err => {
+        console.error('GrammarWise: Clipboard error for translation:', err);
+      });
+    } catch (e) {
+      console.error('GrammarWise: Google Docs translation paste error:', e);
+    }
+  }
+
   // Fallback to clipboard
   if (!replaced) {
     console.log('GrammarWise: Replace failed, copying translation to clipboard');
     copyTranslation();
-    showTranslateError('Text copied to clipboard. Paste it manually in the desired location.');
+
+    if (isGoogleDocs) {
+      showTranslateError('Translation copied! Press Ctrl+V (or Cmd+V) to paste in Google Docs.');
+    } else {
+      showTranslateError('Text copied to clipboard. Paste it manually in the desired location.');
+    }
   }
 }
 
