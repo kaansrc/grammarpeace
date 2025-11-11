@@ -309,9 +309,16 @@
 
           <div class="form-group">
             <label for="maxTokens">Max Completion Tokens</label>
-            <input type="number" id="maxTokens" min="512" max="16384" step="512" value="1024">
+            <select id="maxTokens">
+              <option value="512">512 tokens (~375 words - Short texts)</option>
+              <option value="1024" selected>1024 tokens (~750 words - Default)</option>
+              <option value="2048">2048 tokens (~1,500 words - Long texts)</option>
+              <option value="4096">4096 tokens (~3,000 words - Articles)</option>
+              <option value="8192">8192 tokens (~6,000 words - Documents)</option>
+              <option value="16384">16384 tokens (~12,000 words - Large documents)</option>
+            </select>
             <div class="help-text">
-              Default: 1024 tokens (~750 words). Range: 512-16384 tokens.
+              Choose based on typical text length. Higher values cost more.
             </div>
           </div>
 

@@ -22,7 +22,14 @@ function loadSettings() {
     }
 
     // Load max tokens (default to 1024)
-    const maxTokens = result.maxTokens || 1024;
+    // If stored value doesn't match dropdown options, use closest valid option
+    const storedMaxTokens = result.maxTokens || 1024;
+    const validOptions = [512, 1024, 2048, 4096, 8192, 16384];
+    let maxTokens = validOptions.includes(storedMaxTokens)
+      ? storedMaxTokens
+      : validOptions.reduce((prev, curr) =>
+          Math.abs(curr - storedMaxTokens) < Math.abs(prev - storedMaxTokens) ? curr : prev
+        );
     document.getElementById('maxTokens').value = maxTokens;
 
     // Load preferences
@@ -99,9 +106,10 @@ function saveSettings(event) {
     }
   }
 
-  // Validate max tokens
-  if (isNaN(maxTokens) || maxTokens < 512 || maxTokens > 16384) {
-    showStatus('Max tokens must be between 512 and 16384', 'error');
+  // Validate max tokens (dropdown ensures valid values, but double-check)
+  const validTokenValues = [512, 1024, 2048, 4096, 8192, 16384];
+  if (isNaN(maxTokens) || !validTokenValues.includes(maxTokens)) {
+    showStatus('Please select a valid max tokens value', 'error');
     return;
   }
 
