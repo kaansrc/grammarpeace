@@ -44,6 +44,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 document.addEventListener('mouseup', handleTextSelection);
 document.addEventListener('selectionchange', handleSelectionChange);
 
+// For Google Docs, also listen on capture phase and with a delay
+if (isGoogleDocs) {
+  document.addEventListener('mouseup', (event) => {
+    // Google Docs selection happens asynchronously
+    setTimeout(() => {
+      handleTextSelection(event);
+    }, 100);
+  }, true); // Use capture phase
+
+  // Also listen for Google Docs specific events
+  document.addEventListener('click', (event) => {
+    setTimeout(() => {
+      const selection = window.getSelection();
+      const text = selection.toString().trim();
+      if (text.length > 0) {
+        console.log('GrammarWise: Google Docs click selection detected');
+        handleTextSelection(event);
+      }
+    }, 150);
+  }, true);
+}
+
 function handleSelectionChange() {
   // Don't hide button immediately - give user time to interact with it
   // Increase delay to 2 seconds to give more time to click
@@ -68,6 +90,13 @@ function handleTextSelection(event) {
 
   const selection = window.getSelection();
   const text = selection.toString().trim();
+
+  if (isGoogleDocs) {
+    console.log('GrammarWise: Google Docs text selection check, length:', text.length);
+    console.log('GrammarWise: Selection:', selection);
+    console.log('GrammarWise: Event target:', event.target);
+    console.log('GrammarWise: Is top frame:', window === window.top);
+  }
 
   if (text.length > 0) {
     console.log('GrammarWise: Text selected:', text.substring(0, 50) + '...');

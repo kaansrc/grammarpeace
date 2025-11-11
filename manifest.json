@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GrammarWise - AI Grammar Checker",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "AI-powered grammar checker & translator. Supports Claude & OpenAI. 15+ languages, auto-detect, instant corrections.",
   "permissions": [
     "storage",
@@ -20,7 +20,8 @@
       "matches": ["<all_urls>"],
       "js": ["content.js"],
       "css": ["content.css"],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "all_frames": true
     }
   ],
   "action": {
