@@ -226,11 +226,11 @@ async function callOpenAIAPI(apiKey, prompt, maxTokens) {
 
 function createGrammarPrompt(text, language, tone) {
   const toneInstructions = {
-    professional: 'Make it professional and business-appropriate.',
-    casual: 'Make it casual and conversational.',
-    friendly: 'Make it friendly and warm.',
-    formal: 'Make it formal and academic.',
-    concise: 'Make it concise and to the point.'
+    professional: 'Use a professional and business-appropriate tone.',
+    casual: 'Use a casual and conversational tone.',
+    friendly: 'Use a friendly and warm tone.',
+    formal: 'Use a formal and academic tone.',
+    concise: 'Make it concise and to the point, removing unnecessary words.'
   };
 
   const languageNames = {
@@ -253,27 +253,50 @@ function createGrammarPrompt(text, language, tone) {
   };
 
   const toneInstruction = toneInstructions[tone] || toneInstructions.professional;
-  const languageName = languageNames[language] || 'Auto-detect';
+  const languageName = languageNames[language] || 'the original language';
 
-  let languageInstruction = '';
+  let prompt = '';
+
   if (language === 'auto') {
-    languageInstruction = 'Detect the language of the text and fix the grammar, spelling, and punctuation in that language.';
-  } else {
-    languageInstruction = `Fix the grammar, spelling, and punctuation in ${languageName}.`;
-  }
+    prompt = `You are a grammar correction assistant. Your task is to:
+1. Detect the language of the input text
+2. Fix ALL grammar, spelling, and punctuation errors in that SAME language
+3. ${toneInstruction}
+4. Keep the text in its ORIGINAL language - DO NOT translate
 
-  return `${languageInstruction} ${toneInstruction}
+CRITICAL RULES:
+- Return ONLY the corrected text
+- Do NOT translate to another language
+- Do NOT add explanations, comments, or notes
+- Do NOT use markdown formatting
+- Do NOT use em dashes (—) - use hyphens (-) or commas instead
+- Keep the same language as the input text
 
-CRITICAL: Return ONLY the corrected text in the same language as the input. Do NOT add any explanations, comments, notes, or phrases like "Here's the corrected version". Do NOT use markdown formatting. Just return the corrected text exactly as it should be written.
-
-IMPORTANT: Do NOT use em dashes (—). Use regular hyphens (-) or commas instead.
-
-If the text seems incomplete or unusual, still return your best correction without any explanation.
-
-Text:
+Text to correct:
 ${text}
 
 Corrected text:`;
+  } else {
+    prompt = `You are a grammar correction assistant. The input text is in ${languageName}. Your task is to:
+1. Fix ALL grammar, spelling, and punctuation errors in ${languageName}
+2. ${toneInstruction}
+3. Keep the text in ${languageName} - DO NOT change the language
+
+CRITICAL RULES:
+- Return ONLY the corrected text in ${languageName}
+- Do NOT translate to another language
+- Do NOT add explanations, comments, or notes
+- Do NOT use markdown formatting
+- Do NOT use em dashes (—) - use hyphens (-) or commas instead
+- The text must remain in ${languageName}
+
+Text to correct:
+${text}
+
+Corrected text in ${languageName}:`;
+  }
+
+  return prompt;
 }
 
 function createTranslationPrompt(text, fromLang, toLang) {
@@ -299,23 +322,43 @@ function createTranslationPrompt(text, fromLang, toLang) {
   const fromLanguage = languageNames[fromLang] || 'the source language';
   const toLanguage = languageNames[toLang] || 'English';
 
+  let prompt = '';
+
   if (fromLang === 'auto') {
-    return `Translate the following text to ${toLanguage}.
+    prompt = `You are a professional translator. Your task is to:
+1. Detect the language of the input text
+2. Translate it accurately to ${toLanguage}
+3. Maintain the meaning, tone, and style of the original text
 
-CRITICAL: Return ONLY the translated text. Do NOT add any explanations, comments, notes, or phrases like "Here's the translation". Do NOT use markdown formatting. Just return the translated text exactly as it should be written.
+CRITICAL RULES:
+- Return ONLY the translated text in ${toLanguage}
+- Do NOT add explanations, comments, or notes
+- Do NOT use markdown formatting
+- Do NOT add phrases like "Here's the translation"
+- Preserve the original formatting and structure
 
-Text:
+Text to translate:
 ${text}
 
-Translation:`;
+Translation in ${toLanguage}:`;
   } else {
-    return `Translate the following text from ${fromLanguage} to ${toLanguage}.
+    prompt = `You are a professional translator. Your task is to:
+1. Translate the following ${fromLanguage} text to ${toLanguage}
+2. Maintain the meaning, tone, and style of the original text
+3. Ensure natural and fluent ${toLanguage}
 
-CRITICAL: Return ONLY the translated text. Do NOT add any explanations, comments, notes, or phrases like "Here's the translation". Do NOT use markdown formatting. Just return the translated text exactly as it should be written.
+CRITICAL RULES:
+- Return ONLY the translated text in ${toLanguage}
+- Do NOT add explanations, comments, or notes
+- Do NOT use markdown formatting
+- Do NOT add phrases like "Here's the translation"
+- Preserve the original formatting and structure
 
-Text:
+${fromLanguage} text to translate:
 ${text}
 
-Translation:`;
+Translation in ${toLanguage}:`;
   }
+
+  return prompt;
 }
