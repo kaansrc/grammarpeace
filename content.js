@@ -274,87 +274,84 @@ function showGrammarPanel(x, y) {
       <button id="grammarwise-close" class="grammarwise-close-btn">&times;</button>
     </div>
     <div class="grammarwise-tabs">
-      <button class="grammarwise-tab active" data-tab="grammar">Fix Grammar</button>
+      <button class="grammarwise-tab active" data-tab="grammar">Grammar</button>
+      <button class="grammarwise-tab" data-tab="tone">Tone</button>
       <button class="grammarwise-tab" data-tab="translate">Translate</button>
     </div>
     <div class="grammarwise-content">
       <!-- Grammar Tab -->
       <div id="grammarwise-tab-grammar" class="grammarwise-tab-content active">
-        <!-- Grammar Check Section -->
-        <div class="grammarwise-section">
-          <h4 class="grammarwise-section-title">Check Grammar</h4>
-          <div class="grammarwise-controls">
-            <label for="grammarwise-language">Language:</label>
-            <select id="grammarwise-language" class="grammarwise-select">
-              <option value="auto">Auto-detect</option>
-              <option value="en">English</option>
-              <option value="es">Spanish</option>
-              <option value="fr">French</option>
-              <option value="de">German</option>
-              <option value="it">Italian</option>
-              <option value="pt">Portuguese</option>
-              <option value="ru">Russian</option>
-              <option value="ja">Japanese</option>
-              <option value="ko">Korean</option>
-              <option value="zh">Chinese</option>
-              <option value="ar">Arabic</option>
-              <option value="hi">Hindi</option>
-              <option value="tr">Turkish</option>
-              <option value="nl">Dutch</option>
-              <option value="pl">Polish</option>
-            </select>
-            <button id="grammarwise-check" class="grammarwise-btn-primary">Check Grammar</button>
-          </div>
-          <div id="grammarwise-result" class="grammarwise-result" style="display: none;">
-            <strong>Corrected:</strong>
-            <div id="grammarwise-corrected-text" class="grammarwise-text"></div>
-            <div class="grammarwise-actions">
-              <button id="grammarwise-copy" class="grammarwise-btn">Copy</button>
-              <button id="grammarwise-replace" class="grammarwise-btn-primary">Replace</button>
-            </div>
-          </div>
-          <div id="grammarwise-loading" class="grammarwise-loading" style="display: none;">
-            <div class="grammarwise-spinner"></div>
-            <p>Checking grammar...</p>
-          </div>
-          <div id="grammarwise-error" class="grammarwise-error" style="display: none;"></div>
+        <div class="grammarwise-controls">
+          <label for="grammarwise-language">Language:</label>
+          <select id="grammarwise-language" class="grammarwise-select">
+            <option value="auto">Auto-detect</option>
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="it">Italian</option>
+            <option value="pt">Portuguese</option>
+            <option value="ru">Russian</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="zh">Chinese</option>
+            <option value="ar">Arabic</option>
+            <option value="hi">Hindi</option>
+            <option value="tr">Turkish</option>
+            <option value="nl">Dutch</option>
+            <option value="pl">Polish</option>
+          </select>
+          <button id="grammarwise-check" class="grammarwise-btn-primary">Check Grammar</button>
         </div>
-
-        <div class="grammarwise-divider"></div>
-
-        <!-- Tone Rewrite Section -->
-        <div class="grammarwise-section">
-          <h4 class="grammarwise-section-title">Rewrite with Tone</h4>
-          <div class="grammarwise-controls">
-            <label for="grammarwise-tone">Tone:</label>
-            <select id="grammarwise-tone" class="grammarwise-select">
-              <option value="professional">Professional</option>
-              <option value="casual">Casual</option>
-              <option value="friendly">Friendly</option>
-              <option value="formal">Formal</option>
-              <option value="concise">Concise</option>
-            </select>
-            <button id="grammarwise-rewrite-tone" class="grammarwise-btn-primary">Rewrite</button>
-          </div>
-          <div id="grammarwise-tone-result" class="grammarwise-result" style="display: none;">
-            <strong>Rewritten:</strong>
-            <div id="grammarwise-rewritten-text" class="grammarwise-text"></div>
-            <div class="grammarwise-actions">
-              <button id="grammarwise-tone-copy" class="grammarwise-btn">Copy</button>
-              <button id="grammarwise-tone-replace" class="grammarwise-btn-primary">Replace</button>
-            </div>
-          </div>
-          <div id="grammarwise-tone-loading" class="grammarwise-loading" style="display: none;">
-            <div class="grammarwise-spinner"></div>
-            <p>Rewriting with tone...</p>
-          </div>
-          <div id="grammarwise-tone-error" class="grammarwise-error" style="display: none;"></div>
-        </div>
-
         <div class="grammarwise-original">
           <strong>Original:</strong>
           <div class="grammarwise-text">${escapeHtml(selectedText)}</div>
         </div>
+        <div id="grammarwise-result" class="grammarwise-result" style="display: none;">
+          <strong>Corrected:</strong>
+          <div id="grammarwise-corrected-text" class="grammarwise-text"></div>
+          <div class="grammarwise-actions">
+            <button id="grammarwise-copy" class="grammarwise-btn">Copy</button>
+            <button id="grammarwise-replace" class="grammarwise-btn-primary">Replace</button>
+          </div>
+        </div>
+        <div id="grammarwise-loading" class="grammarwise-loading" style="display: none;">
+          <div class="grammarwise-spinner"></div>
+          <p>Checking grammar...</p>
+        </div>
+        <div id="grammarwise-error" class="grammarwise-error" style="display: none;"></div>
+      </div>
+
+      <!-- Tone Tab -->
+      <div id="grammarwise-tab-tone" class="grammarwise-tab-content" style="display: none;">
+        <div class="grammarwise-controls">
+          <label for="grammarwise-tone">Tone:</label>
+          <select id="grammarwise-tone" class="grammarwise-select">
+            <option value="professional">Professional</option>
+            <option value="casual">Casual</option>
+            <option value="friendly">Friendly</option>
+            <option value="formal">Formal</option>
+            <option value="concise">Concise</option>
+          </select>
+          <button id="grammarwise-rewrite-tone" class="grammarwise-btn-primary">Rewrite</button>
+        </div>
+        <div class="grammarwise-original">
+          <strong>Original:</strong>
+          <div class="grammarwise-text">${escapeHtml(selectedText)}</div>
+        </div>
+        <div id="grammarwise-tone-result" class="grammarwise-result" style="display: none;">
+          <strong>Rewritten:</strong>
+          <div id="grammarwise-rewritten-text" class="grammarwise-text"></div>
+          <div class="grammarwise-actions">
+            <button id="grammarwise-tone-copy" class="grammarwise-btn">Copy</button>
+            <button id="grammarwise-tone-replace" class="grammarwise-btn-primary">Replace</button>
+          </div>
+        </div>
+        <div id="grammarwise-tone-loading" class="grammarwise-loading" style="display: none;">
+          <div class="grammarwise-spinner"></div>
+          <p>Rewriting with tone...</p>
+        </div>
+        <div id="grammarwise-tone-error" class="grammarwise-error" style="display: none;"></div>
       </div>
 
       <!-- Translate Tab -->
