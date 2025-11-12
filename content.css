@@ -152,17 +152,32 @@
   transition: all 0.2s ease;
   flex: 1;
   min-width: 120px;
+  appearance: auto;
+  -webkit-appearance: menulist;
+  -moz-appearance: menulist;
 }
 
 .grammarwise-select option {
   color: #111827;
   background: white;
+  padding: 8px;
+}
+
+.grammarwise-select option:checked {
+  background: #6366f1;
+  color: white;
+}
+
+.grammarwise-select option:hover {
+  background: #f3f4f6;
 }
 
 .grammarwise-select:focus {
   outline: none;
   border-color: #6366f1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background: white;
+  color: #111827;
 }
 
 .grammarwise-btn,
