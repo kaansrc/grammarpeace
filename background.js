@@ -47,7 +47,14 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'checkGrammar') {
-    checkGrammar(request.text, request.language, request.tone)
+    checkGrammar(request.text, request.language)
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true; // Keep the message channel open for async response
+  }
+
+  if (request.action === 'rewriteWithTone') {
+    rewriteWithTone(request.text, request.tone)
       .then(result => sendResponse(result))
       .catch(error => sendResponse({ success: false, error: error.message }));
     return true; // Keep the message channel open for async response
@@ -61,7 +68,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-async function checkGrammar(text, language, tone) {
+async function checkGrammar(text, language) {
   try {
     // Get API settings from storage
     const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens']);
@@ -77,8 +84,8 @@ async function checkGrammar(text, language, tone) {
       };
     }
 
-    // Prepare the prompt based on language and tone
-    const prompt = createGrammarPrompt(text, language, tone);
+    // Prepare the prompt based on language only (no tone)
+    const prompt = createGrammarPrompt(text, language);
 
     // Call appropriate API
     let correctedText;
@@ -95,6 +102,47 @@ async function checkGrammar(text, language, tone) {
 
   } catch (error) {
     console.error('Error checking grammar:', error);
+    return {
+      success: false,
+      error: error.message || 'An unexpected error occurred'
+    };
+  }
+}
+
+async function rewriteWithTone(text, tone) {
+  try {
+    // Get API settings from storage
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens']);
+
+    const provider = result.apiProvider || 'claude';
+    const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+    const maxTokens = result.maxTokens || 1024;
+
+    if (!apiKey) {
+      return {
+        success: false,
+        error: `Please set your ${provider === 'claude' ? 'Claude' : 'OpenAI'} API key in the extension settings.`
+      };
+    }
+
+    // Prepare the prompt for tone rewriting
+    const prompt = createToneRewritePrompt(text, tone);
+
+    // Call appropriate API
+    let rewrittenText;
+    if (provider === 'claude') {
+      rewrittenText = await callClaudeAPI(apiKey, prompt, maxTokens);
+    } else {
+      rewrittenText = await callOpenAIAPI(apiKey, prompt, maxTokens);
+    }
+
+    return {
+      success: true,
+      rewrittenText: rewrittenText
+    };
+
+  } catch (error) {
+    console.error('Error rewriting with tone:', error);
     return {
       success: false,
       error: error.message || 'An unexpected error occurred'
@@ -224,15 +272,7 @@ async function callOpenAIAPI(apiKey, prompt, maxTokens) {
   return message.content.trim();
 }
 
-function createGrammarPrompt(text, language, tone) {
-  const toneInstructions = {
-    professional: 'Use a professional and business-appropriate tone.',
-    casual: 'Use a casual and conversational tone.',
-    friendly: 'Use a friendly and warm tone.',
-    formal: 'Use a formal and academic tone.',
-    concise: 'Make it concise and to the point, removing unnecessary words.'
-  };
-
+function createGrammarPrompt(text, language) {
   const languageNames = {
     auto: 'Auto-detect',
     en: 'English',
@@ -252,43 +292,47 @@ function createGrammarPrompt(text, language, tone) {
     pl: 'Polish'
   };
 
-  const toneInstruction = toneInstructions[tone] || toneInstructions.professional;
   const languageName = languageNames[language] || 'the original language';
 
   let prompt = '';
 
   if (language === 'auto') {
-    prompt = `You are a grammar correction assistant. Your task is to:
+    prompt = `You are a grammar correction assistant. Your ONLY task is to:
 1. Detect the language of the input text
 2. Fix ALL grammar, spelling, and punctuation errors in that SAME language
-3. ${toneInstruction}
+3. Maintain the EXACT same writing style, tone, and voice of the original text
 4. Keep the text in its ORIGINAL language - DO NOT translate
 
 CRITICAL RULES:
-- Return ONLY the corrected text
+- Return ONLY the corrected text with errors fixed
+- Do NOT change the tone or style
+- Do NOT rewrite or rephrase unless fixing errors
 - Do NOT translate to another language
 - Do NOT add explanations, comments, or notes
 - Do NOT use markdown formatting
 - Do NOT use em dashes (—) - use hyphens (-) or commas instead
-- Keep the same language as the input text
+- Preserve the author's original voice and style
 
 Text to correct:
 ${text}
 
 Corrected text:`;
   } else {
-    prompt = `You are a grammar correction assistant. The input text is in ${languageName}. Your task is to:
+    prompt = `You are a grammar correction assistant. The input text is in ${languageName}. Your ONLY task is to:
 1. Fix ALL grammar, spelling, and punctuation errors in ${languageName}
-2. ${toneInstruction}
+2. Maintain the EXACT same writing style, tone, and voice of the original text
 3. Keep the text in ${languageName} - DO NOT change the language
 
 CRITICAL RULES:
-- Return ONLY the corrected text in ${languageName}
+- Return ONLY the corrected text with errors fixed
+- Do NOT change the tone or style
+- Do NOT rewrite or rephrase unless fixing errors
 - Do NOT translate to another language
 - Do NOT add explanations, comments, or notes
 - Do NOT use markdown formatting
 - Do NOT use em dashes (—) - use hyphens (-) or commas instead
 - The text must remain in ${languageName}
+- Preserve the author's original voice and style
 
 Text to correct:
 ${text}
@@ -297,6 +341,55 @@ Corrected text in ${languageName}:`;
   }
 
   return prompt;
+}
+
+function createToneRewritePrompt(text, tone) {
+  const toneInstructions = {
+    professional: {
+      description: 'professional and business-appropriate',
+      details: 'Use formal language, avoid slang, maintain clarity and professionalism suitable for business communication.'
+    },
+    casual: {
+      description: 'casual and conversational',
+      details: 'Use everyday language, contractions are fine, write as you would speak to a friend while keeping it clear.'
+    },
+    friendly: {
+      description: 'friendly and warm',
+      details: 'Use welcoming and approachable language, show empathy and warmth while maintaining professionalism.'
+    },
+    formal: {
+      description: 'formal and academic',
+      details: 'Use sophisticated vocabulary, avoid contractions, maintain academic rigor and formal structure.'
+    },
+    concise: {
+      description: 'concise and to-the-point',
+      details: 'Remove unnecessary words, use direct language, keep sentences short and impactful.'
+    }
+  };
+
+  const toneInfo = toneInstructions[tone] || toneInstructions.professional;
+
+  return `You are a professional writing assistant. Your task is to rewrite the following text with a ${toneInfo.description} tone.
+
+INSTRUCTIONS:
+1. Rewrite the text to match the ${toneInfo.description} tone
+2. ${toneInfo.details}
+3. Fix any grammar, spelling, or punctuation errors
+4. Keep the text in the SAME language as the input
+5. Maintain the core message and meaning
+
+CRITICAL RULES:
+- Return ONLY the rewritten text
+- Do NOT translate to another language
+- Do NOT add explanations, comments, or notes
+- Do NOT use markdown formatting
+- Do NOT use em dashes (—) - use hyphens (-) or commas instead
+- Write in correct, fluent English (or the original language if not English)
+
+Original text:
+${text}
+
+Rewritten text with ${toneInfo.description} tone:`;
 }
 
 function createTranslationPrompt(text, fromLang, toLang) {

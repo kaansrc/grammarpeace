@@ -280,53 +280,81 @@ function showGrammarPanel(x, y) {
     <div class="grammarwise-content">
       <!-- Grammar Tab -->
       <div id="grammarwise-tab-grammar" class="grammarwise-tab-content active">
-        <div class="grammarwise-controls">
-          <label for="grammarwise-language">Language:</label>
-          <select id="grammarwise-language" class="grammarwise-select">
-            <option value="auto">Auto-detect</option>
-            <option value="en">English</option>
-            <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="it">Italian</option>
-            <option value="pt">Portuguese</option>
-            <option value="ru">Russian</option>
-            <option value="ja">Japanese</option>
-            <option value="ko">Korean</option>
-            <option value="zh">Chinese</option>
-            <option value="ar">Arabic</option>
-            <option value="hi">Hindi</option>
-            <option value="tr">Turkish</option>
-            <option value="nl">Dutch</option>
-            <option value="pl">Polish</option>
-          </select>
-          <label for="grammarwise-tone">Tone:</label>
-          <select id="grammarwise-tone" class="grammarwise-select">
-            <option value="professional">Professional</option>
-            <option value="casual">Casual</option>
-            <option value="friendly">Friendly</option>
-            <option value="formal">Formal</option>
-            <option value="concise">Concise</option>
-          </select>
-          <button id="grammarwise-check" class="grammarwise-btn-primary">Check Grammar</button>
+        <!-- Grammar Check Section -->
+        <div class="grammarwise-section">
+          <h4 class="grammarwise-section-title">Check Grammar</h4>
+          <div class="grammarwise-controls">
+            <label for="grammarwise-language">Language:</label>
+            <select id="grammarwise-language" class="grammarwise-select">
+              <option value="auto">Auto-detect</option>
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+              <option value="it">Italian</option>
+              <option value="pt">Portuguese</option>
+              <option value="ru">Russian</option>
+              <option value="ja">Japanese</option>
+              <option value="ko">Korean</option>
+              <option value="zh">Chinese</option>
+              <option value="ar">Arabic</option>
+              <option value="hi">Hindi</option>
+              <option value="tr">Turkish</option>
+              <option value="nl">Dutch</option>
+              <option value="pl">Polish</option>
+            </select>
+            <button id="grammarwise-check" class="grammarwise-btn-primary">Check Grammar</button>
+          </div>
+          <div id="grammarwise-result" class="grammarwise-result" style="display: none;">
+            <strong>Corrected:</strong>
+            <div id="grammarwise-corrected-text" class="grammarwise-text"></div>
+            <div class="grammarwise-actions">
+              <button id="grammarwise-copy" class="grammarwise-btn">Copy</button>
+              <button id="grammarwise-replace" class="grammarwise-btn-primary">Replace</button>
+            </div>
+          </div>
+          <div id="grammarwise-loading" class="grammarwise-loading" style="display: none;">
+            <div class="grammarwise-spinner"></div>
+            <p>Checking grammar...</p>
+          </div>
+          <div id="grammarwise-error" class="grammarwise-error" style="display: none;"></div>
         </div>
+
+        <div class="grammarwise-divider"></div>
+
+        <!-- Tone Rewrite Section -->
+        <div class="grammarwise-section">
+          <h4 class="grammarwise-section-title">Rewrite with Tone</h4>
+          <div class="grammarwise-controls">
+            <label for="grammarwise-tone">Tone:</label>
+            <select id="grammarwise-tone" class="grammarwise-select">
+              <option value="professional">Professional</option>
+              <option value="casual">Casual</option>
+              <option value="friendly">Friendly</option>
+              <option value="formal">Formal</option>
+              <option value="concise">Concise</option>
+            </select>
+            <button id="grammarwise-rewrite-tone" class="grammarwise-btn-primary">Rewrite</button>
+          </div>
+          <div id="grammarwise-tone-result" class="grammarwise-result" style="display: none;">
+            <strong>Rewritten:</strong>
+            <div id="grammarwise-rewritten-text" class="grammarwise-text"></div>
+            <div class="grammarwise-actions">
+              <button id="grammarwise-tone-copy" class="grammarwise-btn">Copy</button>
+              <button id="grammarwise-tone-replace" class="grammarwise-btn-primary">Replace</button>
+            </div>
+          </div>
+          <div id="grammarwise-tone-loading" class="grammarwise-loading" style="display: none;">
+            <div class="grammarwise-spinner"></div>
+            <p>Rewriting with tone...</p>
+          </div>
+          <div id="grammarwise-tone-error" class="grammarwise-error" style="display: none;"></div>
+        </div>
+
         <div class="grammarwise-original">
           <strong>Original:</strong>
           <div class="grammarwise-text">${escapeHtml(selectedText)}</div>
         </div>
-        <div id="grammarwise-result" class="grammarwise-result" style="display: none;">
-          <strong>Corrected:</strong>
-          <div id="grammarwise-corrected-text" class="grammarwise-text"></div>
-          <div class="grammarwise-actions">
-            <button id="grammarwise-copy" class="grammarwise-btn">Copy</button>
-            <button id="grammarwise-replace" class="grammarwise-btn-primary">Replace</button>
-          </div>
-        </div>
-        <div id="grammarwise-loading" class="grammarwise-loading" style="display: none;">
-          <div class="grammarwise-spinner"></div>
-          <p>Checking grammar...</p>
-        </div>
-        <div id="grammarwise-error" class="grammarwise-error" style="display: none;"></div>
       </div>
 
       <!-- Translate Tab -->
@@ -493,6 +521,15 @@ function showGrammarPanel(x, y) {
   if (copyBtn) copyBtn.addEventListener('click', copyToClipboard);
   if (replaceBtn) replaceBtn.addEventListener('click', replaceText);
 
+  // Tone rewrite event listeners
+  document.getElementById('grammarwise-rewrite-tone').addEventListener('click', rewriteWithTone);
+
+  const toneCopyBtn = document.getElementById('grammarwise-tone-copy');
+  const toneReplaceBtn = document.getElementById('grammarwise-tone-replace');
+
+  if (toneCopyBtn) toneCopyBtn.addEventListener('click', copyToneResult);
+  if (toneReplaceBtn) toneReplaceBtn.addEventListener('click', replaceToneResult);
+
   // Translate tab event listeners
   document.getElementById('grammarwise-translate').addEventListener('click', translateText);
 
@@ -534,7 +571,6 @@ async function checkGrammar() {
   isProcessing = true;
 
   const language = document.getElementById('grammarwise-language').value;
-  const tone = document.getElementById('grammarwise-tone').value;
   const loadingDiv = document.getElementById('grammarwise-loading');
   const resultDiv = document.getElementById('grammarwise-result');
   const errorDiv = document.getElementById('grammarwise-error');
@@ -554,8 +590,7 @@ async function checkGrammar() {
     const response = await chrome.runtime.sendMessage({
       action: 'checkGrammar',
       text: selectedText,
-      language: language,
-      tone: tone
+      language: language
     });
 
     // Check for runtime errors after sendMessage
@@ -587,8 +622,76 @@ async function checkGrammar() {
   }
 }
 
+async function rewriteWithTone() {
+  // Prevent multiple simultaneous operations
+  if (isProcessing) {
+    console.log('GrammarWise: Already processing, ignoring request');
+    return;
+  }
+
+  console.log('GrammarWise: Rewriting with tone...');
+  isProcessing = true;
+
+  const tone = document.getElementById('grammarwise-tone').value;
+  const loadingDiv = document.getElementById('grammarwise-tone-loading');
+  const resultDiv = document.getElementById('grammarwise-tone-result');
+  const errorDiv = document.getElementById('grammarwise-tone-error');
+
+  // Show loading
+  loadingDiv.style.display = 'block';
+  resultDiv.style.display = 'none';
+  errorDiv.style.display = 'none';
+
+  try {
+    // Check if extension context is valid
+    if (!chrome.runtime?.id) {
+      throw new Error('Extension context invalidated. Please refresh the page.');
+    }
+
+    // Send message to background script
+    const response = await chrome.runtime.sendMessage({
+      action: 'rewriteWithTone',
+      text: selectedText,
+      tone: tone
+    });
+
+    // Check for runtime errors after sendMessage
+    if (chrome.runtime.lastError) {
+      throw new Error(chrome.runtime.lastError.message);
+    }
+
+    console.log('GrammarWise: Received tone rewrite response:', response);
+    loadingDiv.style.display = 'none';
+
+    if (response && response.success) {
+      document.getElementById('grammarwise-rewritten-text').textContent = response.rewrittenText;
+      resultDiv.style.display = 'block';
+    } else {
+      showToneError(response?.error || 'Failed to rewrite with tone');
+    }
+  } catch (error) {
+    console.error('GrammarWise: Error during tone rewrite:', error);
+    loadingDiv.style.display = 'none';
+
+    // Handle specific error cases
+    if (error.message.includes('Extension context invalidated')) {
+      showToneError('Extension was reloaded. Please refresh this page and try again.');
+    } else {
+      showToneError(error.message || 'An error occurred');
+    }
+  } finally {
+    isProcessing = false;
+  }
+}
+
 function showError(message) {
   const errorDiv = document.getElementById('grammarwise-error');
+  errorDiv.textContent = message;
+  errorDiv.style.display = 'block';
+}
+
+function showToneError(message) {
+  const errorDiv = document.getElementById('grammarwise-tone-error');
   errorDiv.textContent = message;
   errorDiv.style.display = 'block';
 }
@@ -790,6 +893,85 @@ function replaceText() {
     } else {
       showError('Text copied to clipboard. Paste it manually in the desired location.');
     }
+  }
+}
+
+function copyToneResult() {
+  const rewrittenText = document.getElementById('grammarwise-rewritten-text').textContent;
+  navigator.clipboard.writeText(rewrittenText).then(() => {
+    const btn = document.getElementById('grammarwise-tone-copy');
+    const originalText = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => {
+      btn.textContent = originalText;
+    }, 2000);
+  }).catch(err => {
+    console.error('GrammarWise: Failed to copy tone result:', err);
+    showToneError('Failed to copy to clipboard');
+  });
+}
+
+function replaceToneResult() {
+  const rewrittenText = document.getElementById('grammarwise-rewritten-text').textContent;
+  console.log('GrammarWise: Attempting to replace with rewritten text');
+
+  // Use the same replacement logic as replaceText
+  let replaced = false;
+
+  // Strategy 1: Use stored originalElement if it's editable
+  if (originalElement && document.body.contains(originalElement)) {
+    try {
+      originalElement.focus();
+    } catch (e) {
+      console.log('GrammarWise: Could not focus original element');
+    }
+
+    if (originalElement.tagName === 'TEXTAREA' || originalElement.tagName === 'INPUT') {
+      try {
+        const start = originalElement.selectionStart;
+        const end = originalElement.selectionEnd;
+        const text = originalElement.value;
+
+        originalElement.value = text.substring(0, start) + rewrittenText + text.substring(end);
+        originalElement.selectionStart = originalElement.selectionEnd = start + rewrittenText.length;
+
+        originalElement.dispatchEvent(new Event('input', { bubbles: true }));
+        originalElement.dispatchEvent(new Event('change', { bubbles: true }));
+
+        console.log('GrammarWise: Successfully replaced with rewritten text');
+        replaced = true;
+        hideGrammarPanel();
+        return;
+      } catch (e) {
+        console.error('GrammarWise: Error replacing text:', e);
+      }
+    }
+
+    if (originalElement.isContentEditable) {
+      try {
+        if (selectionRange) {
+          const selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(selectionRange);
+        }
+        const success = document.execCommand('insertText', false, rewrittenText);
+        if (success) {
+          console.log('GrammarWise: Successfully replaced with rewritten text in contentEditable');
+          replaced = true;
+          hideGrammarPanel();
+          return;
+        }
+      } catch (e) {
+        console.error('GrammarWise: Error with execCommand:', e);
+      }
+    }
+  }
+
+  // Fallback to clipboard
+  if (!replaced) {
+    console.log('GrammarWise: Replace failed, copying to clipboard');
+    copyToneResult();
+    showToneError('Text copied to clipboard. Paste it manually in the desired location.');
   }
 }
 
