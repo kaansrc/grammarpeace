@@ -566,6 +566,11 @@ async function showGrammarPanel(x, y) {
   setTimeout(() => {
     document.addEventListener('click', handleOutsideClick);
   }, 100);
+
+  // Automatically trigger grammar check when panel opens
+  setTimeout(() => {
+    checkGrammar();
+  }, 150);
 }
 
 function handleOutsideClick(event) {
