@@ -222,12 +222,12 @@ function showFloatingButton(x, y) {
 
   floatingButton.innerHTML = `✌️`;
 
-  floatingButton.addEventListener('click', (e) => {
+  floatingButton.addEventListener('click', async (e) => {
     e.stopPropagation();
     e.preventDefault();
     console.log('GrammarWise: Button clicked');
     const rect = floatingButton.getBoundingClientRect();
-    showGrammarPanel(rect.left + window.scrollX, rect.top + window.scrollY);
+    await showGrammarPanel(rect.left + window.scrollX, rect.top + window.scrollY);
   });
 
   document.body.appendChild(floatingButton);
@@ -261,11 +261,29 @@ function hideFloatingButton() {
   }
 }
 
-function showGrammarPanel(x, y) {
+// Validate extension context by attempting to communicate with background script
+async function validateExtensionContext() {
+  // First check if runtime ID exists
+  if (!chrome.runtime?.id) {
+    return false;
+  }
+
+  // Try to actually communicate with the background script
+  try {
+    const response = await chrome.runtime.sendMessage({ action: 'ping' });
+    return response && response.success;
+  } catch (error) {
+    console.error('GrammarWise: Extension context validation failed:', error);
+    return false;
+  }
+}
+
+async function showGrammarPanel(x, y) {
   console.log('GrammarWise: Showing panel at', x, y);
 
-  // Check if extension context is valid before showing panel
-  if (!chrome.runtime?.id) {
+  // Validate extension context before showing panel
+  const isValid = await validateExtensionContext();
+  if (!isValid) {
     console.error('GrammarWise: Extension context invalidated');
     alert('GrammarWise: Extension was reloaded.\n\nPlease refresh this page (F5) to continue using the extension.');
     return;

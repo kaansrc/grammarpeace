@@ -46,6 +46,12 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  // Handle ping requests for context validation
+  if (request.action === 'ping') {
+    sendResponse({ success: true });
+    return true;
+  }
+
   if (request.action === 'checkGrammar') {
     checkGrammar(request.text, request.language)
       .then(result => sendResponse(result))
