@@ -263,6 +263,14 @@ function hideFloatingButton() {
 
 function showGrammarPanel(x, y) {
   console.log('GrammarWise: Showing panel at', x, y);
+
+  // Check if extension context is valid before showing panel
+  if (!chrome.runtime?.id) {
+    console.error('GrammarWise: Extension context invalidated');
+    alert('GrammarWise: Extension was reloaded.\n\nPlease refresh this page (F5) to continue using the extension.');
+    return;
+  }
+
   hideGrammarPanel();
   hideFloatingButton();
 
