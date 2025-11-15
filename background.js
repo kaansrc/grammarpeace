@@ -124,6 +124,18 @@ async function checkGrammar(text, language) {
       correctedText = await callOpenAIAPI(apiKey, prompt, maxTokens);
     }
 
+    // Check if the text was actually changed
+    const originalTrimmed = text.trim();
+    const correctedTrimmed = correctedText.trim();
+
+    if (originalTrimmed === correctedTrimmed) {
+      return {
+        success: true,
+        noChanges: true,
+        message: 'Great! No grammar errors found.'
+      };
+    }
+
     return {
       success: true,
       correctedText: correctedText

@@ -640,8 +640,21 @@ async function checkGrammar() {
     loadingDiv.style.display = 'none';
 
     if (response && response.success) {
-      document.getElementById('grammarwise-corrected-text').textContent = response.correctedText;
-      resultDiv.style.display = 'block';
+      if (response.noChanges) {
+        // Show success message when no changes needed
+        const resultContent = document.getElementById('grammarwise-corrected-text');
+        resultContent.innerHTML = `<div style="color: #059669; font-weight: 500; padding: 12px; background: #d1fae5; border-radius: 6px; text-align: center;">✓ ${response.message}</div>`;
+        // Hide the action buttons since there's nothing to copy/replace
+        const actions = resultDiv.querySelector('.grammarwise-actions');
+        if (actions) actions.style.display = 'none';
+        resultDiv.style.display = 'block';
+      } else {
+        // Show corrected text with action buttons
+        document.getElementById('grammarwise-corrected-text').textContent = response.correctedText;
+        const actions = resultDiv.querySelector('.grammarwise-actions');
+        if (actions) actions.style.display = 'flex';
+        resultDiv.style.display = 'block';
+      }
     } else if (response && response.error) {
       showError(response.error);
     } else {
