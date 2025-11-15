@@ -113,25 +113,29 @@
     // Draw icon on canvas
     function drawIcon(canvas, size) {
       const ctx = canvas.getContext('2d');
+      const borderWidth = 2; // 2px border like the button
+      const radius = size / 2;
+      const innerRadius = radius - (borderWidth / 2);
 
       // Draw white circular background
       ctx.fillStyle = 'white';
       ctx.beginPath();
-      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+      ctx.arc(radius, radius, radius, 0, Math.PI * 2);
       ctx.fill();
 
-      // Draw black border (circle)
+      // Draw black border (2px like the button)
       ctx.strokeStyle = 'black';
-      ctx.lineWidth = size * 0.05; // 5% of size for border
+      ctx.lineWidth = borderWidth;
       ctx.beginPath();
-      ctx.arc(size / 2, size / 2, size / 2 - (size * 0.025), 0, Math.PI * 2);
+      ctx.arc(radius, radius, innerRadius, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Draw peace sign emoji ✌️
-      ctx.font = `${size * 0.55}px Arial`; // 55% of canvas size
+      // Draw peace sign emoji ✌️ centered
+      ctx.font = `${size * 0.6}px Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('✌️', size / 2, size / 2);
+      ctx.fillStyle = 'black';
+      ctx.fillText('✌️', radius, radius);
     }
 
     // Generate preview

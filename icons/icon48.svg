@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
   <!-- White circular background -->
   <circle cx="24" cy="24" r="24" fill="white"/>
 
-  <!-- Black border -->
-  <circle cx="24" cy="24" r="22.8" fill="none" stroke="black" stroke-width="2.4000000000000004"/>
+  <!-- Black border (2px like the button) -->
+  <circle cx="24" cy="24" r="23" fill="none" stroke="black" stroke-width="2"/>
 
-  <!-- Peace sign emoji -->
-  <text x="50%" y="50%" font-size="26.400000000000002" text-anchor="middle" dominant-baseline="central">✌️</text>
+  <!-- Peace sign emoji centered -->
+  <text x="24" y="24" font-size="28.799999999999997" text-anchor="middle" dominant-baseline="middle" fill="black">✌️</text>
 </svg>
