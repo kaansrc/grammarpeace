@@ -10,6 +10,29 @@ chrome.runtime.onInstalled.addListener(() => {
   });
   console.log('GrammarWise: Context menu created');
   console.log('GrammarWise: Keyboard shortcut: Ctrl+Shift+G (Cmd+Shift+G on Mac)');
+
+  // Setup keep-alive alarm
+  setupKeepAlive();
+});
+
+// Keep service worker alive to prevent context invalidation
+function setupKeepAlive() {
+  // Create an alarm that fires every 20 seconds
+  chrome.alarms.create('keepAlive', { periodInMinutes: 0.33 }); // 20 seconds
+  console.log('GrammarWise: Keep-alive alarm created');
+}
+
+// Handle alarm to keep service worker alive
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'keepAlive') {
+    // Simple operation to keep service worker alive
+    console.log('GrammarWise: Keep-alive ping');
+  }
+});
+
+// Ensure keep-alive is set up on startup
+chrome.runtime.onStartup.addListener(() => {
+  setupKeepAlive();
 });
 
 // Handle keyboard shortcut command

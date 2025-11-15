@@ -261,21 +261,41 @@ function hideFloatingButton() {
   }
 }
 
+// Helper function to send message with retry logic
+async function sendMessageWithRetry(message, maxRetries = 3, delayMs = 100) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      // Check if runtime ID exists
+      if (!chrome.runtime?.id) {
+        if (attempt < maxRetries) {
+          console.log(`GrammarWise: Runtime ID not found, retry ${attempt}/${maxRetries}`);
+          await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
+          continue;
+        }
+        return null;
+      }
+
+      const response = await chrome.runtime.sendMessage(message);
+      return response;
+    } catch (error) {
+      console.log(`GrammarWise: Message failed (attempt ${attempt}/${maxRetries}):`, error.message);
+
+      if (attempt < maxRetries) {
+        // Wait before retrying with exponential backoff
+        await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
+      } else {
+        console.error('GrammarWise: All retry attempts failed');
+        return null;
+      }
+    }
+  }
+  return null;
+}
+
 // Validate extension context by attempting to communicate with background script
 async function validateExtensionContext() {
-  // First check if runtime ID exists
-  if (!chrome.runtime?.id) {
-    return false;
-  }
-
-  // Try to actually communicate with the background script
-  try {
-    const response = await chrome.runtime.sendMessage({ action: 'ping' });
-    return response && response.success;
-  } catch (error) {
-    console.error('GrammarWise: Extension context validation failed:', error);
-    return false;
-  }
+  const response = await sendMessageWithRetry({ action: 'ping' }, 3, 100);
+  return response && response.success;
 }
 
 async function showGrammarPanel(x, y) {
@@ -609,22 +629,12 @@ async function checkGrammar() {
   errorDiv.style.display = 'none';
 
   try {
-    // Check if extension context is valid
-    if (!chrome.runtime?.id) {
-      throw new Error('Extension context invalidated. Please refresh the page.');
-    }
-
-    // Send message to background script
-    const response = await chrome.runtime.sendMessage({
+    // Send message to background script with retry logic
+    const response = await sendMessageWithRetry({
       action: 'checkGrammar',
       text: selectedText,
       language: language
     });
-
-    // Check for runtime errors after sendMessage
-    if (chrome.runtime.lastError) {
-      throw new Error(chrome.runtime.lastError.message);
-    }
 
     console.log('GrammarWise: Received response:', response);
     loadingDiv.style.display = 'none';
@@ -632,19 +642,15 @@ async function checkGrammar() {
     if (response && response.success) {
       document.getElementById('grammarwise-corrected-text').textContent = response.correctedText;
       resultDiv.style.display = 'block';
+    } else if (response && response.error) {
+      showError(response.error);
     } else {
-      showError(response?.error || 'Failed to check grammar');
+      showError('Failed to check grammar. Please refresh the page and try again.');
     }
   } catch (error) {
     console.error('GrammarWise: Error during grammar check:', error);
     loadingDiv.style.display = 'none';
-
-    // Handle specific error cases
-    if (error.message.includes('Extension context invalidated')) {
-      showError('Extension was reloaded. Please refresh this page and try again.');
-    } else {
-      showError(error.message || 'An error occurred');
-    }
+    showError(error.message || 'An error occurred');
   } finally {
     isProcessing = false;
   }
@@ -671,22 +677,12 @@ async function rewriteWithTone() {
   errorDiv.style.display = 'none';
 
   try {
-    // Check if extension context is valid
-    if (!chrome.runtime?.id) {
-      throw new Error('Extension context invalidated. Please refresh the page.');
-    }
-
-    // Send message to background script
-    const response = await chrome.runtime.sendMessage({
+    // Send message to background script with retry logic
+    const response = await sendMessageWithRetry({
       action: 'rewriteWithTone',
       text: selectedText,
       tone: tone
     });
-
-    // Check for runtime errors after sendMessage
-    if (chrome.runtime.lastError) {
-      throw new Error(chrome.runtime.lastError.message);
-    }
 
     console.log('GrammarWise: Received tone rewrite response:', response);
     loadingDiv.style.display = 'none';
@@ -694,19 +690,15 @@ async function rewriteWithTone() {
     if (response && response.success) {
       document.getElementById('grammarwise-rewritten-text').textContent = response.rewrittenText;
       resultDiv.style.display = 'block';
+    } else if (response && response.error) {
+      showToneError(response.error);
     } else {
-      showToneError(response?.error || 'Failed to rewrite with tone');
+      showToneError('Failed to rewrite with tone. Please refresh the page and try again.');
     }
   } catch (error) {
     console.error('GrammarWise: Error during tone rewrite:', error);
     loadingDiv.style.display = 'none';
-
-    // Handle specific error cases
-    if (error.message.includes('Extension context invalidated')) {
-      showToneError('Extension was reloaded. Please refresh this page and try again.');
-    } else {
-      showToneError(error.message || 'An error occurred');
-    }
+    showToneError(error.message || 'An error occurred');
   } finally {
     isProcessing = false;
   }
@@ -1025,23 +1017,13 @@ async function translateText() {
   errorDiv.style.display = 'none';
 
   try {
-    // Check if extension context is valid
-    if (!chrome.runtime?.id) {
-      throw new Error('Extension context invalidated. Please refresh the page.');
-    }
-
-    // Send message to background script
-    const response = await chrome.runtime.sendMessage({
+    // Send message to background script with retry logic
+    const response = await sendMessageWithRetry({
       action: 'translateText',
       text: selectedText,
       fromLang: fromLang,
       toLang: toLang
     });
-
-    // Check for runtime errors after sendMessage
-    if (chrome.runtime.lastError) {
-      throw new Error(chrome.runtime.lastError.message);
-    }
 
     console.log('GrammarWise: Received translation response:', response);
     loadingDiv.style.display = 'none';
@@ -1049,19 +1031,15 @@ async function translateText() {
     if (response && response.success) {
       document.getElementById('grammarwise-translated-text').textContent = response.translatedText;
       resultDiv.style.display = 'block';
+    } else if (response && response.error) {
+      showTranslateError(response.error);
     } else {
-      showTranslateError(response?.error || 'Failed to translate');
+      showTranslateError('Failed to translate. Please refresh the page and try again.');
     }
   } catch (error) {
     console.error('GrammarWise: Error during translation:', error);
     loadingDiv.style.display = 'none';
-
-    // Handle specific error cases
-    if (error.message.includes('Extension context invalidated')) {
-      showTranslateError('Extension was reloaded. Please refresh this page and try again.');
-    } else {
-      showTranslateError(error.message || 'An error occurred');
-    }
+    showTranslateError(error.message || 'An error occurred');
   } finally {
     isProcessing = false;
   }
