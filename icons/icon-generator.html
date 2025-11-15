@@ -89,7 +89,7 @@
       <canvas id="preview128" width="128" height="128"></canvas>
       <div>
         <strong style="color: #111827;">Preview (128x128)</strong><br>
-        <span style="color: #6b7280; font-size: 14px;">Purple gradient with checkmark</span>
+        <span style="color: #6b7280; font-size: 14px;">White background with peace sign ✌️</span>
       </div>
     </div>
 
@@ -114,29 +114,24 @@
     function drawIcon(canvas, size) {
       const ctx = canvas.getContext('2d');
 
-      // Create gradient background
-      const gradient = ctx.createLinearGradient(0, 0, size, size);
-      gradient.addColorStop(0, '#6366f1');
-      gradient.addColorStop(1, '#4f46e5');
-
-      // Draw rounded rectangle background
-      const radius = size * 0.1875; // 24/128 = 0.1875
-      ctx.fillStyle = gradient;
+      // Draw white circular background
+      ctx.fillStyle = 'white';
       ctx.beginPath();
-      ctx.roundRect(0, 0, size, size, radius);
+      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
       ctx.fill();
 
-      // Draw checkmark
-      ctx.strokeStyle = 'white';
-      ctx.lineWidth = size * 0.078; // 10/128 = 0.078
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
+      // Draw black border (circle)
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = size * 0.05; // 5% of size for border
       ctx.beginPath();
-      ctx.moveTo(size * 0.28, size * 0.5);
-      ctx.lineTo(size * 0.406, size * 0.625);
-      ctx.lineTo(size * 0.719, size * 0.313);
+      ctx.arc(size / 2, size / 2, size / 2 - (size * 0.025), 0, Math.PI * 2);
       ctx.stroke();
+
+      // Draw peace sign emoji ✌️
+      ctx.font = `${size * 0.55}px Arial`; // 55% of canvas size
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('✌️', size / 2, size / 2);
     }
 
     // Generate preview
