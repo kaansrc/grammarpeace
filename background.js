@@ -408,7 +408,7 @@ function createToneRewritePrompt(text, tone) {
     },
     clear: {
       description: 'natural and native-sounding',
-      details: 'Rewrite to sound like a native English speaker wrote it. Fix unnatural phrasing, awkward word choices, and non-native patterns while keeping the original tone and meaning. Make the text flow naturally and feel authentic.'
+      details: 'Make the text sound like a native English speaker wrote it while STRICTLY preserving the original tone. If casual, keep it casual. If it uses contractions, keep contractions. Keep the same level of formality, warmth, and personality. Only fix unnatural phrasing and awkward word choices - do NOT make it more formal or corporate.'
     }
   };
 
