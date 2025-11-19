@@ -328,7 +328,6 @@ async function showGrammarPanel(x, y) {
       <!-- Grammar Tab -->
       <div id="grammarwise-tab-grammar" class="grammarwise-tab-content active">
         <div class="grammarwise-controls">
-          <label for="grammarwise-language">Language:</label>
           <select id="grammarwise-language" class="grammarwise-select">
             <option value="auto">Auto-detect</option>
             <option value="en">English</option>
@@ -348,6 +347,7 @@ async function showGrammarPanel(x, y) {
             <option value="pl">Polish</option>
           </select>
           <button id="grammarwise-check" class="grammarwise-btn-primary">Check Grammar</button>
+          <button id="grammarwise-improve" class="grammarwise-btn">Improve</button>
         </div>
         <div class="grammarwise-original">
           <strong>Original:</strong>
@@ -558,6 +558,7 @@ async function showGrammarPanel(x, y) {
 
   // Grammar tab event listeners
   document.getElementById('grammarwise-check').addEventListener('click', checkGrammar);
+  document.getElementById('grammarwise-improve').addEventListener('click', improveText);
 
   const copyBtn = document.getElementById('grammarwise-copy');
   const replaceBtn = document.getElementById('grammarwise-replace');
@@ -663,6 +664,67 @@ async function checkGrammar() {
     }
   } catch (error) {
     console.error('GrammarWise: Error during grammar check:', error);
+    loadingDiv.style.display = 'none';
+    showError(error.message || 'An error occurred');
+  } finally {
+    isProcessing = false;
+  }
+}
+
+async function improveText() {
+  // Prevent multiple simultaneous operations
+  if (isProcessing) {
+    console.log('GrammarWise: Already processing, ignoring request');
+    return;
+  }
+
+  console.log('GrammarWise: Improving text...');
+  isProcessing = true;
+
+  const loadingDiv = document.getElementById('grammarwise-loading');
+  const resultDiv = document.getElementById('grammarwise-result');
+  const errorDiv = document.getElementById('grammarwise-error');
+
+  // Show loading
+  loadingDiv.style.display = 'block';
+  resultDiv.style.display = 'none';
+  errorDiv.style.display = 'none';
+
+  // Update loading text
+  const loadingText = loadingDiv.querySelector('p');
+  if (loadingText) loadingText.textContent = 'Improving text...';
+
+  try {
+    // Send message to background script with 'clear' tone for improvement
+    const response = await sendMessageWithRetry({
+      action: 'rewriteWithTone',
+      text: selectedText,
+      tone: 'clear'
+    });
+
+    console.log('GrammarWise: Received improve response:', response);
+    loadingDiv.style.display = 'none';
+
+    // Reset loading text
+    if (loadingText) loadingText.textContent = 'Checking grammar...';
+
+    if (response && response.success) {
+      // Show improved text with action buttons
+      document.getElementById('grammarwise-corrected-text').textContent = response.rewrittenText;
+      const actions = resultDiv.querySelector('.grammarwise-actions');
+      if (actions) actions.style.display = 'flex';
+      resultDiv.style.display = 'block';
+
+      // Update the label to show "Improved:" instead of "Corrected:"
+      const strongLabel = resultDiv.querySelector('strong');
+      if (strongLabel) strongLabel.textContent = 'Improved:';
+    } else if (response && response.error) {
+      showError(response.error);
+    } else {
+      showError('Failed to improve text. Please refresh the page and try again.');
+    }
+  } catch (error) {
+    console.error('GrammarWise: Error during text improvement:', error);
     loadingDiv.style.display = 'none';
     showError(error.message || 'An error occurred');
   } finally {
