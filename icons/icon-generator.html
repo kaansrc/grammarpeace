@@ -131,10 +131,10 @@
       ctx.stroke();
 
       // Draw peace sign emoji ✌️ centered
-      ctx.font = `${size * 0.6}px Arial`;
+      // Note: Don't set fillStyle for emoji - let browser use system color emoji font
+      ctx.font = `${size * 0.6}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", Arial`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = 'black';
       ctx.fillText('✌️', radius, radius);
     }
 

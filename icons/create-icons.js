@@ -17,8 +17,8 @@ sizes.forEach(size => {
   <!-- Black border (2px like the button) -->
   <circle cx="${radius}" cy="${radius}" r="${innerRadius}" fill="none" stroke="black" stroke-width="${borderWidth}"/>
 
-  <!-- Peace sign emoji centered -->
-  <text x="${radius}" y="${radius}" font-size="${size * 0.6}" text-anchor="middle" dominant-baseline="middle" fill="black">✌️</text>
+  <!-- Peace sign emoji centered (no fill to preserve emoji colors) -->
+  <text x="${radius}" y="${radius}" font-size="${size * 0.6}" text-anchor="middle" dominant-baseline="middle">✌️</text>
 </svg>`;
 
   fs.writeFileSync(`icon${size}.svg`, svg);
