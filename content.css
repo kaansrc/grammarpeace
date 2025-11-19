@@ -167,8 +167,8 @@
   color: #111827;
   cursor: pointer;
   transition: all 0.2s ease;
-  flex: 1;
-  min-width: 120px;
+  min-width: 100px;
+  max-width: 140px;
   appearance: auto;
   -webkit-appearance: menulist;
   -moz-appearance: menulist;
