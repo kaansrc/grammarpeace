@@ -346,7 +346,7 @@ async function showGrammarPanel(x, y) {
             <option value="nl">Dutch</option>
             <option value="pl">Polish</option>
           </select>
-          <button id="grammarwise-check" class="grammarwise-btn-primary">Check Grammar</button>
+          <button id="grammarwise-check" class="grammarwise-btn-primary">Check</button>
           <button id="grammarwise-improve" class="grammarwise-btn">Improve</button>
         </div>
         <div class="grammarwise-original">
