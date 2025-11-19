@@ -405,6 +405,10 @@ function createToneRewritePrompt(text, tone) {
     concise: {
       description: 'concise and to-the-point',
       details: 'Remove unnecessary words, use direct language, keep sentences short and impactful.'
+    },
+    clear: {
+      description: 'clear, improved, and well-structured',
+      details: 'Restructure sentences for better clarity and flow. Simplify complex phrasing, improve logical connections between ideas, and make the writing easier to understand while preserving the core message and intent.'
     }
   };
 
