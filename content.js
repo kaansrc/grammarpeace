@@ -378,6 +378,7 @@ async function showGrammarPanel(x, y) {
             <option value="friendly">Friendly</option>
             <option value="formal">Formal</option>
             <option value="concise">Concise</option>
+            <option value="clear">Clear & Improved</option>
           </select>
           <button id="grammarwise-rewrite-tone" class="grammarwise-btn-primary">Rewrite</button>
         </div>
