@@ -407,8 +407,8 @@ function createToneRewritePrompt(text, tone) {
       details: 'Remove unnecessary words, use direct language, keep sentences short and impactful.'
     },
     clear: {
-      description: 'clear, improved, and well-structured',
-      details: 'Restructure sentences for better clarity and flow. Simplify complex phrasing, improve logical connections between ideas, and make the writing easier to understand while preserving the core message and intent.'
+      description: 'natural and native-sounding',
+      details: 'Make the text sound like a native English speaker wrote it while STRICTLY preserving the original tone. If casual, keep it casual. If it uses contractions, keep contractions. Keep the same level of formality, warmth, and personality. Only fix unnatural phrasing and awkward word choices - do NOT make it more formal or corporate.'
     }
   };
 
