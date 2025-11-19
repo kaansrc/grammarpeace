@@ -95,9 +95,24 @@
 
     <button onclick="generateAllIcons()">📥 Generate & Download All Icons</button>
 
+    <div class="progress" id="progress" style="display: none; margin-top: 16px; padding: 12px; background: #fef3c7; border-radius: 8px; color: #92400e;">
+      Downloading... <span id="progress-text">0/4</span>
+      <br><small>If downloads are blocked, click "Allow" in your browser</small>
+    </div>
+
     <div class="success" id="success">
       ✅ All icons generated! Check your downloads folder for:<br>
       icon16.png, icon32.png, icon48.png, icon128.png
+    </div>
+
+    <div style="margin-top: 16px;">
+      <strong>Or download individually:</strong>
+      <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+        <button onclick="downloadSingle(16)" style="width: auto; padding: 8px 16px; font-size: 14px;">16px</button>
+        <button onclick="downloadSingle(32)" style="width: auto; padding: 8px 16px; font-size: 14px;">32px</button>
+        <button onclick="downloadSingle(48)" style="width: auto; padding: 8px 16px; font-size: 14px;">48px</button>
+        <button onclick="downloadSingle(128)" style="width: auto; padding: 8px 16px; font-size: 14px;">128px</button>
+      </div>
     </div>
 
     <div class="info">
