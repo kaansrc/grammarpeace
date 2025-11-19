@@ -407,8 +407,8 @@ function createToneRewritePrompt(text, tone) {
       details: 'Remove unnecessary words, use direct language, keep sentences short and impactful.'
     },
     clear: {
-      description: 'clear, improved, and well-structured',
-      details: 'Restructure sentences for better clarity and flow. Simplify complex phrasing, improve logical connections between ideas, and make the writing easier to understand while preserving the core message and intent.'
+      description: 'natural and native-sounding',
+      details: 'Rewrite to sound like a native English speaker wrote it. Fix unnatural phrasing, awkward word choices, and non-native patterns while keeping the original tone and meaning. Make the text flow naturally and feel authentic.'
     }
   };
 
