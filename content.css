@@ -1,8 +1,53 @@
+/* CSS Variables for Light/Dark Theme - Typewriter Style */
+:root {
+  --gw-bg-primary: #ffffff;
+  --gw-bg-secondary: #fafafa;
+  --gw-bg-tertiary: #f0f0f0;
+  --gw-text-primary: #1a1a1a;
+  --gw-text-secondary: #333333;
+  --gw-text-tertiary: #666666;
+  --gw-border: #e0e0e0;
+  --gw-border-hover: #cccccc;
+  --gw-accent: #e85d04;
+  --gw-accent-hover: #d45303;
+  --gw-accent-subtle: rgba(232, 93, 4, 0.1);
+  --gw-success-bg: #e8f5e9;
+  --gw-success-text: #2e7d32;
+  --gw-error-bg: #ffebee;
+  --gw-error-text: #c62828;
+  --gw-error-border: #ffcdd2;
+  --gw-shadow: rgba(0, 0, 0, 0.15);
+  --gw-shadow-accent: rgba(232, 93, 4, 0.3);
+}
+
+/* Dark Theme - Inverted Typewriter */
+#grammarwise-panel.dark-theme,
+#grammarwise-floating-button.dark-theme {
+  --gw-bg-primary: #1a1a1a;
+  --gw-bg-secondary: #252525;
+  --gw-bg-tertiary: #333333;
+  --gw-text-primary: #f5f5f5;
+  --gw-text-secondary: #e0e0e0;
+  --gw-text-tertiary: #999999;
+  --gw-border: #404040;
+  --gw-border-hover: #555555;
+  --gw-accent: #ff7b29;
+  --gw-accent-hover: #ff9150;
+  --gw-accent-subtle: rgba(255, 123, 41, 0.15);
+  --gw-success-bg: #1b3d1f;
+  --gw-success-text: #81c784;
+  --gw-error-bg: #3d1b1b;
+  --gw-error-text: #ef9a9a;
+  --gw-error-border: #5c2828;
+  --gw-shadow: rgba(0, 0, 0, 0.4);
+  --gw-shadow-accent: rgba(255, 123, 41, 0.3);
+}
+
 /* GrammarWise Floating Button */
 #grammarwise-floating-button {
   position: absolute;
   z-index: 2147483647;
-  background: #6366f1;
+  background: var(--gw-accent);
   color: white;
   border-radius: 50%;
   width: 40px;
@@ -11,13 +56,13 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px var(--gw-shadow-accent);
   transition: all 0.2s ease;
   animation: grammarwise-fadeIn 0.2s ease;
 }
 
 #grammarwise-floating-button:hover {
-  background: #4f46e5;
+  background: var(--gw-accent-hover);
   transform: scale(1.1);
 }
 
@@ -25,10 +70,10 @@
 #grammarwise-panel {
   position: fixed;
   z-index: 2147483647;
-  background: white;
+  background: var(--gw-bg-primary);
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  width: 400px;
+  box-shadow: 0 10px 40px var(--gw-shadow);
+  width: 450px;
   max-width: 90vw;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   animation: grammarwise-slideUp 0.3s ease;
@@ -42,23 +87,37 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--gw-border);
   flex-shrink: 0;
-  background: white;
+  background: var(--gw-bg-primary);
+}
+
+.grammarwise-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .grammarwise-header h3 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: var(--gw-text-primary);
+}
+
+.grammarwise-stats {
+  font-size: 12px;
+  color: var(--gw-text-tertiary);
+  background: var(--gw-bg-tertiary);
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
 .grammarwise-close-btn {
   background: none;
   border: none;
   font-size: 28px;
-  color: #9ca3af;
+  color: var(--gw-text-tertiary);
   cursor: pointer;
   padding: 0;
   width: 30px;
@@ -74,16 +133,16 @@
 }
 
 .grammarwise-close-btn:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: var(--gw-bg-tertiary);
+  color: var(--gw-text-primary);
 }
 
 /* Tabs */
 .grammarwise-tabs {
   display: flex;
   gap: 0;
-  border-bottom: 2px solid #e5e7eb;
-  background: white;
+  border-bottom: 2px solid var(--gw-border);
+  background: var(--gw-bg-primary);
   flex-shrink: 0;
 }
 
@@ -94,7 +153,7 @@
   border: none;
   font-size: 14px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--gw-text-tertiary);
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
@@ -103,13 +162,13 @@
 }
 
 .grammarwise-tab:hover {
-  color: #374151;
-  background: #f9fafb;
+  color: var(--gw-text-secondary);
+  background: var(--gw-bg-secondary);
 }
 
 .grammarwise-tab.active {
-  color: #6366f1;
-  border-bottom-color: #6366f1;
+  color: var(--gw-accent);
+  border-bottom-color: var(--gw-accent);
 }
 
 .grammarwise-tab-content {
@@ -125,6 +184,7 @@
   overflow-y: auto;
   flex: 1;
   min-height: 0;
+  background: var(--gw-bg-primary);
 }
 
 .grammarwise-section {
@@ -134,13 +194,13 @@
 .grammarwise-section-title {
   font-size: 15px;
   font-weight: 600;
-  color: #111827;
+  color: var(--gw-text-primary);
   margin-bottom: 12px;
 }
 
 .grammarwise-divider {
   height: 1px;
-  background: #e5e7eb;
+  background: var(--gw-border);
   margin: 24px 0;
 }
 
@@ -155,16 +215,16 @@
 .grammarwise-controls label {
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: var(--gw-text-secondary);
 }
 
 .grammarwise-select {
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--gw-border-hover);
   border-radius: 6px;
   font-size: 14px;
-  background: white;
-  color: #111827;
+  background: var(--gw-bg-primary);
+  color: var(--gw-text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
   min-width: 100px;
@@ -175,26 +235,26 @@
 }
 
 .grammarwise-select option {
-  color: #111827;
-  background: white;
+  color: var(--gw-text-primary);
+  background: var(--gw-bg-primary);
   padding: 8px;
 }
 
 .grammarwise-select option:checked {
-  background: #6366f1;
+  background: var(--gw-accent);
   color: white;
 }
 
 .grammarwise-select option:hover {
-  background: #f3f4f6;
+  background: var(--gw-bg-tertiary);
 }
 
 .grammarwise-select:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-  background: white;
-  color: #111827;
+  border-color: var(--gw-accent);
+  box-shadow: 0 0 0 3px var(--gw-accent-subtle);
+  background: var(--gw-bg-primary);
+  color: var(--gw-text-primary);
 }
 
 .grammarwise-btn,
@@ -209,21 +269,21 @@
 }
 
 .grammarwise-btn {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--gw-bg-tertiary);
+  color: var(--gw-text-secondary);
 }
 
 .grammarwise-btn:hover {
-  background: #e5e7eb;
+  background: var(--gw-border);
 }
 
 .grammarwise-btn-primary {
-  background: #6366f1;
+  background: var(--gw-accent);
   color: white;
 }
 
 .grammarwise-btn-primary:hover {
-  background: #4f46e5;
+  background: var(--gw-accent-hover);
 }
 
 .grammarwise-original,
@@ -239,17 +299,17 @@
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: var(--gw-text-secondary);
   margin-bottom: 8px;
 }
 
 .grammarwise-text {
   padding: 12px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: var(--gw-bg-secondary);
+  border: 1px solid var(--gw-border);
   border-radius: 6px;
   font-size: 14px;
-  color: #111827;
+  color: var(--gw-text-primary);
   line-height: 1.6;
   max-height: 150px;
   overflow-y: auto;
@@ -262,7 +322,7 @@
   flex-shrink: 0;
   position: sticky;
   bottom: 0;
-  background: white;
+  background: var(--gw-bg-primary);
   padding-top: 8px;
 }
 
@@ -272,8 +332,8 @@
 }
 
 .grammarwise-spinner {
-  border: 3px solid #e5e7eb;
-  border-top: 3px solid #6366f1;
+  border: 3px solid var(--gw-border);
+  border-top: 3px solid var(--gw-accent);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -284,15 +344,15 @@
 .grammarwise-loading p {
   margin: 0;
   font-size: 14px;
-  color: #6b7280;
+  color: var(--gw-text-tertiary);
 }
 
 .grammarwise-error {
   padding: 12px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+  background: var(--gw-error-bg);
+  border: 1px solid var(--gw-error-border);
   border-radius: 6px;
-  color: #dc2626;
+  color: var(--gw-error-text);
   font-size: 14px;
   margin-top: 12px;
 }
@@ -331,15 +391,496 @@
 }
 
 .grammarwise-text::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--gw-bg-secondary);
   border-radius: 3px;
 }
 
 .grammarwise-text::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--gw-border-hover);
   border-radius: 3px;
 }
 
 .grammarwise-text::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: var(--gw-text-tertiary);
+}
+
+/* Result header with diff toggle */
+.grammarwise-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.grammarwise-result-header strong {
+  margin-bottom: 0;
+}
+
+/* Small button for diff toggle */
+.grammarwise-btn-small {
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--gw-border);
+  background: var(--gw-bg-secondary);
+  color: var(--gw-text-tertiary);
+}
+
+.grammarwise-btn-small:hover {
+  background: var(--gw-bg-tertiary);
+  color: var(--gw-text-secondary);
+}
+
+.grammarwise-btn-small.active {
+  background: var(--gw-accent);
+  color: white;
+  border-color: var(--gw-accent);
+}
+
+/* Diff highlighting */
+.gw-diff-add {
+  background: #dcfce7;
+  color: #166534;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+.gw-diff-remove {
+  background: #fee2e2;
+  color: #991b1b;
+  text-decoration: line-through;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+/* Dark theme diff colors */
+#grammarwise-panel.dark-theme .gw-diff-add {
+  background: #166534;
+  color: #bbf7d0;
+}
+
+#grammarwise-panel.dark-theme .gw-diff-remove {
+  background: #991b1b;
+  color: #fecaca;
+}
+
+/* History styles */
+.grammarwise-history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--gw-border);
+}
+
+.grammarwise-history-header span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gw-text-secondary);
+}
+
+.grammarwise-history-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.grammarwise-history-empty {
+  text-align: center;
+  color: var(--gw-text-tertiary);
+  font-size: 14px;
+  padding: 20px;
+}
+
+.grammarwise-history-item {
+  padding: 10px;
+  border: 1px solid var(--gw-border);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background: var(--gw-bg-secondary);
+}
+
+.grammarwise-history-item:last-child {
+  margin-bottom: 0;
+}
+
+.grammarwise-history-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.grammarwise-history-type {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--gw-accent);
+  background: var(--gw-accent-subtle);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.grammarwise-history-time {
+  font-size: 11px;
+  color: var(--gw-text-tertiary);
+}
+
+.grammarwise-history-original {
+  font-size: 12px;
+  color: var(--gw-text-tertiary);
+  margin-bottom: 4px;
+  text-decoration: line-through;
+}
+
+.grammarwise-history-result {
+  font-size: 13px;
+  color: var(--gw-text-primary);
+  margin-bottom: 8px;
+}
+
+.grammarwise-history-use {
+  float: right;
+}
+
+/* Presets row */
+.grammarwise-presets-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.grammarwise-preset-select {
+  flex: 1;
+  max-width: none;
+}
+
+/* Detected tone badge */
+.grammarwise-tone-detected {
+  background: var(--gw-bg-secondary);
+  border: 1px solid var(--gw-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--gw-text-secondary);
+}
+
+.grammarwise-tone-detected strong {
+  color: var(--gw-accent);
+}
+
+/* Writing Statistics */
+.grammarwise-stats-details {
+  margin: 12px 0;
+  border: 1px solid var(--gw-border);
+  border-radius: 6px;
+  background: var(--gw-bg-secondary);
+}
+
+.grammarwise-stats-summary {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gw-text-secondary);
+  user-select: none;
+}
+
+.grammarwise-stats-summary:hover {
+  color: var(--gw-text-primary);
+}
+
+.grammarwise-writing-stats {
+  padding: 0 12px 12px;
+}
+
+.grammarwise-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.grammarwise-stat-item {
+  text-align: center;
+  padding: 8px;
+  background: var(--gw-bg-primary);
+  border-radius: 4px;
+}
+
+.grammarwise-stat-value {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--gw-accent);
+}
+
+.grammarwise-stat-label {
+  display: block;
+  font-size: 10px;
+  color: var(--gw-text-tertiary);
+  margin-top: 2px;
+}
+
+.grammarwise-stats-detail {
+  border-top: 1px solid var(--gw-border);
+  padding-top: 10px;
+}
+
+.grammarwise-stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--gw-text-secondary);
+  padding: 4px 0;
+}
+
+.grammarwise-stats-empty {
+  text-align: center;
+  color: var(--gw-text-tertiary);
+  font-size: 13px;
+  padding: 12px;
+}
+
+/* Alternatives Section */
+.grammarwise-alternatives-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--gw-border);
+}
+
+.grammarwise-alternatives-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.grammarwise-alternatives-header strong {
+  font-size: 13px;
+  color: var(--gw-text-secondary);
+}
+
+.grammarwise-alternatives-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--gw-text-tertiary);
+  padding: 8px 0;
+}
+
+.grammarwise-mini-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--gw-border);
+  border-top-color: var(--gw-accent);
+  border-radius: 50%;
+  animation: grammarwise-spin 0.8s linear infinite;
+}
+
+.grammarwise-alternatives-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grammarwise-alternative-item {
+  background: var(--gw-bg-secondary);
+  border: 1px solid var(--gw-border);
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.grammarwise-alternative-item:hover {
+  border-color: var(--gw-border-hover);
+}
+
+.grammarwise-alternative-text {
+  font-size: 13px;
+  color: var(--gw-text-primary);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.grammarwise-alternative-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.grammarwise-alt-use,
+.grammarwise-alt-copy {
+  font-size: 11px !important;
+  padding: 4px 8px !important;
+}
+
+.grammarwise-alternatives-error {
+  font-size: 12px;
+  color: var(--gw-error-text);
+  padding: 8px;
+  background: var(--gw-error-bg);
+  border-radius: 4px;
+}
+
+/* Result Header Buttons */
+.grammarwise-result-header-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+/* Explanation Section */
+.grammarwise-explanation-section {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--gw-bg-secondary);
+  border: 1px solid var(--gw-border);
+  border-radius: 6px;
+}
+
+.grammarwise-explanation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.grammarwise-explanation-header strong {
+  font-size: 13px;
+  color: var(--gw-text-secondary);
+}
+
+.grammarwise-explanation-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--gw-text-tertiary);
+  padding: 8px 0;
+}
+
+.grammarwise-explanation-content {
+  font-size: 13px;
+  color: var(--gw-text-primary);
+  line-height: 1.6;
+}
+
+.grammarwise-explanation-bullet {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 8px;
+}
+
+.grammarwise-explanation-bullet::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--gw-accent);
+  font-weight: bold;
+}
+
+.grammarwise-explanation-line {
+  margin-bottom: 8px;
+}
+
+.grammarwise-explanation-error {
+  font-size: 12px;
+  color: var(--gw-error-text);
+  padding: 8px;
+  background: var(--gw-error-bg);
+  border-radius: 4px;
+}
+
+/* More Tab - Section styles */
+.grammarwise-section-desc {
+  font-size: 12px;
+  color: var(--gw-text-tertiary);
+  margin-bottom: 12px;
+}
+
+/* Presets Management */
+.grammarwise-presets-manage {
+  margin-top: 8px;
+}
+
+.grammarwise-preset-create {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.grammarwise-preset-create .grammarwise-select {
+  min-width: 100px;
+  flex: 1;
+}
+
+.grammarwise-presets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.grammarwise-presets-empty {
+  text-align: center;
+  color: var(--gw-text-tertiary);
+  font-size: 13px;
+  padding: 16px;
+  margin: 0;
+}
+
+.grammarwise-preset-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--gw-bg-secondary);
+  border: 1px solid var(--gw-border);
+  border-radius: 6px;
+}
+
+.grammarwise-preset-item:hover {
+  border-color: var(--gw-border-hover);
+}
+
+.grammarwise-preset-info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.grammarwise-preset-lang {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gw-accent);
+  background: var(--gw-accent-subtle);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.grammarwise-preset-tone {
+  font-size: 12px;
+  color: var(--gw-text-secondary);
+  background: var(--gw-bg-tertiary);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.grammarwise-preset-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.grammarwise-preset-delete {
+  color: var(--gw-error-text) !important;
+  font-weight: bold;
 }

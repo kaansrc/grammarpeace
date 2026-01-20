@@ -13,7 +13,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #1a1a1a;
       min-height: 100vh;
       padding: 40px 20px;
     }
@@ -23,12 +23,12 @@
       margin: 0 auto;
       background: white;
       border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
       overflow: hidden;
     }
 
     .header {
-      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      background: #1a1a1a;
       color: white;
       padding: 32px;
       text-align: center;
@@ -102,8 +102,8 @@
     input[type="password"]:focus,
     select:focus {
       outline: none;
-      border-color: #6366f1;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      border-color: #e85d04;
+      box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.1);
     }
 
     .help-text {
@@ -113,7 +113,7 @@
     }
 
     .help-text a {
-      color: #6366f1;
+      color: #e85d04;
       text-decoration: none;
     }
 
@@ -139,15 +139,15 @@
     }
 
     .btn-primary {
-      background: #6366f1;
+      background: #e85d04;
       color: white;
       flex: 1;
     }
 
     .btn-primary:hover {
-      background: #4f46e5;
+      background: #d45303;
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      box-shadow: 0 4px 12px rgba(232, 93, 4, 0.4);
     }
 
     .btn-secondary {
@@ -228,6 +228,67 @@
       height: 1px;
       background: #e5e7eb;
       margin: 32px 0;
+    }
+
+    .dictionary-input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dictionary-input-row input {
+      flex: 1;
+    }
+
+    .dictionary-input-row button {
+      white-space: nowrap;
+    }
+
+    .dictionary-words {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      min-height: 40px;
+      padding: 12px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .dictionary-word {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #374151;
+    }
+
+    .dictionary-word:hover {
+      border-color: #d1d5db;
+    }
+
+    .dictionary-word .remove-word {
+      cursor: pointer;
+      color: #9ca3af;
+      font-size: 16px;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .dictionary-word .remove-word:hover {
+      color: #ef4444;
+    }
+
+    .empty-dictionary {
+      color: #9ca3af;
+      font-size: 13px;
+      margin: 0;
+      width: 100%;
+      text-align: center;
     }
   </style>
 </head>
@@ -339,6 +400,30 @@
 
         <div class="section">
           <div class="section-title">
+            <span>🎨</span>
+            <span>Appearance</span>
+          </div>
+          <div class="section-description">
+            Customize how GrammarWise looks.
+          </div>
+
+          <div class="form-group">
+            <label for="theme">Theme</label>
+            <select id="theme">
+              <option value="system">System (Auto)</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+            <div class="help-text">
+              Choose your preferred theme or let GrammarWise follow your system settings.
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+          <div class="section-title">
             <span>⚙️</span>
             <span>Default Preferences</span>
           </div>
@@ -420,6 +505,41 @@
               <option value="nl">Dutch</option>
               <option value="pl">Polish</option>
             </select>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+          <div class="section-title">
+            <span>📖</span>
+            <span>Custom Dictionary</span>
+          </div>
+          <div class="section-description">
+            Add words that should not be flagged as errors (e.g., names, technical terms, brand names).
+          </div>
+
+          <div class="form-group">
+            <label for="newDictWord">Add New Word</label>
+            <div class="dictionary-input-row">
+              <input type="text" id="newDictWord" placeholder="Enter a word...">
+              <button type="button" id="addWordBtn" class="btn-secondary">Add</button>
+            </div>
+          </div>
+
+          <div class="dictionary-words" id="dictionaryWords">
+            <p class="empty-dictionary">No custom words added yet.</p>
+          </div>
+
+          <div class="info-box">
+            <h4>How it works:</h4>
+            <p>Words in your custom dictionary will be ignored during grammar checks. This is useful for:</p>
+            <ul>
+              <li>Names (people, companies, products)</li>
+              <li>Technical terms and acronyms</li>
+              <li>Words specific to your industry</li>
+              <li>Intentional stylistic choices</li>
+            </ul>
           </div>
         </div>
 
