@@ -1,231 +1,122 @@
-# GrammarWise - AI Grammar Checker Chrome Extension
+# GrammarPeace ✌️
 
-An AI-powered grammar checking Chrome extension that uses Claude Haiku 4.5 API to provide instant, context-aware grammar corrections with customizable tone settings. Fast, affordable, and privacy-focused.
+**Free, open-source grammar checker powered by Claude & OpenAI.**
+
+Stop paying $360/year for Grammarly. GrammarPeace gives you the same features — grammar checking, tone rewriting, and translation — using the best AI models available, for free.
+
+[Website](https://grammarpeace.com) · [Chrome Web Store](https://chromewebstore.google.com/detail/grammarpeace) · [Report Bug](https://github.com/kaansrc/grammarpeace/issues)
+
+---
+
+## Why GrammarPeace?
+
+| Feature | Grammarly | GrammarPeace |
+|---------|-----------|--------------|
+| Price | $360/year | **Free** |
+| AI Model | Proprietary | Claude & OpenAI (state-of-the-art) |
+| Data Privacy | Collects your writing | **Your data stays yours** |
+| Open Source | No | **Yes** |
+| Word Limits | Yes | **No** |
 
 ## Features
 
-- **Lightning Fast**: Powered by Claude Haiku 4.5 for instant grammar corrections
-- **Super Affordable**: Costs less than a penny per check (see cost estimate below)
-- **Customizable Tone**: Choose from multiple tone options (Professional, Casual, Friendly, Formal, Concise)
-- **Privacy-Focused**: Your API key is stored locally and never shared
-- **No Subscription**: Use your own Claude API key, pay only for what you use
-- **Beautiful UI**: Modern, intuitive interface with smooth animations
-- **One-Click Replace**: Replace selected text with corrected version instantly
-- **Works Everywhere**: Use on any webpage, any text field
+- **Grammar Check** — Instant grammar and spelling corrections with one-click fixes
+- **Improve Text** — Make your writing sound more natural and native
+- **Tone Rewriting** — Rewrite text as Professional, Casual, Friendly, Formal, or Concise
+- **Translation** — Translate between 15+ languages instantly
+- **Explain Corrections** — Learn why changes were made
+- **Diff View** — See exactly what changed with highlighted differences
+- **Writing Statistics** — Word count, reading time, Flesch readability score
+- **Quick Presets** — Save your favorite language + tone combinations
+- **History** — Access your recent corrections
+- **Dark Mode** — Easy on the eyes
+- **Works Everywhere** — Gmail, Google Docs, Twitter, LinkedIn, any website
+
+## How It Works
+
+1. **Select text** on any webpage
+2. **Click the ✌️ button** that appears
+3. **Choose an action**: Check, Improve, Tone, or Translate
+4. **Copy or Replace** the result with one click
+
+**Keyboard shortcut**: `Ctrl+Shift+G` (or `Cmd+Shift+G` on Mac)
 
 ## Installation
 
-### From Source (Development)
+### Chrome Web Store (Recommended)
+[Install from Chrome Web Store](https://chromewebstore.google.com/detail/grammarpeace)
 
-1. **Clone or download this repository**
-   ```bash
-   git clone https://github.com/yourusername/grammarwise.git
-   cd grammarwise
-   ```
+### Manual Installation
+1. Download or clone this repository
+2. Open Chrome → `chrome://extensions/`
+3. Enable **Developer mode** (top right toggle)
+4. Click **Load unpacked** → select this folder
+5. Done!
 
-2. **Add icons** (see Icons section below)
+## Setup
 
-3. **Load the extension in Chrome**
-   - Open Chrome and navigate to `chrome://extensions/`
-   - Enable "Developer mode" (toggle in top-right corner)
-   - Click "Load unpacked"
-   - Select the `grammarwise` directory
+GrammarPeace requires an API key from Anthropic or OpenAI:
 
-4. **Configure your API key**
-   - Click on the GrammarWise extension icon in Chrome toolbar
-   - Click "Open Settings"
-   - Enter your Claude API key (get one from [Anthropic Console](https://console.anthropic.com/))
-   - Set your default tone preference
-   - Click "Save Settings"
-   - Use "Test API" button to verify your key works
+1. Click the extension icon → **Settings**
+2. Choose your AI provider:
+   - **Anthropic (Claude)**: [console.anthropic.com](https://console.anthropic.com/)
+   - **OpenAI**: [platform.openai.com](https://platform.openai.com/)
+3. Paste your API key and save
 
-## Getting a Claude API Key
+**API Cost**: Typical usage costs a few cents per month. Much cheaper than $30/month subscriptions.
 
-1. Visit [console.anthropic.com](https://console.anthropic.com/)
-2. Sign in or create an account
-3. Navigate to the API Keys section
-4. Create a new API key
-5. Copy the key and paste it in GrammarWise settings
+## Supported Languages
 
-**Note**: API usage is charged by Anthropic based on your usage. See their [pricing page](https://www.anthropic.com/pricing) for details.
+English, Spanish, French, German, Italian, Portuguese, Russian, Japanese, Korean, Chinese, Arabic, Hindi, Turkish, Dutch, Polish
 
-## Usage
+## Privacy
 
-1. **Select text** on any webpage that you want to check
-2. **Click the GrammarWise icon** that appears next to your selection (purple circle with checkmark)
-3. **Choose your preferred tone** from the dropdown (optional)
-4. **Click "Check Grammar"** to get corrections
-5. **Review the corrected text** and either:
-   - Click "Replace" to replace the original text (works in editable fields)
-   - Click "Copy" to copy to clipboard
+GrammarPeace is designed with privacy as a core principle:
 
-## Icons
+- **No servers** — We don't operate any servers. Zero.
+- **No accounts** — No sign-up, no login, no tracking.
+- **No data collection** — We don't collect analytics, usage stats, or personal data.
+- **Direct API calls** — Your text goes directly from your browser to the AI provider.
+- **Local storage only** — Your API key and settings stay in your browser.
+- **Open source** — Read the code yourself.
 
-The extension requires icon files in PNG format. Create or download icons and place them in an `icons` directory:
-
-```
-grammarwise/
-├── icons/
-│   ├── icon16.png   (16x16 px)
-│   ├── icon32.png   (32x32 px)
-│   ├── icon48.png   (48x48 px)
-│   └── icon128.png  (128x128 px)
-```
-
-You can create icons using:
-- Design tools like Figma, Canva, or Photoshop
-- Online icon generators
-- AI image generators
-
-**Recommended design**: A checkmark or pen icon with purple/indigo colors to match the extension theme.
+[Full Privacy Policy](https://grammarpeace.com/privacy.html)
 
 ## File Structure
 
 ```
-grammarwise/
-├── manifest.json           # Extension configuration
-├── background.js           # Service worker for API calls
-├── content.js             # Content script for text selection UI
-├── content.css            # Styles for floating UI
-├── popup.html             # Extension popup UI
-├── popup.js               # Popup logic
-├── options.html           # Settings page UI
-├── options.js             # Settings page logic
-├── icons/                 # Extension icons
-│   ├── icon16.png
-│   ├── icon32.png
-│   ├── icon48.png
-│   └── icon128.png
-└── README.md              # This file
+grammarpeace/
+├── manifest.json      # Extension configuration (Manifest V3)
+├── background.js      # Service worker for API calls
+├── content.js         # Content script for text selection UI
+├── content.css        # Styles for the grammar panel
+├── popup.html/js      # Extension popup
+├── options.html/js    # Settings page
+├── icons/             # Extension icons
+└── docs/              # Website files
 ```
 
-## Cost Estimate
+## Tech Stack
 
-GrammarWise uses **Claude Haiku 4.5**, which is optimized for speed and cost-efficiency:
-
-- **Input**: ~$0.80 per million tokens
-- **Output**: ~$4.00 per million tokens
-- **Typical grammar check**: 100-300 tokens total
-- **Estimated cost per check**: ~$0.0001-0.0003 (less than a penny!)
-- **Example**: 1,000 grammar checks ≈ $0.10-0.30
-
-This makes GrammarWise extremely affordable for personal use compared to subscription services.
-
-## Customization
-
-### Changing the Model
-
-To use a different Claude model, edit `background.js` and change the `model` parameter:
-
-```javascript
-model: 'claude-haiku-4-5',  // Current default - fast and affordable
-```
-
-Available models:
-- `claude-haiku-4-5` (fastest, most affordable - recommended)
-- `claude-3-5-sonnet-20241022` (balanced performance)
-- `claude-3-opus-20240229` (highest quality, most expensive)
-
-### Adding More Tone Options
-
-To add custom tones, edit both `content.js` and `background.js`:
-
-**In content.js** (around line 54), add your tone to the dropdown:
-```html
-<option value="yourTone">Your Tone Name</option>
-```
-
-**In background.js** (around line 65), add the tone instruction:
-```javascript
-yourTone: 'Your tone instruction here.',
-```
-
-### Customizing the Prompt
-
-Edit the `createPrompt` function in `background.js` to customize how Claude processes the text.
-
-## Known Limitations
-
-### Google Docs and Special Editors
-
-GrammarWise has **limited support for Google Docs** due to its complex canvas-based rendering. On Google Docs:
-- ✅ Right-click context menu works
-- ✅ "Copy" button works
-- ⚠️ Floating button may position incorrectly
-- ❌ "Replace" button doesn't work
-
-**Recommended workflow for Google Docs**:
-1. Select text
-2. Right-click → "Check Grammar with GrammarWise"
-3. Use "Copy" button
-4. Manually paste back into Google Docs
-
-**Where GrammarWise works perfectly**:
-- Gmail, Outlook, standard text inputs
-- Social media (Twitter, LinkedIn, Reddit)
-- WordPress, Medium
-- Most standard websites
-
-See [KNOWN_ISSUES.md](KNOWN_ISSUES.md) for complete compatibility information.
-
-## Troubleshooting
-
-### Floating button doesn't appear or appears at wrong position
-- **Solution 1**: Use the right-click context menu instead
-- **Solution 2**: Check browser console (F12) for errors
-- **Solution 3**: Try refreshing the page
-
-### Extension icon doesn't appear when selecting text
-- Make sure you're on a webpage (not Chrome settings or extension pages)
-- Try refreshing the page
-- Check if the extension is enabled in `chrome://extensions/`
-
-### "Please set your Claude API key" error
-- Open extension settings and enter a valid API key
-- Make sure the key starts with `sk-ant-`
-- Click "Test API" to verify the key works
-
-### API test fails
-- Check your internet connection
-- Verify your API key is correct and active
-- Check if you have credits available in your Anthropic account
-
-### Replace button doesn't work
-- The replace feature only works in editable text fields (text boxes, content-editable divs)
-- For static text, use the "Copy" button and paste manually
-
-## Privacy & Security
-
-- Your API key is stored locally in Chrome's sync storage
-- API keys are never sent anywhere except directly to Anthropic's API
-- Selected text is only sent to Claude API for processing
-- No analytics or tracking is implemented
+- Chrome Extension Manifest V3
+- Anthropic Claude API / OpenAI API
+- Vanilla JavaScript (zero dependencies)
+- Pure CSS (no frameworks)
 
 ## Contributing
 
-Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest new features
-- Submit pull requests
-- Improve documentation
+Contributions welcome!
+
+- **Found a bug?** [Open an issue](https://github.com/kaansrc/grammarpeace/issues)
+- **Have an idea?** [Suggest a feature](https://github.com/kaansrc/grammarpeace/issues)
+- **Want to help?** Submit a pull request
 
 ## License
 
-MIT License - feel free to use, modify, and distribute this extension.
-
-## Credits
-
-- Built with [Claude](https://www.anthropic.com/claude) by Anthropic
-- Extension template inspired by modern Chrome extension best practices
-
-## Support
-
-If you encounter issues or have questions:
-1. Check the Troubleshooting section above
-2. Review your browser console for error messages
-3. Verify your API key is valid and has credits
-4. Create an issue on GitHub
+MIT License — use it however you want.
 
 ---
 
-**Note**: This extension is not officially affiliated with Anthropic. It's an independent project that uses the Claude API.
+**Made with ✌️ by [kaansrc](https://github.com/kaansrc)**
+
+*GrammarPeace is not affiliated with Anthropic or OpenAI. It's an independent open-source project.*
