@@ -1,4 +1,4 @@
-// Content script for GrammarWise
+// Content script for GrammarPeace
 let floatingButton = null;
 let grammarPanel = null;
 let selectedText = '';
@@ -74,7 +74,7 @@ initTheme();
 // Detect if we're on Google Docs
 const isGoogleDocs = window.location.hostname === 'docs.google.com' && window.location.pathname.includes('/document/');
 
-// GrammarWise content script loaded
+// GrammarPeace content script loaded
 if (isGoogleDocs) {
   
   // Show a one-time notification to the user
@@ -101,7 +101,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     if (!text) {
       const message = isGoogleDocs
-        ? 'GrammarWise for Google Docs:\n\n1. Select your text\n2. Press Ctrl+C (or Cmd+C) to copy\n3. Click the GrammarWise extension icon\n4. Paste text into the popup\n\nNote: Google Docs uses custom text handling that prevents direct text extraction.'
+        ? 'GrammarPeace for Google Docs:\n\n1. Select your text\n2. Press Ctrl+C (or Cmd+C) to copy\n3. Click the GrammarPeace extension icon\n4. Paste text into the popup\n\nNote: Google Docs uses custom text handling that prevents direct text extraction.'
         : 'Please select some text first, then press Ctrl+Shift+G (or Cmd+Shift+G on Mac).';
       alert(message);
       sendResponse({ success: false });
@@ -255,8 +255,8 @@ function handleSelectionChange() {
 
 function handleTextSelection(event) {
   // Don't show button if clicking inside our own UI
-  if (event.target.closest('#grammarwise-floating-button') ||
-      event.target.closest('#grammarwise-panel')) {
+  if (event.target.closest('#grammarpeace-floating-button') ||
+      event.target.closest('#grammarpeace-panel')) {
     return;
   }
 
@@ -299,7 +299,7 @@ function showFloatingButton(x, y) {
   hideFloatingButton();
 
   floatingButton = document.createElement('div');
-  floatingButton.id = 'grammarwise-floating-button';
+  floatingButton.id = 'grammarpeace-floating-button';
 
   // Force inline styles to ensure visibility
   // Making it EXTRA visible for debugging
@@ -475,38 +475,38 @@ function formatReadingTime(seconds) {
 function renderWritingStats(text) {
   const stats = getWritingStatistics(text);
   if (!stats) {
-    return '<p class="grammarwise-stats-empty">No text to analyze</p>';
+    return '<p class="grammarpeace-stats-empty">No text to analyze</p>';
   }
 
   return `
-    <div class="grammarwise-stats-grid">
-      <div class="grammarwise-stat-item">
-        <span class="grammarwise-stat-value">${stats.wordCount}</span>
-        <span class="grammarwise-stat-label">Words</span>
+    <div class="grammarpeace-stats-grid">
+      <div class="grammarpeace-stat-item">
+        <span class="grammarpeace-stat-value">${stats.wordCount}</span>
+        <span class="grammarpeace-stat-label">Words</span>
       </div>
-      <div class="grammarwise-stat-item">
-        <span class="grammarwise-stat-value">${stats.sentenceCount}</span>
-        <span class="grammarwise-stat-label">Sentences</span>
+      <div class="grammarpeace-stat-item">
+        <span class="grammarpeace-stat-value">${stats.sentenceCount}</span>
+        <span class="grammarpeace-stat-label">Sentences</span>
       </div>
-      <div class="grammarwise-stat-item">
-        <span class="grammarwise-stat-value">${stats.paragraphCount}</span>
-        <span class="grammarwise-stat-label">Paragraphs</span>
+      <div class="grammarpeace-stat-item">
+        <span class="grammarpeace-stat-value">${stats.paragraphCount}</span>
+        <span class="grammarpeace-stat-label">Paragraphs</span>
       </div>
-      <div class="grammarwise-stat-item">
-        <span class="grammarwise-stat-value">${stats.readingTime}</span>
-        <span class="grammarwise-stat-label">Read time</span>
+      <div class="grammarpeace-stat-item">
+        <span class="grammarpeace-stat-value">${stats.readingTime}</span>
+        <span class="grammarpeace-stat-label">Read time</span>
       </div>
     </div>
-    <div class="grammarwise-stats-detail">
-      <div class="grammarwise-stat-row">
+    <div class="grammarpeace-stats-detail">
+      <div class="grammarpeace-stat-row">
         <span>Avg. word length:</span>
         <span>${stats.avgWordLength} chars</span>
       </div>
-      <div class="grammarwise-stat-row">
+      <div class="grammarpeace-stat-row">
         <span>Avg. sentence length:</span>
         <span>${stats.avgSentenceLength} words</span>
       </div>
-      <div class="grammarwise-stat-row">
+      <div class="grammarpeace-stat-row">
         <span>Readability (Flesch):</span>
         <span>${stats.fleschScore} - ${stats.fleschLabel}</span>
       </div>
@@ -672,7 +672,7 @@ async function deletePreset(id) {
 
 // Load presets into dropdown
 async function loadPresetsDropdown() {
-  const presetSelect = document.getElementById('grammarwise-preset');
+  const presetSelect = document.getElementById('grammarpeace-preset');
   if (!presetSelect) return;
 
   const presets = await getPresets();
@@ -690,7 +690,7 @@ async function loadPresetsDropdown() {
 
 // Apply selected preset
 function applyPreset() {
-  const presetSelect = document.getElementById('grammarwise-preset');
+  const presetSelect = document.getElementById('grammarpeace-preset');
   if (!presetSelect || !presetSelect.value) return;
 
   getPresets().then(presets => {
@@ -699,13 +699,13 @@ function applyPreset() {
 
     // Apply language setting
     if (preset.language) {
-      const langSelect = document.getElementById('grammarwise-language');
+      const langSelect = document.getElementById('grammarpeace-language');
       if (langSelect) langSelect.value = preset.language;
     }
 
     // Apply tone setting if on tone tab
     if (preset.tone) {
-      const toneSelect = document.getElementById('grammarwise-tone');
+      const toneSelect = document.getElementById('grammarpeace-tone');
       if (toneSelect) toneSelect.value = preset.tone;
     }
 
@@ -716,10 +716,10 @@ function applyPreset() {
 
 // Handle detect tone button
 async function handleDetectTone() {
-  const detectBtn = document.getElementById('grammarwise-detect-tone');
-  const toneSelect = document.getElementById('grammarwise-tone');
-  const detectedDiv = document.getElementById('grammarwise-detected-tone');
-  const detectedValue = document.getElementById('grammarwise-detected-tone-value');
+  const detectBtn = document.getElementById('grammarpeace-detect-tone');
+  const toneSelect = document.getElementById('grammarpeace-tone');
+  const detectedDiv = document.getElementById('grammarpeace-detected-tone');
+  const detectedValue = document.getElementById('grammarpeace-detected-tone-value');
 
   if (!detectBtn || !toneSelect) return;
 
@@ -767,8 +767,8 @@ async function handleDetectTone() {
 
 // Handle save preset button
 async function handleSavePreset() {
-  const langSelect = document.getElementById('grammarwise-language');
-  const toneSelect = document.getElementById('grammarwise-tone');
+  const langSelect = document.getElementById('grammarpeace-language');
+  const toneSelect = document.getElementById('grammarpeace-tone');
 
   const language = langSelect ? langSelect.value : 'auto';
   const tone = toneSelect ? toneSelect.value : 'professional';
@@ -791,7 +791,7 @@ async function handleSavePreset() {
     loadPresetsDropdown();
 
     // Brief visual feedback
-    const btn = document.getElementById('grammarwise-save-preset');
+    const btn = document.getElementById('grammarpeace-save-preset');
     if (btn) {
       const original = btn.textContent;
       btn.textContent = '✓';
@@ -802,8 +802,8 @@ async function handleSavePreset() {
 
 // New preset handling for More tab
 async function handleSavePresetNew() {
-  const langSelect = document.getElementById('grammarwise-preset-lang');
-  const toneSelect = document.getElementById('grammarwise-preset-tone');
+  const langSelect = document.getElementById('grammarpeace-preset-lang');
+  const toneSelect = document.getElementById('grammarpeace-preset-tone');
 
   const language = langSelect ? langSelect.value : 'auto';
   const tone = toneSelect ? toneSelect.value : 'professional';
@@ -826,7 +826,7 @@ async function handleSavePresetNew() {
     renderPresetsList();
 
     // Brief visual feedback
-    const btn = document.getElementById('grammarwise-save-preset');
+    const btn = document.getElementById('grammarpeace-save-preset');
     if (btn) {
       const original = btn.textContent;
       btn.textContent = 'Saved!';
@@ -836,13 +836,13 @@ async function handleSavePresetNew() {
 }
 
 async function renderPresetsList() {
-  const listContainer = document.getElementById('grammarwise-presets-list');
+  const listContainer = document.getElementById('grammarpeace-presets-list');
   if (!listContainer) return;
 
   const presets = await getPresets();
 
   if (presets.length === 0) {
-    listContainer.innerHTML = '<p class="grammarwise-presets-empty">No presets saved yet</p>';
+    listContainer.innerHTML = '<p class="grammarpeace-presets-empty">No presets saved yet</p>';
     return;
   }
 
@@ -862,14 +862,14 @@ async function renderPresetsList() {
     const langLabel = languageNames[preset.language] || preset.language;
     const toneLabel = toneNames[preset.tone] || preset.tone;
     html += `
-      <div class="grammarwise-preset-item" data-id="${preset.id}">
-        <div class="grammarwise-preset-info">
-          <span class="grammarwise-preset-lang">${langLabel}</span>
-          <span class="grammarwise-preset-tone">${toneLabel}</span>
+      <div class="grammarpeace-preset-item" data-id="${preset.id}">
+        <div class="grammarpeace-preset-info">
+          <span class="grammarpeace-preset-lang">${langLabel}</span>
+          <span class="grammarpeace-preset-tone">${toneLabel}</span>
         </div>
-        <div class="grammarwise-preset-actions">
-          <button class="grammarwise-btn-small grammarwise-preset-apply" data-id="${preset.id}" title="Apply this preset">Apply</button>
-          <button class="grammarwise-btn-small grammarwise-preset-delete" data-id="${preset.id}" title="Delete this preset">×</button>
+        <div class="grammarpeace-preset-actions">
+          <button class="grammarpeace-btn-small grammarpeace-preset-apply" data-id="${preset.id}" title="Apply this preset">Apply</button>
+          <button class="grammarpeace-btn-small grammarpeace-preset-delete" data-id="${preset.id}" title="Delete this preset">×</button>
         </div>
       </div>
     `;
@@ -878,19 +878,19 @@ async function renderPresetsList() {
   listContainer.innerHTML = html;
 
   // Add event listeners for apply buttons
-  listContainer.querySelectorAll('.grammarwise-preset-apply').forEach(btn => {
+  listContainer.querySelectorAll('.grammarpeace-preset-apply').forEach(btn => {
     btn.addEventListener('click', async () => {
       const id = parseInt(btn.dataset.id);
       const presets = await getPresets();
       const preset = presets.find(p => p.id === id);
       if (preset) {
         // Apply to main language selector
-        const langSelect = document.getElementById('grammarwise-language');
+        const langSelect = document.getElementById('grammarpeace-language');
         if (langSelect && preset.language) {
           langSelect.value = preset.language;
         }
         // Apply to tone selector
-        const toneSelect = document.getElementById('grammarwise-tone');
+        const toneSelect = document.getElementById('grammarpeace-tone');
         if (toneSelect && preset.tone) {
           toneSelect.value = preset.tone;
         }
@@ -902,7 +902,7 @@ async function renderPresetsList() {
   });
 
   // Add event listeners for delete buttons
-  listContainer.querySelectorAll('.grammarwise-preset-delete').forEach(btn => {
+  listContainer.querySelectorAll('.grammarpeace-preset-delete').forEach(btn => {
     btn.addEventListener('click', async () => {
       const id = parseInt(btn.dataset.id);
       await deletePreset(id);
@@ -964,13 +964,13 @@ async function clearHistory() {
 
 // Render history list in the panel
 async function renderHistoryList() {
-  const historyList = document.getElementById('grammarwise-history-list');
+  const historyList = document.getElementById('grammarpeace-history-list');
   if (!historyList) return;
 
   const history = await getHistory();
 
   if (history.length === 0) {
-    historyList.innerHTML = '<p class="grammarwise-history-empty">No history yet</p>';
+    historyList.innerHTML = '<p class="grammarpeace-history-empty">No history yet</p>';
     return;
   }
 
@@ -988,14 +988,14 @@ async function renderHistoryList() {
     const dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 
     html += `
-      <div class="grammarwise-history-item" data-id="${item.id}">
-        <div class="grammarwise-history-meta">
-          <span class="grammarwise-history-type">${actionLabels[item.actionType] || item.actionType}</span>
-          <span class="grammarwise-history-time">${dateStr} ${timeStr}</span>
+      <div class="grammarpeace-history-item" data-id="${item.id}">
+        <div class="grammarpeace-history-meta">
+          <span class="grammarpeace-history-type">${actionLabels[item.actionType] || item.actionType}</span>
+          <span class="grammarpeace-history-time">${dateStr} ${timeStr}</span>
         </div>
-        <div class="grammarwise-history-original">${escapeHtml(item.original.substring(0, 100))}${item.original.length > 100 ? '...' : ''}</div>
-        <div class="grammarwise-history-result">${escapeHtml(item.result.substring(0, 100))}${item.result.length > 100 ? '...' : ''}</div>
-        <button class="grammarwise-btn-small grammarwise-history-use" data-result="${escapeHtml(item.result)}">Use</button>
+        <div class="grammarpeace-history-original">${escapeHtml(item.original.substring(0, 100))}${item.original.length > 100 ? '...' : ''}</div>
+        <div class="grammarpeace-history-result">${escapeHtml(item.result.substring(0, 100))}${item.result.length > 100 ? '...' : ''}</div>
+        <button class="grammarpeace-btn-small grammarpeace-history-use" data-result="${escapeHtml(item.result)}">Use</button>
       </div>
     `;
   }
@@ -1003,7 +1003,7 @@ async function renderHistoryList() {
   historyList.innerHTML = html;
 
   // Add click handlers for "Use" buttons
-  historyList.querySelectorAll('.grammarwise-history-use').forEach(btn => {
+  historyList.querySelectorAll('.grammarpeace-history-use').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const result = e.target.getAttribute('data-result');
       navigator.clipboard.writeText(result).then(() => {
@@ -1019,8 +1019,8 @@ async function renderHistoryList() {
 // Toggle diff view
 function toggleDiffView() {
   showDiffView = !showDiffView;
-  const correctedTextDiv = document.getElementById('grammarwise-corrected-text');
-  const diffToggleBtn = document.getElementById('grammarwise-diff-toggle');
+  const correctedTextDiv = document.getElementById('grammarpeace-corrected-text');
+  const diffToggleBtn = document.getElementById('grammarpeace-diff-toggle');
 
   if (!correctedTextDiv || !lastCorrectedText) return;
 
@@ -1044,7 +1044,7 @@ async function showGrammarPanel(x, y) {
   // Validate extension context before showing panel
   const isValid = await validateExtensionContext();
   if (!isValid) {
-    alert('GrammarWise: Extension was reloaded.\n\nPlease refresh this page (F5) to continue using the extension.');
+    alert('GrammarPeace: Extension was reloaded.\n\nPlease refresh this page (F5) to continue using the extension.');
     return;
   }
 
@@ -1055,27 +1055,27 @@ async function showGrammarPanel(x, y) {
   const stats = getTextStats(selectedText);
 
   grammarPanel = document.createElement('div');
-  grammarPanel.id = 'grammarwise-panel';
+  grammarPanel.id = 'grammarpeace-panel';
   grammarPanel.innerHTML = `
-    <div class="grammarwise-header">
-      <div class="grammarwise-header-left">
-        <h3>GrammarWise</h3>
-        <span class="grammarwise-stats">${stats.words} words, ${stats.chars} chars</span>
+    <div class="grammarpeace-header">
+      <div class="grammarpeace-header-left">
+        <h3>GrammarPeace</h3>
+        <span class="grammarpeace-stats">${stats.words} words, ${stats.chars} chars</span>
       </div>
-      <button id="grammarwise-close" class="grammarwise-close-btn">&times;</button>
+      <button id="grammarpeace-close" class="grammarpeace-close-btn">&times;</button>
     </div>
-    <div class="grammarwise-tabs">
-      <button class="grammarwise-tab active" data-tab="grammar">Grammar</button>
-      <button class="grammarwise-tab" data-tab="tone">Tone</button>
-      <button class="grammarwise-tab" data-tab="translate">Translate</button>
-      <button class="grammarwise-tab" data-tab="history">History</button>
-      <button class="grammarwise-tab" data-tab="more">More</button>
+    <div class="grammarpeace-tabs">
+      <button class="grammarpeace-tab active" data-tab="grammar">Grammar</button>
+      <button class="grammarpeace-tab" data-tab="tone">Tone</button>
+      <button class="grammarpeace-tab" data-tab="translate">Translate</button>
+      <button class="grammarpeace-tab" data-tab="history">History</button>
+      <button class="grammarpeace-tab" data-tab="more">More</button>
     </div>
-    <div class="grammarwise-content">
+    <div class="grammarpeace-content">
       <!-- Grammar Tab -->
-      <div id="grammarwise-tab-grammar" class="grammarwise-tab-content active">
-        <div class="grammarwise-controls">
-          <select id="grammarwise-language" class="grammarwise-select">
+      <div id="grammarpeace-tab-grammar" class="grammarpeace-tab-content active">
+        <div class="grammarpeace-controls">
+          <select id="grammarpeace-language" class="grammarpeace-select">
             <option value="auto">Auto-detect</option>
             <option value="en">English</option>
             <option value="es">Spanish</option>
@@ -1093,62 +1093,62 @@ async function showGrammarPanel(x, y) {
             <option value="nl">Dutch</option>
             <option value="pl">Polish</option>
           </select>
-          <button id="grammarwise-check" class="grammarwise-btn-primary">Check</button>
-          <button id="grammarwise-improve" class="grammarwise-btn">Improve</button>
+          <button id="grammarpeace-check" class="grammarpeace-btn-primary">Check</button>
+          <button id="grammarpeace-improve" class="grammarpeace-btn">Improve</button>
         </div>
-        <div class="grammarwise-original">
+        <div class="grammarpeace-original">
           <strong>Original:</strong>
-          <div class="grammarwise-text">${escapeHtml(selectedText)}</div>
+          <div class="grammarpeace-text">${escapeHtml(selectedText)}</div>
         </div>
-        <div id="grammarwise-result" class="grammarwise-result" style="display: none;">
-          <div class="grammarwise-result-header">
+        <div id="grammarpeace-result" class="grammarpeace-result" style="display: none;">
+          <div class="grammarpeace-result-header">
             <strong>Corrected:</strong>
-            <div class="grammarwise-result-header-buttons">
-              <button id="grammarwise-diff-toggle" class="grammarwise-btn-small" title="Toggle diff view">Diff</button>
-              <button id="grammarwise-explain" class="grammarwise-btn-small" title="Explain the corrections">Explain</button>
+            <div class="grammarpeace-result-header-buttons">
+              <button id="grammarpeace-diff-toggle" class="grammarpeace-btn-small" title="Toggle diff view">Diff</button>
+              <button id="grammarpeace-explain" class="grammarpeace-btn-small" title="Explain the corrections">Explain</button>
             </div>
           </div>
-          <div id="grammarwise-corrected-text" class="grammarwise-text"></div>
-          <div id="grammarwise-explanation-section" class="grammarwise-explanation-section" style="display: none;">
-            <div class="grammarwise-explanation-header">
+          <div id="grammarpeace-corrected-text" class="grammarpeace-text"></div>
+          <div id="grammarpeace-explanation-section" class="grammarpeace-explanation-section" style="display: none;">
+            <div class="grammarpeace-explanation-header">
               <strong>Explanation:</strong>
-              <button id="grammarwise-close-explanation" class="grammarwise-btn-small" title="Close explanation">Close</button>
+              <button id="grammarpeace-close-explanation" class="grammarpeace-btn-small" title="Close explanation">Close</button>
             </div>
-            <div id="grammarwise-explanation-loading" class="grammarwise-explanation-loading" style="display: none;">
-              <span class="grammarwise-mini-spinner"></span> Analyzing corrections...
+            <div id="grammarpeace-explanation-loading" class="grammarpeace-explanation-loading" style="display: none;">
+              <span class="grammarpeace-mini-spinner"></span> Analyzing corrections...
             </div>
-            <div id="grammarwise-explanation-content" class="grammarwise-explanation-content"></div>
+            <div id="grammarpeace-explanation-content" class="grammarpeace-explanation-content"></div>
           </div>
-          <div id="grammarwise-alternatives-section" class="grammarwise-alternatives-section" style="display: none;">
-            <div class="grammarwise-alternatives-header">
+          <div id="grammarpeace-alternatives-section" class="grammarpeace-alternatives-section" style="display: none;">
+            <div class="grammarpeace-alternatives-header">
               <strong>Alternatives:</strong>
-              <button id="grammarwise-get-alternatives" class="grammarwise-btn-small" title="Get alternative suggestions">Get More</button>
+              <button id="grammarpeace-get-alternatives" class="grammarpeace-btn-small" title="Get alternative suggestions">Get More</button>
             </div>
-            <div id="grammarwise-alternatives-loading" class="grammarwise-alternatives-loading" style="display: none;">
-              <span class="grammarwise-mini-spinner"></span> Loading alternatives...
+            <div id="grammarpeace-alternatives-loading" class="grammarpeace-alternatives-loading" style="display: none;">
+              <span class="grammarpeace-mini-spinner"></span> Loading alternatives...
             </div>
-            <div id="grammarwise-alternatives-list" class="grammarwise-alternatives-list"></div>
+            <div id="grammarpeace-alternatives-list" class="grammarpeace-alternatives-list"></div>
           </div>
-          <div class="grammarwise-actions">
-            <button id="grammarwise-copy" class="grammarwise-btn">Copy</button>
-            <button id="grammarwise-replace" class="grammarwise-btn-primary">Replace</button>
+          <div class="grammarpeace-actions">
+            <button id="grammarpeace-copy" class="grammarpeace-btn">Copy</button>
+            <button id="grammarpeace-replace" class="grammarpeace-btn-primary">Replace</button>
           </div>
         </div>
-        <div id="grammarwise-loading" class="grammarwise-loading" style="display: none;">
-          <div class="grammarwise-spinner"></div>
+        <div id="grammarpeace-loading" class="grammarpeace-loading" style="display: none;">
+          <div class="grammarpeace-spinner"></div>
           <p>Checking grammar...</p>
         </div>
-        <div id="grammarwise-error" class="grammarwise-error" style="display: none;"></div>
+        <div id="grammarpeace-error" class="grammarpeace-error" style="display: none;"></div>
       </div>
 
       <!-- Tone Tab -->
-      <div id="grammarwise-tab-tone" class="grammarwise-tab-content" style="display: none;">
-        <div class="grammarwise-tone-detected" id="grammarwise-detected-tone" style="display: none;">
-          <span>Detected: </span><strong id="grammarwise-detected-tone-value"></strong>
+      <div id="grammarpeace-tab-tone" class="grammarpeace-tab-content" style="display: none;">
+        <div class="grammarpeace-tone-detected" id="grammarpeace-detected-tone" style="display: none;">
+          <span>Detected: </span><strong id="grammarpeace-detected-tone-value"></strong>
         </div>
-        <div class="grammarwise-controls">
-          <label for="grammarwise-tone">Tone:</label>
-          <select id="grammarwise-tone" class="grammarwise-select">
+        <div class="grammarpeace-controls">
+          <label for="grammarpeace-tone">Tone:</label>
+          <select id="grammarpeace-tone" class="grammarpeace-select">
             <option value="professional">Professional</option>
             <option value="casual">Casual</option>
             <option value="friendly">Friendly</option>
@@ -1156,33 +1156,33 @@ async function showGrammarPanel(x, y) {
             <option value="concise">Concise</option>
             <option value="clear">Clear & Improved</option>
           </select>
-          <button id="grammarwise-detect-tone" class="grammarwise-btn-small" title="Auto-detect tone">Detect</button>
-          <button id="grammarwise-rewrite-tone" class="grammarwise-btn-primary">Rewrite</button>
+          <button id="grammarpeace-detect-tone" class="grammarpeace-btn-small" title="Auto-detect tone">Detect</button>
+          <button id="grammarpeace-rewrite-tone" class="grammarpeace-btn-primary">Rewrite</button>
         </div>
-        <div class="grammarwise-original">
+        <div class="grammarpeace-original">
           <strong>Original:</strong>
-          <div class="grammarwise-text">${escapeHtml(selectedText)}</div>
+          <div class="grammarpeace-text">${escapeHtml(selectedText)}</div>
         </div>
-        <div id="grammarwise-tone-result" class="grammarwise-result" style="display: none;">
+        <div id="grammarpeace-tone-result" class="grammarpeace-result" style="display: none;">
           <strong>Rewritten:</strong>
-          <div id="grammarwise-rewritten-text" class="grammarwise-text"></div>
-          <div class="grammarwise-actions">
-            <button id="grammarwise-tone-copy" class="grammarwise-btn">Copy</button>
-            <button id="grammarwise-tone-replace" class="grammarwise-btn-primary">Replace</button>
+          <div id="grammarpeace-rewritten-text" class="grammarpeace-text"></div>
+          <div class="grammarpeace-actions">
+            <button id="grammarpeace-tone-copy" class="grammarpeace-btn">Copy</button>
+            <button id="grammarpeace-tone-replace" class="grammarpeace-btn-primary">Replace</button>
           </div>
         </div>
-        <div id="grammarwise-tone-loading" class="grammarwise-loading" style="display: none;">
-          <div class="grammarwise-spinner"></div>
+        <div id="grammarpeace-tone-loading" class="grammarpeace-loading" style="display: none;">
+          <div class="grammarpeace-spinner"></div>
           <p>Rewriting with tone...</p>
         </div>
-        <div id="grammarwise-tone-error" class="grammarwise-error" style="display: none;"></div>
+        <div id="grammarpeace-tone-error" class="grammarpeace-error" style="display: none;"></div>
       </div>
 
       <!-- Translate Tab -->
-      <div id="grammarwise-tab-translate" class="grammarwise-tab-content" style="display: none;">
-        <div class="grammarwise-controls">
-          <label for="grammarwise-from-lang">From:</label>
-          <select id="grammarwise-from-lang" class="grammarwise-select">
+      <div id="grammarpeace-tab-translate" class="grammarpeace-tab-content" style="display: none;">
+        <div class="grammarpeace-controls">
+          <label for="grammarpeace-from-lang">From:</label>
+          <select id="grammarpeace-from-lang" class="grammarpeace-select">
             <option value="auto">Auto-detect</option>
             <option value="en">English</option>
             <option value="es">Spanish</option>
@@ -1200,8 +1200,8 @@ async function showGrammarPanel(x, y) {
             <option value="nl">Dutch</option>
             <option value="pl">Polish</option>
           </select>
-          <label for="grammarwise-to-lang">To:</label>
-          <select id="grammarwise-to-lang" class="grammarwise-select">
+          <label for="grammarpeace-to-lang">To:</label>
+          <select id="grammarpeace-to-lang" class="grammarpeace-select">
             <option value="en">English</option>
             <option value="es">Spanish</option>
             <option value="fr">French</option>
@@ -1218,55 +1218,55 @@ async function showGrammarPanel(x, y) {
             <option value="nl">Dutch</option>
             <option value="pl">Polish</option>
           </select>
-          <button id="grammarwise-translate" class="grammarwise-btn-primary">Translate</button>
+          <button id="grammarpeace-translate" class="grammarpeace-btn-primary">Translate</button>
         </div>
-        <div class="grammarwise-original">
+        <div class="grammarpeace-original">
           <strong>Original:</strong>
-          <div class="grammarwise-text">${escapeHtml(selectedText)}</div>
+          <div class="grammarpeace-text">${escapeHtml(selectedText)}</div>
         </div>
-        <div id="grammarwise-translate-result" class="grammarwise-result" style="display: none;">
+        <div id="grammarpeace-translate-result" class="grammarpeace-result" style="display: none;">
           <strong>Translation:</strong>
-          <div id="grammarwise-translated-text" class="grammarwise-text"></div>
-          <div class="grammarwise-actions">
-            <button id="grammarwise-translate-copy" class="grammarwise-btn">Copy</button>
-            <button id="grammarwise-translate-replace" class="grammarwise-btn-primary">Replace</button>
+          <div id="grammarpeace-translated-text" class="grammarpeace-text"></div>
+          <div class="grammarpeace-actions">
+            <button id="grammarpeace-translate-copy" class="grammarpeace-btn">Copy</button>
+            <button id="grammarpeace-translate-replace" class="grammarpeace-btn-primary">Replace</button>
           </div>
         </div>
-        <div id="grammarwise-translate-loading" class="grammarwise-loading" style="display: none;">
-          <div class="grammarwise-spinner"></div>
+        <div id="grammarpeace-translate-loading" class="grammarpeace-loading" style="display: none;">
+          <div class="grammarpeace-spinner"></div>
           <p>Translating...</p>
         </div>
-        <div id="grammarwise-translate-error" class="grammarwise-error" style="display: none;"></div>
+        <div id="grammarpeace-translate-error" class="grammarpeace-error" style="display: none;"></div>
       </div>
 
       <!-- History Tab -->
-      <div id="grammarwise-tab-history" class="grammarwise-tab-content" style="display: none;">
-        <div class="grammarwise-history-header">
+      <div id="grammarpeace-tab-history" class="grammarpeace-tab-content" style="display: none;">
+        <div class="grammarpeace-history-header">
           <span>Recent corrections</span>
-          <button id="grammarwise-clear-history" class="grammarwise-btn-small">Clear</button>
+          <button id="grammarpeace-clear-history" class="grammarpeace-btn-small">Clear</button>
         </div>
-        <div id="grammarwise-history-list" class="grammarwise-history-list">
-          <p class="grammarwise-history-empty">No history yet</p>
+        <div id="grammarpeace-history-list" class="grammarpeace-history-list">
+          <p class="grammarpeace-history-empty">No history yet</p>
         </div>
       </div>
 
       <!-- More Tab -->
-      <div id="grammarwise-tab-more" class="grammarwise-tab-content" style="display: none;">
-        <div class="grammarwise-section">
-          <div class="grammarwise-section-title">Writing Statistics</div>
-          <div id="grammarwise-writing-stats" class="grammarwise-writing-stats">
+      <div id="grammarpeace-tab-more" class="grammarpeace-tab-content" style="display: none;">
+        <div class="grammarpeace-section">
+          <div class="grammarpeace-section-title">Writing Statistics</div>
+          <div id="grammarpeace-writing-stats" class="grammarpeace-writing-stats">
             ${renderWritingStats(selectedText)}
           </div>
         </div>
 
-        <div class="grammarwise-divider"></div>
+        <div class="grammarpeace-divider"></div>
 
-        <div class="grammarwise-section">
-          <div class="grammarwise-section-title">Quick Presets</div>
-          <p class="grammarwise-section-desc">Save your favorite language + tone combinations for quick access.</p>
-          <div class="grammarwise-presets-manage">
-            <div class="grammarwise-preset-create">
-              <select id="grammarwise-preset-lang" class="grammarwise-select">
+        <div class="grammarpeace-section">
+          <div class="grammarpeace-section-title">Quick Presets</div>
+          <p class="grammarpeace-section-desc">Save your favorite language + tone combinations for quick access.</p>
+          <div class="grammarpeace-presets-manage">
+            <div class="grammarpeace-preset-create">
+              <select id="grammarpeace-preset-lang" class="grammarpeace-select">
                 <option value="auto">Auto-detect</option>
                 <option value="en">English</option>
                 <option value="es">Spanish</option>
@@ -1284,17 +1284,17 @@ async function showGrammarPanel(x, y) {
                 <option value="nl">Dutch</option>
                 <option value="pl">Polish</option>
               </select>
-              <select id="grammarwise-preset-tone" class="grammarwise-select">
+              <select id="grammarpeace-preset-tone" class="grammarpeace-select">
                 <option value="professional">Professional</option>
                 <option value="casual">Casual</option>
                 <option value="friendly">Friendly</option>
                 <option value="formal">Formal</option>
                 <option value="concise">Concise</option>
               </select>
-              <button id="grammarwise-save-preset" class="grammarwise-btn-small" title="Save as preset">Save</button>
+              <button id="grammarpeace-save-preset" class="grammarpeace-btn-small" title="Save as preset">Save</button>
             </div>
-            <div id="grammarwise-presets-list" class="grammarwise-presets-list">
-              <p class="grammarwise-presets-empty">No presets saved yet</p>
+            <div id="grammarpeace-presets-list" class="grammarpeace-presets-list">
+              <p class="grammarpeace-presets-empty">No presets saved yet</p>
             </div>
           </div>
         </div>
@@ -1342,15 +1342,15 @@ async function showGrammarPanel(x, y) {
     chrome.storage.sync.get(['defaultTone', 'defaultGrammarLang', 'defaultFromLang', 'defaultToLang'], (result) => {
       // Check for chrome.runtime errors
       if (chrome.runtime.lastError) {
-        console.warn('GrammarWise: Could not load settings:', chrome.runtime.lastError.message);
+        console.warn('GrammarPeace: Could not load settings:', chrome.runtime.lastError.message);
         return;
       }
 
       // Safely set values only if elements exist
-      const languageSelect = document.getElementById('grammarwise-language');
-      const toneSelect = document.getElementById('grammarwise-tone');
-      const fromLangSelect = document.getElementById('grammarwise-from-lang');
-      const toLangSelect = document.getElementById('grammarwise-to-lang');
+      const languageSelect = document.getElementById('grammarpeace-language');
+      const toneSelect = document.getElementById('grammarpeace-tone');
+      const fromLangSelect = document.getElementById('grammarpeace-from-lang');
+      const toLangSelect = document.getElementById('grammarpeace-to-lang');
 
       if (result.defaultGrammarLang && languageSelect) {
         languageSelect.value = result.defaultGrammarLang;
@@ -1366,23 +1366,23 @@ async function showGrammarPanel(x, y) {
       }
     });
   } else {
-    console.warn('GrammarWise: Extension context invalidated, using default settings');
+    console.warn('GrammarPeace: Extension context invalidated, using default settings');
   }
 
   // Add tab switching
-  const tabs = grammarPanel.querySelectorAll('.grammarwise-tab');
+  const tabs = grammarPanel.querySelectorAll('.grammarpeace-tab');
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       // Remove active class from all tabs and contents
-      grammarPanel.querySelectorAll('.grammarwise-tab').forEach(t => t.classList.remove('active'));
-      grammarPanel.querySelectorAll('.grammarwise-tab-content').forEach(c => c.style.display = 'none');
+      grammarPanel.querySelectorAll('.grammarpeace-tab').forEach(t => t.classList.remove('active'));
+      grammarPanel.querySelectorAll('.grammarpeace-tab-content').forEach(c => c.style.display = 'none');
 
       // Add active class to clicked tab
       tab.classList.add('active');
 
       // Show corresponding content
       const tabName = tab.getAttribute('data-tab');
-      const content = grammarPanel.querySelector(`#grammarwise-tab-${tabName}`);
+      const content = grammarPanel.querySelector(`#grammarpeace-tab-${tabName}`);
       if (content) {
         content.style.display = 'block';
       }
@@ -1390,7 +1390,7 @@ async function showGrammarPanel(x, y) {
   });
 
   // Add event listeners
-  const closeBtn = document.getElementById('grammarwise-close');
+  const closeBtn = document.getElementById('grammarpeace-close');
   closeBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -1398,29 +1398,29 @@ async function showGrammarPanel(x, y) {
   });
 
   // Grammar tab event listeners
-  document.getElementById('grammarwise-check').addEventListener('click', checkGrammar);
-  document.getElementById('grammarwise-improve').addEventListener('click', improveText);
+  document.getElementById('grammarpeace-check').addEventListener('click', checkGrammar);
+  document.getElementById('grammarpeace-improve').addEventListener('click', improveText);
 
-  const copyBtn = document.getElementById('grammarwise-copy');
-  const replaceBtn = document.getElementById('grammarwise-replace');
-  const diffToggleBtn = document.getElementById('grammarwise-diff-toggle');
+  const copyBtn = document.getElementById('grammarpeace-copy');
+  const replaceBtn = document.getElementById('grammarpeace-replace');
+  const diffToggleBtn = document.getElementById('grammarpeace-diff-toggle');
 
   if (copyBtn) copyBtn.addEventListener('click', copyToClipboard);
   if (replaceBtn) replaceBtn.addEventListener('click', replaceText);
   if (diffToggleBtn) diffToggleBtn.addEventListener('click', toggleDiffView);
 
   // Alternatives event listener
-  const getAlternativesBtn = document.getElementById('grammarwise-get-alternatives');
+  const getAlternativesBtn = document.getElementById('grammarpeace-get-alternatives');
   if (getAlternativesBtn) getAlternativesBtn.addEventListener('click', handleGetAlternatives);
 
   // Explain errors event listeners
-  const explainBtn = document.getElementById('grammarwise-explain');
-  const closeExplanationBtn = document.getElementById('grammarwise-close-explanation');
+  const explainBtn = document.getElementById('grammarpeace-explain');
+  const closeExplanationBtn = document.getElementById('grammarpeace-close-explanation');
   if (explainBtn) explainBtn.addEventListener('click', handleExplainErrors);
   if (closeExplanationBtn) closeExplanationBtn.addEventListener('click', closeExplanation);
 
   // Presets event listeners (in More tab)
-  const savePresetBtn = document.getElementById('grammarwise-save-preset');
+  const savePresetBtn = document.getElementById('grammarpeace-save-preset');
   if (savePresetBtn) {
     savePresetBtn.addEventListener('click', handleSavePresetNew);
   }
@@ -1434,28 +1434,28 @@ async function showGrammarPanel(x, y) {
   }
 
   // Tone rewrite event listeners
-  document.getElementById('grammarwise-rewrite-tone').addEventListener('click', rewriteWithTone);
+  document.getElementById('grammarpeace-rewrite-tone').addEventListener('click', rewriteWithTone);
 
-  const detectToneBtn = document.getElementById('grammarwise-detect-tone');
+  const detectToneBtn = document.getElementById('grammarpeace-detect-tone');
   if (detectToneBtn) detectToneBtn.addEventListener('click', handleDetectTone);
 
-  const toneCopyBtn = document.getElementById('grammarwise-tone-copy');
-  const toneReplaceBtn = document.getElementById('grammarwise-tone-replace');
+  const toneCopyBtn = document.getElementById('grammarpeace-tone-copy');
+  const toneReplaceBtn = document.getElementById('grammarpeace-tone-replace');
 
   if (toneCopyBtn) toneCopyBtn.addEventListener('click', copyToneResult);
   if (toneReplaceBtn) toneReplaceBtn.addEventListener('click', replaceToneResult);
 
   // Translate tab event listeners
-  document.getElementById('grammarwise-translate').addEventListener('click', translateText);
+  document.getElementById('grammarpeace-translate').addEventListener('click', translateText);
 
-  const translateCopyBtn = document.getElementById('grammarwise-translate-copy');
-  const translateReplaceBtn = document.getElementById('grammarwise-translate-replace');
+  const translateCopyBtn = document.getElementById('grammarpeace-translate-copy');
+  const translateReplaceBtn = document.getElementById('grammarpeace-translate-replace');
 
   if (translateCopyBtn) translateCopyBtn.addEventListener('click', copyTranslation);
   if (translateReplaceBtn) translateReplaceBtn.addEventListener('click', replaceWithTranslation);
 
   // History tab event listeners
-  const clearHistoryBtn = document.getElementById('grammarwise-clear-history');
+  const clearHistoryBtn = document.getElementById('grammarpeace-clear-history');
   if (clearHistoryBtn) {
     clearHistoryBtn.addEventListener('click', async () => {
       await clearHistory();
@@ -1500,10 +1500,10 @@ async function checkGrammar() {
 
   isProcessing = true;
 
-  const language = document.getElementById('grammarwise-language').value;
-  const loadingDiv = document.getElementById('grammarwise-loading');
-  const resultDiv = document.getElementById('grammarwise-result');
-  const errorDiv = document.getElementById('grammarwise-error');
+  const language = document.getElementById('grammarpeace-language').value;
+  const loadingDiv = document.getElementById('grammarpeace-loading');
+  const resultDiv = document.getElementById('grammarpeace-result');
+  const errorDiv = document.getElementById('grammarpeace-error');
 
   // Show loading
   loadingDiv.style.display = 'block';
@@ -1523,11 +1523,11 @@ async function checkGrammar() {
     if (response && response.success) {
       if (response.noChanges) {
         // Show success message when no changes needed
-        const resultContent = document.getElementById('grammarwise-corrected-text');
+        const resultContent = document.getElementById('grammarpeace-corrected-text');
         resultContent.innerHTML = `<div style="color: var(--gw-success-text); font-weight: 500; padding: 12px; background: var(--gw-success-bg); border-radius: 6px; text-align: center;">✓ ${response.message}</div>`;
         // Hide the action buttons and diff toggle since there's nothing to copy/replace
-        const actions = resultDiv.querySelector('.grammarwise-actions');
-        const diffBtn = document.getElementById('grammarwise-diff-toggle');
+        const actions = resultDiv.querySelector('.grammarpeace-actions');
+        const diffBtn = document.getElementById('grammarpeace-diff-toggle');
         if (actions) actions.style.display = 'none';
         if (diffBtn) diffBtn.style.display = 'none';
         lastCorrectedText = '';
@@ -1538,9 +1538,9 @@ async function checkGrammar() {
         lastCorrectedText = response.correctedText;
 
         // Show corrected text with action buttons
-        document.getElementById('grammarwise-corrected-text').textContent = response.correctedText;
-        const actions = resultDiv.querySelector('.grammarwise-actions');
-        const diffBtn = document.getElementById('grammarwise-diff-toggle');
+        document.getElementById('grammarpeace-corrected-text').textContent = response.correctedText;
+        const actions = resultDiv.querySelector('.grammarpeace-actions');
+        const diffBtn = document.getElementById('grammarpeace-diff-toggle');
         if (actions) actions.style.display = 'flex';
         if (diffBtn) {
           diffBtn.style.display = 'inline-block';
@@ -1549,9 +1549,9 @@ async function checkGrammar() {
         }
 
         // Show alternatives section (reset state)
-        const altSection = document.getElementById('grammarwise-alternatives-section');
-        const altList = document.getElementById('grammarwise-alternatives-list');
-        const altLoading = document.getElementById('grammarwise-alternatives-loading');
+        const altSection = document.getElementById('grammarpeace-alternatives-section');
+        const altList = document.getElementById('grammarpeace-alternatives-list');
+        const altLoading = document.getElementById('grammarpeace-alternatives-loading');
         if (altSection) {
           altSection.style.display = 'block';
           if (altList) altList.innerHTML = '';
@@ -1584,9 +1584,9 @@ async function improveText() {
 
   isProcessing = true;
 
-  const loadingDiv = document.getElementById('grammarwise-loading');
-  const resultDiv = document.getElementById('grammarwise-result');
-  const errorDiv = document.getElementById('grammarwise-error');
+  const loadingDiv = document.getElementById('grammarpeace-loading');
+  const resultDiv = document.getElementById('grammarpeace-result');
+  const errorDiv = document.getElementById('grammarpeace-error');
 
   // Show loading
   loadingDiv.style.display = 'block';
@@ -1616,9 +1616,9 @@ async function improveText() {
       lastCorrectedText = response.rewrittenText;
 
       // Show improved text with action buttons
-      document.getElementById('grammarwise-corrected-text').textContent = response.rewrittenText;
-      const actions = resultDiv.querySelector('.grammarwise-actions');
-      const diffBtn = document.getElementById('grammarwise-diff-toggle');
+      document.getElementById('grammarpeace-corrected-text').textContent = response.rewrittenText;
+      const actions = resultDiv.querySelector('.grammarpeace-actions');
+      const diffBtn = document.getElementById('grammarpeace-diff-toggle');
       if (actions) actions.style.display = 'flex';
       if (diffBtn) {
         diffBtn.style.display = 'inline-block';
@@ -1628,7 +1628,7 @@ async function improveText() {
       resultDiv.style.display = 'block';
 
       // Update the label to show "Improved:" instead of "Corrected:"
-      const strongLabel = resultDiv.querySelector('.grammarwise-result-header strong');
+      const strongLabel = resultDiv.querySelector('.grammarpeace-result-header strong');
       if (strongLabel) strongLabel.textContent = 'Improved:';
 
       // Save to history
@@ -1647,11 +1647,11 @@ async function improveText() {
 }
 
 async function handleGetAlternatives() {
-  const altLoading = document.getElementById('grammarwise-alternatives-loading');
-  const altList = document.getElementById('grammarwise-alternatives-list');
-  const altBtn = document.getElementById('grammarwise-get-alternatives');
-  const correctedText = document.getElementById('grammarwise-corrected-text').textContent;
-  const language = document.getElementById('grammarwise-language').value;
+  const altLoading = document.getElementById('grammarpeace-alternatives-loading');
+  const altList = document.getElementById('grammarpeace-alternatives-list');
+  const altBtn = document.getElementById('grammarpeace-get-alternatives');
+  const correctedText = document.getElementById('grammarpeace-corrected-text').textContent;
+  const language = document.getElementById('grammarpeace-language').value;
 
   if (!correctedText || !selectedText) {
     return;
@@ -1675,41 +1675,41 @@ async function handleGetAlternatives() {
     if (response && response.success && response.alternatives.length > 0) {
       renderAlternatives(response.alternatives);
     } else if (response && response.error) {
-      if (altList) altList.innerHTML = `<div class="grammarwise-alternatives-error">Failed to get alternatives: ${escapeHtml(response.error)}</div>`;
+      if (altList) altList.innerHTML = `<div class="grammarpeace-alternatives-error">Failed to get alternatives: ${escapeHtml(response.error)}</div>`;
     } else {
-      if (altList) altList.innerHTML = '<div class="grammarwise-alternatives-error">No alternatives available.</div>';
+      if (altList) altList.innerHTML = '<div class="grammarpeace-alternatives-error">No alternatives available.</div>';
     }
   } catch (error) {
     if (altLoading) altLoading.style.display = 'none';
-    if (altList) altList.innerHTML = `<div class="grammarwise-alternatives-error">Error: ${escapeHtml(error.message)}</div>`;
+    if (altList) altList.innerHTML = `<div class="grammarpeace-alternatives-error">Error: ${escapeHtml(error.message)}</div>`;
   } finally {
     if (altBtn) altBtn.disabled = false;
   }
 }
 
 function renderAlternatives(alternatives) {
-  const altList = document.getElementById('grammarwise-alternatives-list');
+  const altList = document.getElementById('grammarpeace-alternatives-list');
   if (!altList) return;
 
   altList.innerHTML = alternatives.map((alt, index) => `
-    <div class="grammarwise-alternative-item" data-index="${index}">
-      <div class="grammarwise-alternative-text">${escapeHtml(alt)}</div>
-      <div class="grammarwise-alternative-actions">
-        <button class="grammarwise-btn-small grammarwise-alt-use" data-alt="${escapeHtml(alt)}" title="Use this version">Use</button>
-        <button class="grammarwise-btn-small grammarwise-alt-copy" data-alt="${escapeHtml(alt)}" title="Copy to clipboard">Copy</button>
+    <div class="grammarpeace-alternative-item" data-index="${index}">
+      <div class="grammarpeace-alternative-text">${escapeHtml(alt)}</div>
+      <div class="grammarpeace-alternative-actions">
+        <button class="grammarpeace-btn-small grammarpeace-alt-use" data-alt="${escapeHtml(alt)}" title="Use this version">Use</button>
+        <button class="grammarpeace-btn-small grammarpeace-alt-copy" data-alt="${escapeHtml(alt)}" title="Copy to clipboard">Copy</button>
       </div>
     </div>
   `).join('');
 
   // Add event listeners
-  altList.querySelectorAll('.grammarwise-alt-use').forEach(btn => {
+  altList.querySelectorAll('.grammarpeace-alt-use').forEach(btn => {
     btn.addEventListener('click', () => {
       const altText = btn.dataset.alt;
-      document.getElementById('grammarwise-corrected-text').textContent = altText;
+      document.getElementById('grammarpeace-corrected-text').textContent = altText;
       lastCorrectedText = altText;
       // Reset diff if active
       showDiffView = false;
-      const diffBtn = document.getElementById('grammarwise-diff-toggle');
+      const diffBtn = document.getElementById('grammarpeace-diff-toggle');
       if (diffBtn) {
         diffBtn.classList.remove('active');
         diffBtn.textContent = 'Diff';
@@ -1717,7 +1717,7 @@ function renderAlternatives(alternatives) {
     });
   });
 
-  altList.querySelectorAll('.grammarwise-alt-copy').forEach(btn => {
+  altList.querySelectorAll('.grammarpeace-alt-copy').forEach(btn => {
     btn.addEventListener('click', async () => {
       const altText = btn.dataset.alt;
       try {
@@ -1734,12 +1734,12 @@ function renderAlternatives(alternatives) {
 }
 
 async function handleExplainErrors() {
-  const explainSection = document.getElementById('grammarwise-explanation-section');
-  const explainLoading = document.getElementById('grammarwise-explanation-loading');
-  const explainContent = document.getElementById('grammarwise-explanation-content');
-  const explainBtn = document.getElementById('grammarwise-explain');
-  const correctedText = document.getElementById('grammarwise-corrected-text').textContent;
-  const language = document.getElementById('grammarwise-language').value;
+  const explainSection = document.getElementById('grammarpeace-explanation-section');
+  const explainLoading = document.getElementById('grammarpeace-explanation-loading');
+  const explainContent = document.getElementById('grammarpeace-explanation-content');
+  const explainBtn = document.getElementById('grammarpeace-explain');
+  const correctedText = document.getElementById('grammarpeace-corrected-text').textContent;
+  const language = document.getElementById('grammarpeace-language').value;
 
   if (!correctedText || !selectedText) {
     return;
@@ -1766,13 +1766,13 @@ async function handleExplainErrors() {
       const formatted = formatExplanation(response.explanation);
       if (explainContent) explainContent.innerHTML = formatted;
     } else if (response && response.error) {
-      if (explainContent) explainContent.innerHTML = `<div class="grammarwise-explanation-error">${escapeHtml(response.error)}</div>`;
+      if (explainContent) explainContent.innerHTML = `<div class="grammarpeace-explanation-error">${escapeHtml(response.error)}</div>`;
     } else {
-      if (explainContent) explainContent.innerHTML = '<div class="grammarwise-explanation-error">Unable to generate explanation.</div>';
+      if (explainContent) explainContent.innerHTML = '<div class="grammarpeace-explanation-error">Unable to generate explanation.</div>';
     }
   } catch (error) {
     if (explainLoading) explainLoading.style.display = 'none';
-    if (explainContent) explainContent.innerHTML = `<div class="grammarwise-explanation-error">${escapeHtml(error.message)}</div>`;
+    if (explainContent) explainContent.innerHTML = `<div class="grammarpeace-explanation-error">${escapeHtml(error.message)}</div>`;
   } finally {
     if (explainBtn) explainBtn.disabled = false;
   }
@@ -1786,20 +1786,20 @@ function formatExplanation(text) {
     // Check if it's a bullet point
     if (trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('*')) {
       const content = trimmed.replace(/^[•\-\*]\s*/, '');
-      return `<div class="grammarwise-explanation-bullet">${escapeHtml(content)}</div>`;
+      return `<div class="grammarpeace-explanation-bullet">${escapeHtml(content)}</div>`;
     }
     // Check if it's a numbered item
     if (/^\d+[\.\)]\s/.test(trimmed)) {
       const content = trimmed.replace(/^\d+[\.\)]\s*/, '');
-      return `<div class="grammarwise-explanation-bullet">${escapeHtml(content)}</div>`;
+      return `<div class="grammarpeace-explanation-bullet">${escapeHtml(content)}</div>`;
     }
-    return `<div class="grammarwise-explanation-line">${escapeHtml(trimmed)}</div>`;
+    return `<div class="grammarpeace-explanation-line">${escapeHtml(trimmed)}</div>`;
   });
   return formatted.join('');
 }
 
 function closeExplanation() {
-  const explainSection = document.getElementById('grammarwise-explanation-section');
+  const explainSection = document.getElementById('grammarpeace-explanation-section');
   if (explainSection) explainSection.style.display = 'none';
 }
 
@@ -1811,10 +1811,10 @@ async function rewriteWithTone() {
 
   isProcessing = true;
 
-  const tone = document.getElementById('grammarwise-tone').value;
-  const loadingDiv = document.getElementById('grammarwise-tone-loading');
-  const resultDiv = document.getElementById('grammarwise-tone-result');
-  const errorDiv = document.getElementById('grammarwise-tone-error');
+  const tone = document.getElementById('grammarpeace-tone').value;
+  const loadingDiv = document.getElementById('grammarpeace-tone-loading');
+  const resultDiv = document.getElementById('grammarpeace-tone-result');
+  const errorDiv = document.getElementById('grammarpeace-tone-error');
 
   // Show loading
   loadingDiv.style.display = 'block';
@@ -1832,7 +1832,7 @@ async function rewriteWithTone() {
     loadingDiv.style.display = 'none';
 
     if (response && response.success) {
-      document.getElementById('grammarwise-rewritten-text').textContent = response.rewrittenText;
+      document.getElementById('grammarpeace-rewritten-text').textContent = response.rewrittenText;
       resultDiv.style.display = 'block';
 
       // Save to history
@@ -1851,21 +1851,21 @@ async function rewriteWithTone() {
 }
 
 function showError(message) {
-  const errorDiv = document.getElementById('grammarwise-error');
+  const errorDiv = document.getElementById('grammarpeace-error');
   errorDiv.textContent = message;
   errorDiv.style.display = 'block';
 }
 
 function showToneError(message) {
-  const errorDiv = document.getElementById('grammarwise-tone-error');
+  const errorDiv = document.getElementById('grammarpeace-tone-error');
   errorDiv.textContent = message;
   errorDiv.style.display = 'block';
 }
 
 function copyToClipboard() {
-  const correctedText = document.getElementById('grammarwise-corrected-text').textContent;
+  const correctedText = document.getElementById('grammarpeace-corrected-text').textContent;
   navigator.clipboard.writeText(correctedText).then(() => {
-    const btn = document.getElementById('grammarwise-copy');
+    const btn = document.getElementById('grammarpeace-copy');
     const originalText = btn.textContent;
     btn.textContent = 'Copied!';
     setTimeout(() => {
@@ -1877,7 +1877,7 @@ function copyToClipboard() {
 }
 
 function replaceText() {
-  const correctedText = document.getElementById('grammarwise-corrected-text').textContent;
+  const correctedText = document.getElementById('grammarpeace-corrected-text').textContent;
 
   // Try multiple strategies to replace text
   let replaced = false;
@@ -2040,9 +2040,9 @@ function replaceText() {
 }
 
 function copyToneResult() {
-  const rewrittenText = document.getElementById('grammarwise-rewritten-text').textContent;
+  const rewrittenText = document.getElementById('grammarpeace-rewritten-text').textContent;
   navigator.clipboard.writeText(rewrittenText).then(() => {
-    const btn = document.getElementById('grammarwise-tone-copy');
+    const btn = document.getElementById('grammarpeace-tone-copy');
     const originalText = btn.textContent;
     btn.textContent = 'Copied!';
     setTimeout(() => {
@@ -2054,7 +2054,7 @@ function copyToneResult() {
 }
 
 function replaceToneResult() {
-  const rewrittenText = document.getElementById('grammarwise-rewritten-text').textContent;
+  const rewrittenText = document.getElementById('grammarpeace-rewritten-text').textContent;
 
   // Use the same replacement logic as replaceText
   let replaced = false;
@@ -2118,11 +2118,11 @@ async function translateText() {
 
   isProcessing = true;
 
-  const fromLang = document.getElementById('grammarwise-from-lang').value;
-  const toLang = document.getElementById('grammarwise-to-lang').value;
-  const loadingDiv = document.getElementById('grammarwise-translate-loading');
-  const resultDiv = document.getElementById('grammarwise-translate-result');
-  const errorDiv = document.getElementById('grammarwise-translate-error');
+  const fromLang = document.getElementById('grammarpeace-from-lang').value;
+  const toLang = document.getElementById('grammarpeace-to-lang').value;
+  const loadingDiv = document.getElementById('grammarpeace-translate-loading');
+  const resultDiv = document.getElementById('grammarpeace-translate-result');
+  const errorDiv = document.getElementById('grammarpeace-translate-error');
 
   // Show loading
   loadingDiv.style.display = 'block';
@@ -2141,7 +2141,7 @@ async function translateText() {
     loadingDiv.style.display = 'none';
 
     if (response && response.success) {
-      document.getElementById('grammarwise-translated-text').textContent = response.translatedText;
+      document.getElementById('grammarpeace-translated-text').textContent = response.translatedText;
       resultDiv.style.display = 'block';
 
       // Save to history
@@ -2160,15 +2160,15 @@ async function translateText() {
 }
 
 function showTranslateError(message) {
-  const errorDiv = document.getElementById('grammarwise-translate-error');
+  const errorDiv = document.getElementById('grammarpeace-translate-error');
   errorDiv.textContent = message;
   errorDiv.style.display = 'block';
 }
 
 function copyTranslation() {
-  const translatedText = document.getElementById('grammarwise-translated-text').textContent;
+  const translatedText = document.getElementById('grammarpeace-translated-text').textContent;
   navigator.clipboard.writeText(translatedText).then(() => {
-    const btn = document.getElementById('grammarwise-translate-copy');
+    const btn = document.getElementById('grammarpeace-translate-copy');
     const originalText = btn.textContent;
     btn.textContent = 'Copied!';
     setTimeout(() => {
@@ -2180,7 +2180,7 @@ function copyTranslation() {
 }
 
 function replaceWithTranslation() {
-  const translatedText = document.getElementById('grammarwise-translated-text').textContent;
+  const translatedText = document.getElementById('grammarpeace-translated-text').textContent;
 
   // Use the same replace logic as grammar correction
   let replaced = false;

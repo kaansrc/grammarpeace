@@ -1,4 +1,4 @@
-// Popup script for GrammarWise
+// Popup script for GrammarPeace
 
 document.addEventListener('DOMContentLoaded', checkConfiguration);
 document.getElementById('settingsBtn').addEventListener('click', openSettings);
@@ -23,7 +23,7 @@ function checkConfiguration() {
       statusCard.className = 'status-card not-configured';
       statusIcon.textContent = '⚠️';
       statusTitle.textContent = 'Setup Required';
-      statusDescription.textContent = 'Please configure your Claude API key to start using GrammarWise. Click "Open Settings" below.';
+      statusDescription.textContent = 'Please configure your Claude API key to start using GrammarPeace. Click "Open Settings" below.';
     }
   });
 }
@@ -34,6 +34,6 @@ function openSettings() {
 
 function openHelp() {
   chrome.tabs.create({
-    url: 'https://github.com/yourusername/grammarwise#readme'
+    url: 'https://github.com/yourusername/grammarpeace#readme'
   });
 }

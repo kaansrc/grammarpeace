@@ -1,4 +1,4 @@
-// Options page script for GrammarWise
+// Options page script for GrammarPeace
 
 document.addEventListener('DOMContentLoaded', () => {
   loadSettings();

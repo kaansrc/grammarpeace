@@ -21,8 +21,8 @@
 }
 
 /* Dark Theme - Inverted Typewriter */
-#grammarwise-panel.dark-theme,
-#grammarwise-floating-button.dark-theme {
+#grammarpeace-panel.dark-theme,
+#grammarpeace-floating-button.dark-theme {
   --gw-bg-primary: #1a1a1a;
   --gw-bg-secondary: #252525;
   --gw-bg-tertiary: #333333;
@@ -43,8 +43,8 @@
   --gw-shadow-accent: rgba(255, 123, 41, 0.3);
 }
 
-/* GrammarWise Floating Button */
-#grammarwise-floating-button {
+/* GrammarPeace Floating Button */
+#grammarpeace-floating-button {
   position: absolute;
   z-index: 2147483647;
   background: var(--gw-accent);
@@ -58,16 +58,16 @@
   cursor: pointer;
   box-shadow: 0 4px 12px var(--gw-shadow-accent);
   transition: all 0.2s ease;
-  animation: grammarwise-fadeIn 0.2s ease;
+  animation: grammarpeace-fadeIn 0.2s ease;
 }
 
-#grammarwise-floating-button:hover {
+#grammarpeace-floating-button:hover {
   background: var(--gw-accent-hover);
   transform: scale(1.1);
 }
 
-/* GrammarWise Panel */
-#grammarwise-panel {
+/* GrammarPeace Panel */
+#grammarpeace-panel {
   position: fixed;
   z-index: 2147483647;
   background: var(--gw-bg-primary);
@@ -76,13 +76,13 @@
   width: 450px;
   max-width: 90vw;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  animation: grammarwise-slideUp 0.3s ease;
+  animation: grammarpeace-slideUp 0.3s ease;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.grammarwise-header {
+.grammarpeace-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -92,20 +92,20 @@
   background: var(--gw-bg-primary);
 }
 
-.grammarwise-header-left {
+.grammarpeace-header-left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.grammarwise-header h3 {
+.grammarpeace-header h3 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
   color: var(--gw-text-primary);
 }
 
-.grammarwise-stats {
+.grammarpeace-stats {
   font-size: 12px;
   color: var(--gw-text-tertiary);
   background: var(--gw-bg-tertiary);
@@ -113,7 +113,7 @@
   border-radius: 4px;
 }
 
-.grammarwise-close-btn {
+.grammarpeace-close-btn {
   background: none;
   border: none;
   font-size: 28px;
@@ -132,13 +132,13 @@
   pointer-events: auto;
 }
 
-.grammarwise-close-btn:hover {
+.grammarpeace-close-btn:hover {
   background: var(--gw-bg-tertiary);
   color: var(--gw-text-primary);
 }
 
 /* Tabs */
-.grammarwise-tabs {
+.grammarpeace-tabs {
   display: flex;
   gap: 0;
   border-bottom: 2px solid var(--gw-border);
@@ -146,7 +146,7 @@
   flex-shrink: 0;
 }
 
-.grammarwise-tab {
+.grammarpeace-tab {
   flex: 1;
   padding: 12px 20px;
   background: none;
@@ -161,25 +161,25 @@
   margin-bottom: -2px;
 }
 
-.grammarwise-tab:hover {
+.grammarpeace-tab:hover {
   color: var(--gw-text-secondary);
   background: var(--gw-bg-secondary);
 }
 
-.grammarwise-tab.active {
+.grammarpeace-tab.active {
   color: var(--gw-accent);
   border-bottom-color: var(--gw-accent);
 }
 
-.grammarwise-tab-content {
+.grammarpeace-tab-content {
   display: none;
 }
 
-.grammarwise-tab-content.active {
+.grammarpeace-tab-content.active {
   display: block;
 }
 
-.grammarwise-content {
+.grammarpeace-content {
   padding: 20px;
   overflow-y: auto;
   flex: 1;
@@ -187,24 +187,24 @@
   background: var(--gw-bg-primary);
 }
 
-.grammarwise-section {
+.grammarpeace-section {
   margin-bottom: 20px;
 }
 
-.grammarwise-section-title {
+.grammarpeace-section-title {
   font-size: 15px;
   font-weight: 600;
   color: var(--gw-text-primary);
   margin-bottom: 12px;
 }
 
-.grammarwise-divider {
+.grammarpeace-divider {
   height: 1px;
   background: var(--gw-border);
   margin: 24px 0;
 }
 
-.grammarwise-controls {
+.grammarpeace-controls {
   display: flex;
   gap: 10px;
   margin-bottom: 16px;
@@ -212,13 +212,13 @@
   flex-wrap: wrap;
 }
 
-.grammarwise-controls label {
+.grammarpeace-controls label {
   font-size: 14px;
   font-weight: 500;
   color: var(--gw-text-secondary);
 }
 
-.grammarwise-select {
+.grammarpeace-select {
   padding: 8px 12px;
   border: 1px solid var(--gw-border-hover);
   border-radius: 6px;
@@ -234,22 +234,22 @@
   -moz-appearance: menulist;
 }
 
-.grammarwise-select option {
+.grammarpeace-select option {
   color: var(--gw-text-primary);
   background: var(--gw-bg-primary);
   padding: 8px;
 }
 
-.grammarwise-select option:checked {
+.grammarpeace-select option:checked {
   background: var(--gw-accent);
   color: white;
 }
 
-.grammarwise-select option:hover {
+.grammarpeace-select option:hover {
   background: var(--gw-bg-tertiary);
 }
 
-.grammarwise-select:focus {
+.grammarpeace-select:focus {
   outline: none;
   border-color: var(--gw-accent);
   box-shadow: 0 0 0 3px var(--gw-accent-subtle);
@@ -257,8 +257,8 @@
   color: var(--gw-text-primary);
 }
 
-.grammarwise-btn,
-.grammarwise-btn-primary {
+.grammarpeace-btn,
+.grammarpeace-btn-primary {
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 14px;
@@ -268,34 +268,34 @@
   border: none;
 }
 
-.grammarwise-btn {
+.grammarpeace-btn {
   background: var(--gw-bg-tertiary);
   color: var(--gw-text-secondary);
 }
 
-.grammarwise-btn:hover {
+.grammarpeace-btn:hover {
   background: var(--gw-border);
 }
 
-.grammarwise-btn-primary {
+.grammarpeace-btn-primary {
   background: var(--gw-accent);
   color: white;
 }
 
-.grammarwise-btn-primary:hover {
+.grammarpeace-btn-primary:hover {
   background: var(--gw-accent-hover);
 }
 
-.grammarwise-original,
-.grammarwise-result {
+.grammarpeace-original,
+.grammarpeace-result {
   margin-bottom: 16px;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
-.grammarwise-original strong,
-.grammarwise-result strong {
+.grammarpeace-original strong,
+.grammarpeace-result strong {
   display: block;
   font-size: 14px;
   font-weight: 600;
@@ -303,7 +303,7 @@
   margin-bottom: 8px;
 }
 
-.grammarwise-text {
+.grammarpeace-text {
   padding: 12px;
   background: var(--gw-bg-secondary);
   border: 1px solid var(--gw-border);
@@ -315,7 +315,7 @@
   overflow-y: auto;
 }
 
-.grammarwise-actions {
+.grammarpeace-actions {
   display: flex;
   gap: 8px;
   margin-top: 12px;
@@ -326,28 +326,28 @@
   padding-top: 8px;
 }
 
-.grammarwise-loading {
+.grammarpeace-loading {
   text-align: center;
   padding: 20px;
 }
 
-.grammarwise-spinner {
+.grammarpeace-spinner {
   border: 3px solid var(--gw-border);
   border-top: 3px solid var(--gw-accent);
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  animation: grammarwise-spin 1s linear infinite;
+  animation: grammarpeace-spin 1s linear infinite;
   margin: 0 auto 12px;
 }
 
-.grammarwise-loading p {
+.grammarpeace-loading p {
   margin: 0;
   font-size: 14px;
   color: var(--gw-text-tertiary);
 }
 
-.grammarwise-error {
+.grammarpeace-error {
   padding: 12px;
   background: var(--gw-error-bg);
   border: 1px solid var(--gw-error-border);
@@ -358,7 +358,7 @@
 }
 
 /* Animations */
-@keyframes grammarwise-fadeIn {
+@keyframes grammarpeace-fadeIn {
   from {
     opacity: 0;
     transform: scale(0.8);
@@ -369,7 +369,7 @@
   }
 }
 
-@keyframes grammarwise-slideUp {
+@keyframes grammarpeace-slideUp {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -380,44 +380,44 @@
   }
 }
 
-@keyframes grammarwise-spin {
+@keyframes grammarpeace-spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
 /* Scrollbar styling */
-.grammarwise-text::-webkit-scrollbar {
+.grammarpeace-text::-webkit-scrollbar {
   width: 6px;
 }
 
-.grammarwise-text::-webkit-scrollbar-track {
+.grammarpeace-text::-webkit-scrollbar-track {
   background: var(--gw-bg-secondary);
   border-radius: 3px;
 }
 
-.grammarwise-text::-webkit-scrollbar-thumb {
+.grammarpeace-text::-webkit-scrollbar-thumb {
   background: var(--gw-border-hover);
   border-radius: 3px;
 }
 
-.grammarwise-text::-webkit-scrollbar-thumb:hover {
+.grammarpeace-text::-webkit-scrollbar-thumb:hover {
   background: var(--gw-text-tertiary);
 }
 
 /* Result header with diff toggle */
-.grammarwise-result-header {
+.grammarpeace-result-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
 }
 
-.grammarwise-result-header strong {
+.grammarpeace-result-header strong {
   margin-bottom: 0;
 }
 
 /* Small button for diff toggle */
-.grammarwise-btn-small {
+.grammarpeace-btn-small {
   padding: 4px 8px;
   font-size: 11px;
   font-weight: 500;
@@ -429,12 +429,12 @@
   color: var(--gw-text-tertiary);
 }
 
-.grammarwise-btn-small:hover {
+.grammarpeace-btn-small:hover {
   background: var(--gw-bg-tertiary);
   color: var(--gw-text-secondary);
 }
 
-.grammarwise-btn-small.active {
+.grammarpeace-btn-small.active {
   background: var(--gw-accent);
   color: white;
   border-color: var(--gw-accent);
@@ -457,18 +457,18 @@
 }
 
 /* Dark theme diff colors */
-#grammarwise-panel.dark-theme .gw-diff-add {
+#grammarpeace-panel.dark-theme .gw-diff-add {
   background: #166534;
   color: #bbf7d0;
 }
 
-#grammarwise-panel.dark-theme .gw-diff-remove {
+#grammarpeace-panel.dark-theme .gw-diff-remove {
   background: #991b1b;
   color: #fecaca;
 }
 
 /* History styles */
-.grammarwise-history-header {
+.grammarpeace-history-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -477,25 +477,25 @@
   border-bottom: 1px solid var(--gw-border);
 }
 
-.grammarwise-history-header span {
+.grammarpeace-history-header span {
   font-size: 14px;
   font-weight: 500;
   color: var(--gw-text-secondary);
 }
 
-.grammarwise-history-list {
+.grammarpeace-history-list {
   max-height: 300px;
   overflow-y: auto;
 }
 
-.grammarwise-history-empty {
+.grammarpeace-history-empty {
   text-align: center;
   color: var(--gw-text-tertiary);
   font-size: 14px;
   padding: 20px;
 }
 
-.grammarwise-history-item {
+.grammarpeace-history-item {
   padding: 10px;
   border: 1px solid var(--gw-border);
   border-radius: 6px;
@@ -503,18 +503,18 @@
   background: var(--gw-bg-secondary);
 }
 
-.grammarwise-history-item:last-child {
+.grammarpeace-history-item:last-child {
   margin-bottom: 0;
 }
 
-.grammarwise-history-meta {
+.grammarpeace-history-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 6px;
 }
 
-.grammarwise-history-type {
+.grammarpeace-history-type {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -524,43 +524,43 @@
   border-radius: 3px;
 }
 
-.grammarwise-history-time {
+.grammarpeace-history-time {
   font-size: 11px;
   color: var(--gw-text-tertiary);
 }
 
-.grammarwise-history-original {
+.grammarpeace-history-original {
   font-size: 12px;
   color: var(--gw-text-tertiary);
   margin-bottom: 4px;
   text-decoration: line-through;
 }
 
-.grammarwise-history-result {
+.grammarpeace-history-result {
   font-size: 13px;
   color: var(--gw-text-primary);
   margin-bottom: 8px;
 }
 
-.grammarwise-history-use {
+.grammarpeace-history-use {
   float: right;
 }
 
 /* Presets row */
-.grammarwise-presets-row {
+.grammarpeace-presets-row {
   display: flex;
   gap: 8px;
   margin-bottom: 12px;
   align-items: center;
 }
 
-.grammarwise-preset-select {
+.grammarpeace-preset-select {
   flex: 1;
   max-width: none;
 }
 
 /* Detected tone badge */
-.grammarwise-tone-detected {
+.grammarpeace-tone-detected {
   background: var(--gw-bg-secondary);
   border: 1px solid var(--gw-border);
   border-radius: 6px;
@@ -570,19 +570,19 @@
   color: var(--gw-text-secondary);
 }
 
-.grammarwise-tone-detected strong {
+.grammarpeace-tone-detected strong {
   color: var(--gw-accent);
 }
 
 /* Writing Statistics */
-.grammarwise-stats-details {
+.grammarpeace-stats-details {
   margin: 12px 0;
   border: 1px solid var(--gw-border);
   border-radius: 6px;
   background: var(--gw-bg-secondary);
 }
 
-.grammarwise-stats-summary {
+.grammarpeace-stats-summary {
   padding: 10px 12px;
   cursor: pointer;
   font-size: 13px;
@@ -591,48 +591,48 @@
   user-select: none;
 }
 
-.grammarwise-stats-summary:hover {
+.grammarpeace-stats-summary:hover {
   color: var(--gw-text-primary);
 }
 
-.grammarwise-writing-stats {
+.grammarpeace-writing-stats {
   padding: 0 12px 12px;
 }
 
-.grammarwise-stats-grid {
+.grammarpeace-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin-bottom: 12px;
 }
 
-.grammarwise-stat-item {
+.grammarpeace-stat-item {
   text-align: center;
   padding: 8px;
   background: var(--gw-bg-primary);
   border-radius: 4px;
 }
 
-.grammarwise-stat-value {
+.grammarpeace-stat-value {
   display: block;
   font-size: 16px;
   font-weight: 600;
   color: var(--gw-accent);
 }
 
-.grammarwise-stat-label {
+.grammarpeace-stat-label {
   display: block;
   font-size: 10px;
   color: var(--gw-text-tertiary);
   margin-top: 2px;
 }
 
-.grammarwise-stats-detail {
+.grammarpeace-stats-detail {
   border-top: 1px solid var(--gw-border);
   padding-top: 10px;
 }
 
-.grammarwise-stat-row {
+.grammarpeace-stat-row {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
@@ -640,7 +640,7 @@
   padding: 4px 0;
 }
 
-.grammarwise-stats-empty {
+.grammarpeace-stats-empty {
   text-align: center;
   color: var(--gw-text-tertiary);
   font-size: 13px;
@@ -648,25 +648,25 @@
 }
 
 /* Alternatives Section */
-.grammarwise-alternatives-section {
+.grammarpeace-alternatives-section {
   margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid var(--gw-border);
 }
 
-.grammarwise-alternatives-header {
+.grammarpeace-alternatives-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
 }
 
-.grammarwise-alternatives-header strong {
+.grammarpeace-alternatives-header strong {
   font-size: 13px;
   color: var(--gw-text-secondary);
 }
 
-.grammarwise-alternatives-loading {
+.grammarpeace-alternatives-loading {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -675,53 +675,53 @@
   padding: 8px 0;
 }
 
-.grammarwise-mini-spinner {
+.grammarpeace-mini-spinner {
   display: inline-block;
   width: 12px;
   height: 12px;
   border: 2px solid var(--gw-border);
   border-top-color: var(--gw-accent);
   border-radius: 50%;
-  animation: grammarwise-spin 0.8s linear infinite;
+  animation: grammarpeace-spin 0.8s linear infinite;
 }
 
-.grammarwise-alternatives-list {
+.grammarpeace-alternatives-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.grammarwise-alternative-item {
+.grammarpeace-alternative-item {
   background: var(--gw-bg-secondary);
   border: 1px solid var(--gw-border);
   border-radius: 6px;
   padding: 10px;
 }
 
-.grammarwise-alternative-item:hover {
+.grammarpeace-alternative-item:hover {
   border-color: var(--gw-border-hover);
 }
 
-.grammarwise-alternative-text {
+.grammarpeace-alternative-text {
   font-size: 13px;
   color: var(--gw-text-primary);
   line-height: 1.5;
   margin-bottom: 8px;
 }
 
-.grammarwise-alternative-actions {
+.grammarpeace-alternative-actions {
   display: flex;
   gap: 6px;
   justify-content: flex-end;
 }
 
-.grammarwise-alt-use,
-.grammarwise-alt-copy {
+.grammarpeace-alt-use,
+.grammarpeace-alt-copy {
   font-size: 11px !important;
   padding: 4px 8px !important;
 }
 
-.grammarwise-alternatives-error {
+.grammarpeace-alternatives-error {
   font-size: 12px;
   color: var(--gw-error-text);
   padding: 8px;
@@ -730,13 +730,13 @@
 }
 
 /* Result Header Buttons */
-.grammarwise-result-header-buttons {
+.grammarpeace-result-header-buttons {
   display: flex;
   gap: 6px;
 }
 
 /* Explanation Section */
-.grammarwise-explanation-section {
+.grammarpeace-explanation-section {
   margin-top: 12px;
   padding: 12px;
   background: var(--gw-bg-secondary);
@@ -744,19 +744,19 @@
   border-radius: 6px;
 }
 
-.grammarwise-explanation-header {
+.grammarpeace-explanation-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
 }
 
-.grammarwise-explanation-header strong {
+.grammarpeace-explanation-header strong {
   font-size: 13px;
   color: var(--gw-text-secondary);
 }
 
-.grammarwise-explanation-loading {
+.grammarpeace-explanation-loading {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -765,19 +765,19 @@
   padding: 8px 0;
 }
 
-.grammarwise-explanation-content {
+.grammarpeace-explanation-content {
   font-size: 13px;
   color: var(--gw-text-primary);
   line-height: 1.6;
 }
 
-.grammarwise-explanation-bullet {
+.grammarpeace-explanation-bullet {
   position: relative;
   padding-left: 16px;
   margin-bottom: 8px;
 }
 
-.grammarwise-explanation-bullet::before {
+.grammarpeace-explanation-bullet::before {
   content: '•';
   position: absolute;
   left: 0;
@@ -785,11 +785,11 @@
   font-weight: bold;
 }
 
-.grammarwise-explanation-line {
+.grammarpeace-explanation-line {
   margin-bottom: 8px;
 }
 
-.grammarwise-explanation-error {
+.grammarpeace-explanation-error {
   font-size: 12px;
   color: var(--gw-error-text);
   padding: 8px;
@@ -798,18 +798,18 @@
 }
 
 /* More Tab - Section styles */
-.grammarwise-section-desc {
+.grammarpeace-section-desc {
   font-size: 12px;
   color: var(--gw-text-tertiary);
   margin-bottom: 12px;
 }
 
 /* Presets Management */
-.grammarwise-presets-manage {
+.grammarpeace-presets-manage {
   margin-top: 8px;
 }
 
-.grammarwise-preset-create {
+.grammarpeace-preset-create {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -817,12 +817,12 @@
   flex-wrap: wrap;
 }
 
-.grammarwise-preset-create .grammarwise-select {
+.grammarpeace-preset-create .grammarpeace-select {
   min-width: 100px;
   flex: 1;
 }
 
-.grammarwise-presets-list {
+.grammarpeace-presets-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -830,7 +830,7 @@
   overflow-y: auto;
 }
 
-.grammarwise-presets-empty {
+.grammarpeace-presets-empty {
   text-align: center;
   color: var(--gw-text-tertiary);
   font-size: 13px;
@@ -838,7 +838,7 @@
   margin: 0;
 }
 
-.grammarwise-preset-item {
+.grammarpeace-preset-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -848,17 +848,17 @@
   border-radius: 6px;
 }
 
-.grammarwise-preset-item:hover {
+.grammarpeace-preset-item:hover {
   border-color: var(--gw-border-hover);
 }
 
-.grammarwise-preset-info {
+.grammarpeace-preset-info {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-.grammarwise-preset-lang {
+.grammarpeace-preset-lang {
   font-size: 12px;
   font-weight: 600;
   color: var(--gw-accent);
@@ -867,7 +867,7 @@
   border-radius: 4px;
 }
 
-.grammarwise-preset-tone {
+.grammarpeace-preset-tone {
   font-size: 12px;
   color: var(--gw-text-secondary);
   background: var(--gw-bg-tertiary);
@@ -875,12 +875,12 @@
   border-radius: 4px;
 }
 
-.grammarwise-preset-actions {
+.grammarpeace-preset-actions {
   display: flex;
   gap: 6px;
 }
 
-.grammarwise-preset-delete {
+.grammarpeace-preset-delete {
   color: var(--gw-error-text) !important;
   font-weight: bold;
 }

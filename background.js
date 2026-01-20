@@ -1,10 +1,10 @@
-// Background service worker for GrammarWise
+// Background service worker for GrammarPeace
 
 // Create context menu on installation
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: 'grammarwise-check',
-    title: 'Check Grammar with GrammarWise',
+    id: 'grammarpeace-check',
+    title: 'Check Grammar with GrammarPeace',
     contexts: ['selection'],
     documentUrlPatterns: ['<all_urls>']
   });
@@ -47,7 +47,7 @@ chrome.commands.onCommand.addListener((command) => {
 
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === 'grammarwise-check' && info.selectionText) {
+  if (info.menuItemId === 'grammarpeace-check' && info.selectionText) {
     chrome.tabs.sendMessage(tab.id, {
       action: 'openPanelWithText',
       text: info.selectionText
