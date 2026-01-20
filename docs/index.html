@@ -338,6 +338,88 @@
             font-weight: bold;
         }
 
+        /* Cost Comparison */
+        .cost-comparison {
+            padding: 100px 0;
+            background: var(--gray);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .comparison-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .comparison-card.grammarly {
+            opacity: 0.7;
+        }
+
+        .comparison-card.highlight {
+            border-color: var(--orange);
+            box-shadow: 0 10px 40px rgba(232, 93, 4, 0.15);
+        }
+
+        .comparison-card h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .comparison-card .price {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .comparison-card.grammarly .price {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .comparison-card .price-detail {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .comparison-card .savings {
+            background: var(--orange);
+            color: var(--white);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .cost-note {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 24px;
+            background: var(--white);
+            border-radius: 12px;
+            border-left: 4px solid var(--orange);
+        }
+
+        .cost-note p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .cost-note strong {
+            color: var(--dark);
+        }
+
         /* Footer */
         footer {
             background: var(--dark);
@@ -402,7 +484,8 @@
             }
 
             .features-grid,
-            .steps {
+            .steps,
+            .comparison-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -535,6 +618,37 @@
                         <li><span class="check-icon">✓</span> Open source — verify yourself</li>
                     </ul>
                     <a href="https://chromewebstore.google.com/detail/grammarpeace" class="btn btn-primary" style="width: 100%;">Cancel Grammarly. Get This.</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="cost-comparison" id="cost">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Real Cost Comparison</h2>
+                    <p>Based on 100 grammar checks per day (heavy user)</p>
+                </div>
+                <div class="comparison-grid">
+                    <div class="comparison-card grammarly">
+                        <h3>Grammarly Premium</h3>
+                        <div class="price">$360/yr</div>
+                        <div class="price-detail">$30/month, fixed price</div>
+                    </div>
+                    <div class="comparison-card highlight">
+                        <h3>GrammarPeace + Claude</h3>
+                        <div class="price">~$11/yr</div>
+                        <div class="price-detail">Claude Haiku 4.5 API</div>
+                        <div class="savings">Save 97%</div>
+                    </div>
+                    <div class="comparison-card highlight">
+                        <h3>GrammarPeace + OpenAI</h3>
+                        <div class="price">~$0.90/yr</div>
+                        <div class="price-detail">GPT-4.1 Nano API</div>
+                        <div class="savings">Save 99.7%</div>
+                    </div>
+                </div>
+                <div class="cost-note">
+                    <p><strong>How it works:</strong> You bring your own API key from Anthropic or OpenAI. You pay only for what you use — typically a few cents per month. No subscriptions, no minimums, no BS.</p>
                 </div>
             </div>
         </section>
