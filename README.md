@@ -65,6 +65,17 @@ GrammarPeace requires an API key from Anthropic or OpenAI:
 
 **API Cost**: Typical usage costs a few cents per month. Much cheaper than $30/month subscriptions.
 
+## Supported AI Models
+
+GrammarPeace uses the latest AI models for fast, accurate results:
+
+| Provider | Model | Notes |
+|----------|-------|-------|
+| **Anthropic** | Claude Haiku 4.5 | Fast, cost-effective, excellent quality |
+| **OpenAI** | GPT-4.1 Nano | Lightweight and efficient |
+
+You can switch between providers in Settings. Both deliver excellent grammar checking at minimal cost.
+
 ## Supported Languages
 
 English, Spanish, French, German, Italian, Portuguese, Russian, Japanese, Korean, Chinese, Arabic, Hindi, Turkish, Dutch, Polish
