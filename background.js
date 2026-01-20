@@ -8,8 +8,6 @@ chrome.runtime.onInstalled.addListener(() => {
     contexts: ['selection'],
     documentUrlPatterns: ['<all_urls>']
   });
-  console.log('GrammarWise: Context menu created');
-  console.log('GrammarWise: Keyboard shortcut: Ctrl+Shift+G (Cmd+Shift+G on Mac)');
 
   // Setup keep-alive alarm
   setupKeepAlive();
@@ -17,16 +15,14 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // Keep service worker alive to prevent context invalidation
 function setupKeepAlive() {
-  // Create an alarm that fires every 20 seconds
-  chrome.alarms.create('keepAlive', { periodInMinutes: 0.33 }); // 20 seconds
-  console.log('GrammarWise: Keep-alive alarm created');
+  // Create an alarm that fires every 30 seconds
+  chrome.alarms.create('keepAlive', { periodInMinutes: 0.5 }); // 30 seconds
 }
 
 // Handle alarm to keep service worker alive
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'keepAlive') {
     // Simple operation to keep service worker alive
-    console.log('GrammarWise: Keep-alive ping');
   }
 });
 
@@ -37,15 +33,12 @@ chrome.runtime.onStartup.addListener(() => {
 
 // Handle keyboard shortcut command
 chrome.commands.onCommand.addListener((command) => {
-  console.log('GrammarWise: Command received:', command);
   if (command === 'check-grammar') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]) {
-        console.log('GrammarWise: Sending keyboard shortcut trigger to tab', tabs[0].id);
         chrome.tabs.sendMessage(tabs[0].id, {
           action: 'triggerFromKeyboard'
         }).catch(err => {
-          console.error('GrammarWise: Error sending keyboard trigger:', err);
         });
       }
     });
@@ -54,16 +47,12 @@ chrome.commands.onCommand.addListener((command) => {
 
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  console.log('GrammarWise: Context menu clicked', info);
   if (info.menuItemId === 'grammarwise-check' && info.selectionText) {
-    console.log('GrammarWise: Sending message to tab', tab.id, 'with text:', info.selectionText.substring(0, 50));
     chrome.tabs.sendMessage(tab.id, {
       action: 'openPanelWithText',
       text: info.selectionText
     }).then(() => {
-      console.log('GrammarWise: Message sent successfully');
     }).catch(err => {
-      console.error('GrammarWise: Error sending message:', err);
     });
   }
 });
@@ -95,16 +84,38 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .catch(error => sendResponse({ success: false, error: error.message }));
     return true; // Keep the message channel open for async response
   }
+
+  if (request.action === 'detectTone') {
+    detectTone(request.text)
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true; // Keep the message channel open for async response
+  }
+
+  if (request.action === 'getAlternatives') {
+    getAlternatives(request.text, request.correctedText, request.language)
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true;
+  }
+
+  if (request.action === 'explainErrors') {
+    explainErrors(request.text, request.correctedText, request.language)
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true;
+  }
 });
 
 async function checkGrammar(text, language) {
   try {
     // Get API settings from storage
-    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens']);
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens', 'customDictionary']);
 
     const provider = result.apiProvider || 'claude';
     const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
     const maxTokens = result.maxTokens || 1024;
+    const customDictionary = result.customDictionary || [];
 
     if (!apiKey) {
       return {
@@ -114,7 +125,7 @@ async function checkGrammar(text, language) {
     }
 
     // Prepare the prompt based on language only (no tone)
-    const prompt = createGrammarPrompt(text, language);
+    const prompt = createGrammarPrompt(text, language, customDictionary);
 
     // Call appropriate API
     let correctedText;
@@ -142,7 +153,6 @@ async function checkGrammar(text, language) {
     };
 
   } catch (error) {
-    console.error('Error checking grammar:', error);
     return {
       success: false,
       error: error.message || 'An unexpected error occurred'
@@ -183,7 +193,6 @@ async function rewriteWithTone(text, tone) {
     };
 
   } catch (error) {
-    console.error('Error rewriting with tone:', error);
     return {
       success: false,
       error: error.message || 'An unexpected error occurred'
@@ -224,7 +233,6 @@ async function translateText(text, fromLang, toLang) {
     };
 
   } catch (error) {
-    console.error('Error translating text:', error);
     return {
       success: false,
       error: error.message || 'An unexpected error occurred'
@@ -273,7 +281,7 @@ async function callOpenAIAPI(apiKey, prompt, maxTokens) {
       'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: 'gpt-4.1-nano-2025-04-14',
+      model: 'gpt-4.1-nano',
       max_tokens: maxTokens,
       messages: [{
         role: 'user',
@@ -284,15 +292,12 @@ async function callOpenAIAPI(apiKey, prompt, maxTokens) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    console.error('OpenAI API error response:', errorData);
     throw new Error(errorData.error?.message || `OpenAI API request failed: ${response.status}`);
   }
 
   const data = await response.json();
-  console.log('OpenAI API response:', data);
 
   if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-    console.error('Invalid OpenAI response structure:', JSON.stringify(data));
     throw new Error(`Invalid response from OpenAI API. Response: ${JSON.stringify(data).substring(0, 200)}`);
   }
 
@@ -300,20 +305,18 @@ async function callOpenAIAPI(apiKey, prompt, maxTokens) {
 
   // Check if the model refused to respond
   if (message.refusal) {
-    console.error('OpenAI refused to respond:', message.refusal);
     throw new Error(`OpenAI refused to respond: ${message.refusal}`);
   }
 
   // Check if content is empty
   if (!message.content || message.content.trim() === '') {
-    console.error('OpenAI returned empty content:', JSON.stringify(data));
     throw new Error('OpenAI returned an empty response. Please try again.');
   }
 
   return message.content.trim();
 }
 
-function createGrammarPrompt(text, language) {
+function createGrammarPrompt(text, language, customDictionary = []) {
   const languageNames = {
     auto: 'Auto-detect',
     en: 'English',
@@ -335,6 +338,11 @@ function createGrammarPrompt(text, language) {
 
   const languageName = languageNames[language] || 'the original language';
 
+  // Add custom dictionary instruction if there are words
+  const dictionaryInstruction = customDictionary.length > 0
+    ? `- These words are correct and should NOT be flagged as errors: ${customDictionary.join(', ')}\n`
+    : '';
+
   let prompt = '';
 
   if (language === 'auto') {
@@ -353,7 +361,7 @@ CRITICAL RULES:
 - Do NOT use markdown formatting
 - Do NOT use em dashes (—) - use hyphens (-) or commas instead
 - Preserve the author's original voice and style
-
+${dictionaryInstruction}
 Text to correct:
 ${text}
 
@@ -374,7 +382,7 @@ CRITICAL RULES:
 - Do NOT use em dashes (—) - use hyphens (-) or commas instead
 - The text must remain in ${languageName}
 - Preserve the author's original voice and style
-
+${dictionaryInstruction}
 Text to correct:
 ${text}
 
@@ -499,4 +507,246 @@ Translation in ${toLanguage}:`;
   }
 
   return prompt;
+}
+
+async function detectTone(text) {
+  try {
+    // Get API settings from storage
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey']);
+
+    const provider = result.apiProvider || 'claude';
+    const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+
+    if (!apiKey) {
+      return {
+        success: false,
+        error: `Please set your ${provider === 'claude' ? 'Claude' : 'OpenAI'} API key in the extension settings.`
+      };
+    }
+
+    const prompt = createToneDetectionPrompt(text);
+
+    // Call appropriate API with minimal tokens
+    let detectedTone;
+    if (provider === 'claude') {
+      detectedTone = await callClaudeAPI(apiKey, prompt, 50);
+    } else {
+      detectedTone = await callOpenAIAPI(apiKey, prompt, 50);
+    }
+
+    // Parse the response to get tone
+    const tone = detectedTone.toLowerCase().trim();
+    const validTones = ['professional', 'casual', 'friendly', 'formal', 'concise'];
+    const matchedTone = validTones.find(t => tone.includes(t)) || 'professional';
+
+    return {
+      success: true,
+      tone: matchedTone
+    };
+
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message || 'An unexpected error occurred'
+    };
+  }
+}
+
+function createToneDetectionPrompt(text) {
+  return `Analyze the tone of this text and respond with ONLY ONE word from this list: professional, casual, friendly, formal, concise
+
+Text to analyze:
+${text.substring(0, 500)}
+
+Tone:`;
+}
+
+async function getAlternatives(originalText, correctedText, language) {
+  try {
+    // Get API settings from storage
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens']);
+
+    const provider = result.apiProvider || 'claude';
+    const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+    const maxTokens = result.maxTokens || 1024;
+
+    if (!apiKey) {
+      return {
+        success: false,
+        error: `Please set your ${provider === 'claude' ? 'Claude' : 'OpenAI'} API key in the extension settings.`
+      };
+    }
+
+    const prompt = createAlternativesPrompt(originalText, correctedText, language);
+
+    // Call appropriate API
+    let response;
+    if (provider === 'claude') {
+      response = await callClaudeAPI(apiKey, prompt, maxTokens);
+    } else {
+      response = await callOpenAIAPI(apiKey, prompt, maxTokens);
+    }
+
+    // Parse the alternatives from response
+    const alternatives = parseAlternatives(response);
+
+    return {
+      success: true,
+      alternatives: alternatives
+    };
+
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message || 'An unexpected error occurred'
+    };
+  }
+}
+
+function createAlternativesPrompt(originalText, correctedText, language) {
+  const languageNames = {
+    auto: 'the detected language',
+    en: 'English',
+    es: 'Spanish',
+    fr: 'French',
+    de: 'German',
+    it: 'Italian',
+    pt: 'Portuguese',
+    ru: 'Russian',
+    ja: 'Japanese',
+    ko: 'Korean',
+    zh: 'Chinese',
+    ar: 'Arabic',
+    hi: 'Hindi',
+    tr: 'Turkish',
+    nl: 'Dutch',
+    pl: 'Polish'
+  };
+
+  const languageName = languageNames[language] || 'the original language';
+
+  return `You are a writing assistant. Given the original text and its correction, provide 2 alternative ways to express the same message in ${languageName}.
+
+Each alternative should:
+- Be grammatically correct
+- Keep the same meaning as the original
+- Have a slightly different style or word choice
+- Be natural and fluent
+
+CRITICAL RULES:
+- Return EXACTLY 2 alternatives, numbered as 1. and 2.
+- Each alternative should be on its own line
+- Do NOT add explanations or comments
+- Do NOT use markdown formatting
+- Keep the same language as the original
+
+Original text:
+${originalText}
+
+Current correction:
+${correctedText}
+
+Provide 2 alternatives:`;
+}
+
+function parseAlternatives(response) {
+  const lines = response.trim().split('\n').filter(line => line.trim());
+  const alternatives = [];
+
+  for (const line of lines) {
+    // Remove numbering like "1.", "2.", "1)", "2)" etc.
+    const cleaned = line.replace(/^[\d]+[\.\)]\s*/, '').trim();
+    if (cleaned && cleaned.length > 0) {
+      alternatives.push(cleaned);
+    }
+  }
+
+  // Return up to 2 alternatives
+  return alternatives.slice(0, 2);
+}
+
+async function explainErrors(originalText, correctedText, language) {
+  try {
+    // Get API settings from storage
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens']);
+
+    const provider = result.apiProvider || 'claude';
+    const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+    const maxTokens = result.maxTokens || 1024;
+
+    if (!apiKey) {
+      return {
+        success: false,
+        error: `Please set your ${provider === 'claude' ? 'Claude' : 'OpenAI'} API key in the extension settings.`
+      };
+    }
+
+    const prompt = createExplainErrorsPrompt(originalText, correctedText, language);
+
+    // Call appropriate API
+    let response;
+    if (provider === 'claude') {
+      response = await callClaudeAPI(apiKey, prompt, maxTokens);
+    } else {
+      response = await callOpenAIAPI(apiKey, prompt, maxTokens);
+    }
+
+    return {
+      success: true,
+      explanation: response
+    };
+
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message || 'An unexpected error occurred'
+    };
+  }
+}
+
+function createExplainErrorsPrompt(originalText, correctedText, language) {
+  const languageNames = {
+    auto: 'the detected language',
+    en: 'English',
+    es: 'Spanish',
+    fr: 'French',
+    de: 'German',
+    it: 'Italian',
+    pt: 'Portuguese',
+    ru: 'Russian',
+    ja: 'Japanese',
+    ko: 'Korean',
+    zh: 'Chinese',
+    ar: 'Arabic',
+    hi: 'Hindi',
+    tr: 'Turkish',
+    nl: 'Dutch',
+    pl: 'Polish'
+  };
+
+  const languageName = languageNames[language] || 'the original language';
+
+  return `You are a grammar teacher. Compare the original text with the corrected version and explain what errors were fixed.
+
+For each correction, briefly explain:
+1. What was wrong in the original
+2. Why the correction is correct
+3. The grammar rule that applies (if relevant)
+
+Keep explanations concise and educational. Use simple language.
+
+CRITICAL RULES:
+- Format each correction as a bullet point
+- Be brief but clear
+- Focus on the most important corrections
+- Do NOT use markdown headers or formatting
+- Write in ${languageName} if the text is in that language, otherwise use English
+
+Original text:
+${originalText}
+
+Corrected text:
+${correctedText}
+
+Explain the corrections:`;
 }

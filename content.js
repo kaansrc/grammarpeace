@@ -5,20 +5,83 @@ let selectedText = '';
 let selectionRange = null;
 let originalElement = null; // Store the element that had the selection
 let isProcessing = false; // Prevent multiple simultaneous operations
+let currentTheme = 'light'; // Track current theme
+
+// Get theme preference (system, light, or dark)
+function getThemePreference() {
+  return new Promise((resolve) => {
+    if (chrome.runtime?.id) {
+      chrome.storage.sync.get(['theme'], (result) => {
+        if (chrome.runtime.lastError) {
+          resolve('system');
+          return;
+        }
+        resolve(result.theme || 'system');
+      });
+    } else {
+      resolve('system');
+    }
+  });
+}
+
+// Determine actual theme based on preference
+function resolveTheme(preference) {
+  if (preference === 'system') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return preference;
+}
+
+// Apply theme to elements
+function applyTheme(theme) {
+  currentTheme = theme;
+  if (floatingButton) {
+    floatingButton.classList.toggle('dark-theme', theme === 'dark');
+  }
+  if (grammarPanel) {
+    grammarPanel.classList.toggle('dark-theme', theme === 'dark');
+  }
+}
+
+// Initialize theme
+async function initTheme() {
+  const preference = await getThemePreference();
+  const theme = resolveTheme(preference);
+  applyTheme(theme);
+}
+
+// Listen for system theme changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', async (e) => {
+  const preference = await getThemePreference();
+  if (preference === 'system') {
+    applyTheme(e.matches ? 'dark' : 'light');
+  }
+});
+
+// Listen for theme changes from settings
+if (chrome.runtime?.id) {
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'sync' && changes.theme) {
+      const theme = resolveTheme(changes.theme.newValue || 'system');
+      applyTheme(theme);
+    }
+  });
+}
+
+// Initialize theme on load
+initTheme();
 
 // Detect if we're on Google Docs
 const isGoogleDocs = window.location.hostname === 'docs.google.com' && window.location.pathname.includes('/document/');
 
-console.log('GrammarWise: Content script loaded successfully');
+// GrammarWise content script loaded
 if (isGoogleDocs) {
-  console.log('GrammarWise: Google Docs detected - Right-click menu is the recommended way to use this extension on Google Docs');
-
+  
   // Show a one-time notification to the user
   if (window === window.top) {
     setTimeout(() => {
       chrome.storage.sync.get(['googleDocsNotificationShown'], (result) => {
         if (!result.googleDocsNotificationShown) {
-          console.log('%c📝 GrammarWise on Google Docs\n\n✨ Use keyboard shortcut: Ctrl+Shift+G (Cmd+Shift+G on Mac)\n\nOR:\n\n1. Copy your text (Ctrl+C)\n2. Click the GrammarWise extension icon\n3. Paste and check grammar in the popup\n\nNote: Google Docs uses custom text rendering that prevents automatic text extraction.', 'background: #6366f1; color: white; padding: 12px; font-size: 13px; line-height: 1.6; border-radius: 8px;');
           chrome.storage.sync.set({ googleDocsNotificationShown: true });
         }
       });
@@ -28,18 +91,15 @@ if (isGoogleDocs) {
 
 // Listen for messages from background script (for context menu and keyboard shortcut)
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('GrammarWise: Received message:', request);
 
   // Handle keyboard shortcut trigger
   if (request.action === 'triggerFromKeyboard') {
-    console.log('GrammarWise: Keyboard shortcut triggered (Ctrl+Shift+G)');
 
     // Try to get selected text
     const selection = window.getSelection();
     const text = selection ? selection.toString().trim() : '';
 
     if (!text) {
-      console.log('GrammarWise: No text selected for keyboard shortcut');
       const message = isGoogleDocs
         ? 'GrammarWise for Google Docs:\n\n1. Select your text\n2. Press Ctrl+C (or Cmd+C) to copy\n3. Click the GrammarWise extension icon\n4. Paste text into the popup\n\nNote: Google Docs uses custom text handling that prevents direct text extraction.'
         : 'Please select some text first, then press Ctrl+Shift+G (or Cmd+Shift+G on Mac).';
@@ -51,7 +111,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     selectedText = text;
     selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
     originalElement = document.activeElement;
-    console.log('GrammarWise: Extracted text from keyboard shortcut:', text.substring(0, 50));
 
     // Show panel at top center
     showGrammarPanel(0, 0);
@@ -62,11 +121,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // Handle context menu trigger
   if (request.action === 'openPanelWithText' && request.text) {
     selectedText = request.text;
-    console.log('GrammarWise: Opening panel with text:', selectedText.substring(0, 50));
 
     // For Google Docs, use a fixed top-center position since selection API doesn't work
     if (isGoogleDocs) {
-      console.log('GrammarWise: Using Google Docs positioning');
       showGrammarPanel(0, 0);
       sendResponse({ success: true });
       return true;
@@ -88,7 +145,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           originalElement = document.activeElement;
         }
       } catch (e) {
-        console.log('GrammarWise: Could not get selection rect, using default position');
       }
     }
 
@@ -101,6 +157,65 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Listen for text selection
 document.addEventListener('mouseup', handleTextSelection);
 document.addEventListener('selectionchange', handleSelectionChange);
+
+// Listen for keyboard selection (Shift+Arrow keys)
+document.addEventListener('keyup', (event) => {
+  // Check if Shift key was involved (for text selection)
+  if (event.shiftKey || event.key === 'Shift') {
+    const selection = window.getSelection();
+    const text = selection ? selection.toString().trim() : '';
+    if (text.length > 0) {
+      // Get the selection range for positioning
+      try {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        if (rect.width > 0 || rect.height > 0) {
+          selectedText = text;
+          selectionRange = range;
+          originalElement = document.activeElement;
+          showFloatingButton(rect.right, rect.bottom);
+        }
+      } catch (e) {
+        // Fallback - show at a default position near the active element
+        const activeEl = document.activeElement;
+        if (activeEl) {
+          const rect = activeEl.getBoundingClientRect();
+          selectedText = text;
+          selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+          originalElement = activeEl;
+          showFloatingButton(rect.right, rect.top);
+        }
+      }
+    }
+  }
+});
+
+// Listen for Ctrl+A / Cmd+A (select all)
+document.addEventListener('keydown', (event) => {
+  // Check for Ctrl+A (Windows/Linux) or Cmd+A (Mac)
+  if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
+    // Wait a brief moment for the selection to happen
+    setTimeout(() => {
+      const selection = window.getSelection();
+      const text = selection ? selection.toString().trim() : '';
+      if (text.length > 0) {
+        selectedText = text;
+        selectionRange = selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+        originalElement = document.activeElement;
+
+        // Position button near the active element or center of viewport
+        const activeEl = document.activeElement;
+        if (activeEl && activeEl !== document.body) {
+          const rect = activeEl.getBoundingClientRect();
+          showFloatingButton(rect.right, rect.top);
+        } else {
+          // Fallback to center-right of viewport
+          showFloatingButton(window.innerWidth - 60, 100);
+        }
+      }
+    }, 50);
+  }
+});
 
 // For Google Docs, also listen on capture phase and with a delay
 if (isGoogleDocs) {
@@ -117,7 +232,6 @@ if (isGoogleDocs) {
       const selection = window.getSelection();
       const text = selection.toString().trim();
       if (text.length > 0) {
-        console.log('GrammarWise: Google Docs click selection detected');
         handleTextSelection(event);
       }
     }, 150);
@@ -151,7 +265,6 @@ function handleTextSelection(event) {
 
   // Only log when text is actually selected (reduce noise)
   if (text.length > 0) {
-    console.log('GrammarWise: Text selected:', text.substring(0, 50) + '...');
     selectedText = text;
 
     // Store the active element for later replacement
@@ -167,17 +280,13 @@ function handleTextSelection(event) {
 
       // Fallback to mouse event position if rect is invalid (at 0,0)
       if (rect.left === 0 && rect.top === 0 && rect.right === 0 && rect.bottom === 0) {
-        console.log('GrammarWise: Invalid rect, using mouse position');
         // Convert page coordinates to viewport coordinates
         x = event.clientX;
         y = event.clientY;
       }
 
-      console.log('GrammarWise: Rect:', rect);
-      console.log('GrammarWise: Showing button at viewport coords', x, y);
       showFloatingButton(x, y);
     } catch (e) {
-      console.error('GrammarWise: Error getting selection range:', e);
       // Fallback to mouse viewport position
       showFloatingButton(event.clientX, event.clientY);
     }
@@ -222,36 +331,20 @@ function showFloatingButton(x, y) {
 
   floatingButton.innerHTML = `✌️`;
 
+  // Apply current theme
+  if (currentTheme === 'dark') {
+    floatingButton.classList.add('dark-theme');
+  }
+
   floatingButton.addEventListener('click', async (e) => {
     e.stopPropagation();
     e.preventDefault();
-    console.log('GrammarWise: Button clicked');
     const rect = floatingButton.getBoundingClientRect();
     await showGrammarPanel(rect.left + window.scrollX, rect.top + window.scrollY);
   });
 
   document.body.appendChild(floatingButton);
 
-  // Verify it's visible
-  setTimeout(() => {
-    if (floatingButton && document.body.contains(floatingButton)) {
-      const computed = window.getComputedStyle(floatingButton);
-      console.log('GrammarWise: Button computed style:', {
-        display: computed.display,
-        opacity: computed.opacity,
-        visibility: computed.visibility,
-        zIndex: computed.zIndex,
-        position: computed.position,
-        left: computed.left,
-        top: computed.top
-      });
-      console.log('GrammarWise: Button should be visible at these coordinates!');
-    } else {
-      console.log('GrammarWise: Button was removed from DOM before verification');
-    }
-  }, 50);
-
-  console.log('GrammarWise: Floating button added to DOM at viewport coordinates', x, y);
 }
 
 function hideFloatingButton() {
@@ -268,7 +361,6 @@ async function sendMessageWithRetry(message, maxRetries = 3, delayMs = 100) {
       // Check if runtime ID exists
       if (!chrome.runtime?.id) {
         if (attempt < maxRetries) {
-          console.log(`GrammarWise: Runtime ID not found, retry ${attempt}/${maxRetries}`);
           await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
           continue;
         }
@@ -278,13 +370,11 @@ async function sendMessageWithRetry(message, maxRetries = 3, delayMs = 100) {
       const response = await chrome.runtime.sendMessage(message);
       return response;
     } catch (error) {
-      console.log(`GrammarWise: Message failed (attempt ${attempt}/${maxRetries}):`, error.message);
 
       if (attempt < maxRetries) {
         // Wait before retrying with exponential backoff
         await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
       } else {
-        console.error('GrammarWise: All retry attempts failed');
         return null;
       }
     }
@@ -298,13 +388,662 @@ async function validateExtensionContext() {
   return response && response.success;
 }
 
+// Helper function to calculate character and word counts
+function getTextStats(text) {
+  const chars = text.length;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  return { chars, words };
+}
+
+// Calculate detailed writing statistics
+function getWritingStatistics(text) {
+  if (!text || text.trim().length === 0) {
+    return null;
+  }
+
+  const words = text.trim().split(/\s+/);
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const paragraphs = text.split(/\n\n+/).filter(p => p.trim().length > 0);
+
+  const wordCount = words.length;
+  const sentenceCount = sentences.length || 1;
+  const paragraphCount = paragraphs.length || 1;
+  const charCount = text.length;
+  const charCountNoSpaces = text.replace(/\s/g, '').length;
+
+  // Calculate syllables (simple approximation)
+  const syllableCount = words.reduce((total, word) => {
+    return total + countSyllables(word);
+  }, 0);
+
+  // Average word length
+  const avgWordLength = charCountNoSpaces / wordCount;
+
+  // Average sentence length
+  const avgSentenceLength = wordCount / sentenceCount;
+
+  // Flesch Reading Ease Score
+  // 206.835 - 1.015 * (words/sentences) - 84.6 * (syllables/words)
+  const fleschScore = 206.835 - (1.015 * avgSentenceLength) - (84.6 * (syllableCount / wordCount));
+  const fleschScoreClamped = Math.max(0, Math.min(100, Math.round(fleschScore)));
+
+  // Reading time (avg 200 words per minute)
+  const readingTimeMinutes = wordCount / 200;
+  const readingTimeSeconds = Math.round(readingTimeMinutes * 60);
+
+  return {
+    wordCount,
+    sentenceCount,
+    paragraphCount,
+    charCount,
+    charCountNoSpaces,
+    avgWordLength: avgWordLength.toFixed(1),
+    avgSentenceLength: avgSentenceLength.toFixed(1),
+    fleschScore: fleschScoreClamped,
+    fleschLabel: getFleschLabel(fleschScoreClamped),
+    readingTime: formatReadingTime(readingTimeSeconds)
+  };
+}
+
+function countSyllables(word) {
+  word = word.toLowerCase().replace(/[^a-z]/g, '');
+  if (word.length <= 3) return 1;
+
+  word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '');
+  word = word.replace(/^y/, '');
+  const matches = word.match(/[aeiouy]{1,2}/g);
+  return matches ? matches.length : 1;
+}
+
+function getFleschLabel(score) {
+  if (score >= 90) return 'Very Easy';
+  if (score >= 80) return 'Easy';
+  if (score >= 70) return 'Fairly Easy';
+  if (score >= 60) return 'Standard';
+  if (score >= 50) return 'Fairly Difficult';
+  if (score >= 30) return 'Difficult';
+  return 'Very Difficult';
+}
+
+function formatReadingTime(seconds) {
+  if (seconds < 60) return `${seconds}s`;
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+}
+
+function renderWritingStats(text) {
+  const stats = getWritingStatistics(text);
+  if (!stats) {
+    return '<p class="grammarwise-stats-empty">No text to analyze</p>';
+  }
+
+  return `
+    <div class="grammarwise-stats-grid">
+      <div class="grammarwise-stat-item">
+        <span class="grammarwise-stat-value">${stats.wordCount}</span>
+        <span class="grammarwise-stat-label">Words</span>
+      </div>
+      <div class="grammarwise-stat-item">
+        <span class="grammarwise-stat-value">${stats.sentenceCount}</span>
+        <span class="grammarwise-stat-label">Sentences</span>
+      </div>
+      <div class="grammarwise-stat-item">
+        <span class="grammarwise-stat-value">${stats.paragraphCount}</span>
+        <span class="grammarwise-stat-label">Paragraphs</span>
+      </div>
+      <div class="grammarwise-stat-item">
+        <span class="grammarwise-stat-value">${stats.readingTime}</span>
+        <span class="grammarwise-stat-label">Read time</span>
+      </div>
+    </div>
+    <div class="grammarwise-stats-detail">
+      <div class="grammarwise-stat-row">
+        <span>Avg. word length:</span>
+        <span>${stats.avgWordLength} chars</span>
+      </div>
+      <div class="grammarwise-stat-row">
+        <span>Avg. sentence length:</span>
+        <span>${stats.avgSentenceLength} words</span>
+      </div>
+      <div class="grammarwise-stat-row">
+        <span>Readability (Flesch):</span>
+        <span>${stats.fleschScore} - ${stats.fleschLabel}</span>
+      </div>
+    </div>
+  `;
+}
+
+// Word-level diff algorithm
+function computeWordDiff(original, corrected) {
+  const originalWords = original.split(/(\s+)/);
+  const correctedWords = corrected.split(/(\s+)/);
+
+  // Simple LCS-based diff
+  const m = originalWords.length;
+  const n = correctedWords.length;
+
+  // Build LCS table
+  const lcs = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      if (originalWords[i - 1] === correctedWords[j - 1]) {
+        lcs[i][j] = lcs[i - 1][j - 1] + 1;
+      } else {
+        lcs[i][j] = Math.max(lcs[i - 1][j], lcs[i][j - 1]);
+      }
+    }
+  }
+
+  // Backtrack to find diff
+  const result = [];
+  let i = m, j = n;
+  while (i > 0 || j > 0) {
+    if (i > 0 && j > 0 && originalWords[i - 1] === correctedWords[j - 1]) {
+      result.unshift({ type: 'equal', text: originalWords[i - 1] });
+      i--;
+      j--;
+    } else if (j > 0 && (i === 0 || lcs[i][j - 1] >= lcs[i - 1][j])) {
+      result.unshift({ type: 'add', text: correctedWords[j - 1] });
+      j--;
+    } else {
+      result.unshift({ type: 'remove', text: originalWords[i - 1] });
+      i--;
+    }
+  }
+
+  return result;
+}
+
+// Generate HTML for diff view
+function generateDiffHtml(original, corrected) {
+  const diff = computeWordDiff(original, corrected);
+  let html = '';
+  for (const part of diff) {
+    if (part.type === 'equal') {
+      html += escapeHtml(part.text);
+    } else if (part.type === 'add') {
+      html += `<span class="gw-diff-add">${escapeHtml(part.text)}</span>`;
+    } else if (part.type === 'remove') {
+      html += `<span class="gw-diff-remove">${escapeHtml(part.text)}</span>`;
+    }
+  }
+  return html;
+}
+
+// Track diff view state
+let showDiffView = false;
+let lastCorrectedText = ''; // Store for diff toggle
+
+// History management
+const MAX_HISTORY_ITEMS = 10;
+
+// Custom Dictionary management
+async function getCustomDictionary() {
+  if (!chrome.runtime?.id) return [];
+
+  try {
+    const data = await new Promise(resolve => {
+      chrome.storage.sync.get(['customDictionary'], resolve);
+    });
+    return data.customDictionary || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+async function addToDictionary(word) {
+  if (!chrome.runtime?.id || !word) return false;
+
+  try {
+    const dictionary = await getCustomDictionary();
+    const normalizedWord = word.toLowerCase().trim();
+
+    if (dictionary.includes(normalizedWord)) {
+      return false; // Already exists
+    }
+
+    dictionary.push(normalizedWord);
+    await chrome.storage.sync.set({ customDictionary: dictionary });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function removeFromDictionary(word) {
+  if (!chrome.runtime?.id || !word) return false;
+
+  try {
+    const dictionary = await getCustomDictionary();
+    const normalizedWord = word.toLowerCase().trim();
+    const filtered = dictionary.filter(w => w !== normalizedWord);
+    await chrome.storage.sync.set({ customDictionary: filtered });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Presets management
+async function getPresets() {
+  if (!chrome.runtime?.id) return [];
+
+  try {
+    const data = await new Promise(resolve => {
+      chrome.storage.sync.get(['presets'], resolve);
+    });
+    return data.presets || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+async function savePreset(name, settings) {
+  if (!chrome.runtime?.id) return;
+
+  try {
+    const presets = await getPresets();
+    const newPreset = {
+      id: Date.now(),
+      name: name,
+      ...settings
+    };
+
+    presets.push(newPreset);
+    await chrome.storage.sync.set({ presets });
+    return newPreset;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function deletePreset(id) {
+  if (!chrome.runtime?.id) return;
+
+  try {
+    const presets = await getPresets();
+    const filtered = presets.filter(p => p.id !== id);
+    await chrome.storage.sync.set({ presets: filtered });
+  } catch (e) {
+    // Silently fail
+  }
+}
+
+// Load presets into dropdown
+async function loadPresetsDropdown() {
+  const presetSelect = document.getElementById('grammarwise-preset');
+  if (!presetSelect) return;
+
+  const presets = await getPresets();
+
+  // Clear existing options except the first one
+  presetSelect.innerHTML = '<option value="">Presets...</option>';
+
+  for (const preset of presets) {
+    const option = document.createElement('option');
+    option.value = preset.id;
+    option.textContent = preset.name;
+    presetSelect.appendChild(option);
+  }
+}
+
+// Apply selected preset
+function applyPreset() {
+  const presetSelect = document.getElementById('grammarwise-preset');
+  if (!presetSelect || !presetSelect.value) return;
+
+  getPresets().then(presets => {
+    const preset = presets.find(p => p.id === parseInt(presetSelect.value));
+    if (!preset) return;
+
+    // Apply language setting
+    if (preset.language) {
+      const langSelect = document.getElementById('grammarwise-language');
+      if (langSelect) langSelect.value = preset.language;
+    }
+
+    // Apply tone setting if on tone tab
+    if (preset.tone) {
+      const toneSelect = document.getElementById('grammarwise-tone');
+      if (toneSelect) toneSelect.value = preset.tone;
+    }
+
+    // Reset dropdown
+    presetSelect.value = '';
+  });
+}
+
+// Handle detect tone button
+async function handleDetectTone() {
+  const detectBtn = document.getElementById('grammarwise-detect-tone');
+  const toneSelect = document.getElementById('grammarwise-tone');
+  const detectedDiv = document.getElementById('grammarwise-detected-tone');
+  const detectedValue = document.getElementById('grammarwise-detected-tone-value');
+
+  if (!detectBtn || !toneSelect) return;
+
+  // Show loading state
+  const originalText = detectBtn.textContent;
+  detectBtn.textContent = '...';
+  detectBtn.disabled = true;
+
+  try {
+    const response = await sendMessageWithRetry({
+      action: 'detectTone',
+      text: selectedText
+    });
+
+    if (response && response.success) {
+      // Set the detected tone
+      toneSelect.value = response.tone;
+
+      // Show detected tone badge
+      if (detectedDiv && detectedValue) {
+        const toneLabels = {
+          professional: 'Professional',
+          casual: 'Casual',
+          friendly: 'Friendly',
+          formal: 'Formal',
+          concise: 'Concise'
+        };
+        detectedValue.textContent = toneLabels[response.tone] || response.tone;
+        detectedDiv.style.display = 'block';
+      }
+
+      detectBtn.textContent = '✓';
+    } else {
+      detectBtn.textContent = '!';
+    }
+  } catch (e) {
+    detectBtn.textContent = '!';
+  } finally {
+    detectBtn.disabled = false;
+    setTimeout(() => {
+      detectBtn.textContent = originalText;
+    }, 1500);
+  }
+}
+
+// Handle save preset button
+async function handleSavePreset() {
+  const langSelect = document.getElementById('grammarwise-language');
+  const toneSelect = document.getElementById('grammarwise-tone');
+
+  const language = langSelect ? langSelect.value : 'auto';
+  const tone = toneSelect ? toneSelect.value : 'professional';
+
+  const languageNames = {
+    auto: 'Auto', en: 'EN', es: 'ES', fr: 'FR', de: 'DE', it: 'IT',
+    pt: 'PT', ru: 'RU', ja: 'JA', ko: 'KO', zh: 'ZH', ar: 'AR',
+    hi: 'HI', tr: 'TR', nl: 'NL', pl: 'PL'
+  };
+
+  const toneNames = {
+    professional: 'Pro', casual: 'Casual', friendly: 'Friendly',
+    formal: 'Formal', concise: 'Concise', clear: 'Clear'
+  };
+
+  const name = `${languageNames[language] || language} - ${toneNames[tone] || tone}`;
+
+  const preset = await savePreset(name, { language, tone });
+  if (preset) {
+    loadPresetsDropdown();
+
+    // Brief visual feedback
+    const btn = document.getElementById('grammarwise-save-preset');
+    if (btn) {
+      const original = btn.textContent;
+      btn.textContent = '✓';
+      setTimeout(() => { btn.textContent = original; }, 1000);
+    }
+  }
+}
+
+// New preset handling for More tab
+async function handleSavePresetNew() {
+  const langSelect = document.getElementById('grammarwise-preset-lang');
+  const toneSelect = document.getElementById('grammarwise-preset-tone');
+
+  const language = langSelect ? langSelect.value : 'auto';
+  const tone = toneSelect ? toneSelect.value : 'professional';
+
+  const languageNames = {
+    auto: 'Auto-detect', en: 'English', es: 'Spanish', fr: 'French', de: 'German', it: 'Italian',
+    pt: 'Portuguese', ru: 'Russian', ja: 'Japanese', ko: 'Korean', zh: 'Chinese', ar: 'Arabic',
+    hi: 'Hindi', tr: 'Turkish', nl: 'Dutch', pl: 'Polish'
+  };
+
+  const toneNames = {
+    professional: 'Professional', casual: 'Casual', friendly: 'Friendly',
+    formal: 'Formal', concise: 'Concise'
+  };
+
+  const name = `${languageNames[language]} + ${toneNames[tone]}`;
+
+  const preset = await savePreset(name, { language, tone });
+  if (preset) {
+    renderPresetsList();
+
+    // Brief visual feedback
+    const btn = document.getElementById('grammarwise-save-preset');
+    if (btn) {
+      const original = btn.textContent;
+      btn.textContent = 'Saved!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    }
+  }
+}
+
+async function renderPresetsList() {
+  const listContainer = document.getElementById('grammarwise-presets-list');
+  if (!listContainer) return;
+
+  const presets = await getPresets();
+
+  if (presets.length === 0) {
+    listContainer.innerHTML = '<p class="grammarwise-presets-empty">No presets saved yet</p>';
+    return;
+  }
+
+  const languageNames = {
+    auto: 'Auto', en: 'EN', es: 'ES', fr: 'FR', de: 'DE', it: 'IT',
+    pt: 'PT', ru: 'RU', ja: 'JA', ko: 'KO', zh: 'ZH', ar: 'AR',
+    hi: 'HI', tr: 'TR', nl: 'NL', pl: 'PL'
+  };
+
+  const toneNames = {
+    professional: 'Pro', casual: 'Casual', friendly: 'Friendly',
+    formal: 'Formal', concise: 'Concise'
+  };
+
+  let html = '';
+  for (const preset of presets) {
+    const langLabel = languageNames[preset.language] || preset.language;
+    const toneLabel = toneNames[preset.tone] || preset.tone;
+    html += `
+      <div class="grammarwise-preset-item" data-id="${preset.id}">
+        <div class="grammarwise-preset-info">
+          <span class="grammarwise-preset-lang">${langLabel}</span>
+          <span class="grammarwise-preset-tone">${toneLabel}</span>
+        </div>
+        <div class="grammarwise-preset-actions">
+          <button class="grammarwise-btn-small grammarwise-preset-apply" data-id="${preset.id}" title="Apply this preset">Apply</button>
+          <button class="grammarwise-btn-small grammarwise-preset-delete" data-id="${preset.id}" title="Delete this preset">×</button>
+        </div>
+      </div>
+    `;
+  }
+
+  listContainer.innerHTML = html;
+
+  // Add event listeners for apply buttons
+  listContainer.querySelectorAll('.grammarwise-preset-apply').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = parseInt(btn.dataset.id);
+      const presets = await getPresets();
+      const preset = presets.find(p => p.id === id);
+      if (preset) {
+        // Apply to main language selector
+        const langSelect = document.getElementById('grammarwise-language');
+        if (langSelect && preset.language) {
+          langSelect.value = preset.language;
+        }
+        // Apply to tone selector
+        const toneSelect = document.getElementById('grammarwise-tone');
+        if (toneSelect && preset.tone) {
+          toneSelect.value = preset.tone;
+        }
+        // Visual feedback
+        btn.textContent = 'Applied!';
+        setTimeout(() => { btn.textContent = 'Apply'; }, 1000);
+      }
+    });
+  });
+
+  // Add event listeners for delete buttons
+  listContainer.querySelectorAll('.grammarwise-preset-delete').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = parseInt(btn.dataset.id);
+      await deletePreset(id);
+      renderPresetsList();
+    });
+  });
+}
+
+async function saveToHistory(original, result, actionType) {
+  if (!chrome.runtime?.id) return;
+
+  try {
+    const data = await new Promise(resolve => {
+      chrome.storage.local.get(['history'], resolve);
+    });
+
+    const history = data.history || [];
+    const newItem = {
+      id: Date.now(),
+      original: original.substring(0, 500), // Limit size
+      result: result.substring(0, 500),
+      actionType: actionType, // 'grammar', 'improve', 'tone', 'translate'
+      timestamp: new Date().toISOString()
+    };
+
+    history.unshift(newItem);
+    if (history.length > MAX_HISTORY_ITEMS) {
+      history.pop();
+    }
+
+    await chrome.storage.local.set({ history });
+  } catch (e) {
+    // Silently fail
+  }
+}
+
+async function getHistory() {
+  if (!chrome.runtime?.id) return [];
+
+  try {
+    const data = await new Promise(resolve => {
+      chrome.storage.local.get(['history'], resolve);
+    });
+    return data.history || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+async function clearHistory() {
+  if (!chrome.runtime?.id) return;
+
+  try {
+    await chrome.storage.local.set({ history: [] });
+  } catch (e) {
+    // Silently fail
+  }
+}
+
+// Render history list in the panel
+async function renderHistoryList() {
+  const historyList = document.getElementById('grammarwise-history-list');
+  if (!historyList) return;
+
+  const history = await getHistory();
+
+  if (history.length === 0) {
+    historyList.innerHTML = '<p class="grammarwise-history-empty">No history yet</p>';
+    return;
+  }
+
+  const actionLabels = {
+    grammar: 'Grammar',
+    improve: 'Improve',
+    tone: 'Tone',
+    translate: 'Translate'
+  };
+
+  let html = '';
+  for (const item of history) {
+    const date = new Date(item.timestamp);
+    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const dateStr = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+
+    html += `
+      <div class="grammarwise-history-item" data-id="${item.id}">
+        <div class="grammarwise-history-meta">
+          <span class="grammarwise-history-type">${actionLabels[item.actionType] || item.actionType}</span>
+          <span class="grammarwise-history-time">${dateStr} ${timeStr}</span>
+        </div>
+        <div class="grammarwise-history-original">${escapeHtml(item.original.substring(0, 100))}${item.original.length > 100 ? '...' : ''}</div>
+        <div class="grammarwise-history-result">${escapeHtml(item.result.substring(0, 100))}${item.result.length > 100 ? '...' : ''}</div>
+        <button class="grammarwise-btn-small grammarwise-history-use" data-result="${escapeHtml(item.result)}">Use</button>
+      </div>
+    `;
+  }
+
+  historyList.innerHTML = html;
+
+  // Add click handlers for "Use" buttons
+  historyList.querySelectorAll('.grammarwise-history-use').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const result = e.target.getAttribute('data-result');
+      navigator.clipboard.writeText(result).then(() => {
+        e.target.textContent = 'Copied!';
+        setTimeout(() => {
+          e.target.textContent = 'Use';
+        }, 1500);
+      });
+    });
+  });
+}
+
+// Toggle diff view
+function toggleDiffView() {
+  showDiffView = !showDiffView;
+  const correctedTextDiv = document.getElementById('grammarwise-corrected-text');
+  const diffToggleBtn = document.getElementById('grammarwise-diff-toggle');
+
+  if (!correctedTextDiv || !lastCorrectedText) return;
+
+  if (showDiffView) {
+    correctedTextDiv.innerHTML = generateDiffHtml(selectedText, lastCorrectedText);
+    if (diffToggleBtn) {
+      diffToggleBtn.classList.add('active');
+      diffToggleBtn.textContent = 'Plain';
+    }
+  } else {
+    correctedTextDiv.textContent = lastCorrectedText;
+    if (diffToggleBtn) {
+      diffToggleBtn.classList.remove('active');
+      diffToggleBtn.textContent = 'Diff';
+    }
+  }
+}
+
 async function showGrammarPanel(x, y) {
-  console.log('GrammarWise: Showing panel at', x, y);
 
   // Validate extension context before showing panel
   const isValid = await validateExtensionContext();
   if (!isValid) {
-    console.error('GrammarWise: Extension context invalidated');
     alert('GrammarWise: Extension was reloaded.\n\nPlease refresh this page (F5) to continue using the extension.');
     return;
   }
@@ -312,17 +1051,25 @@ async function showGrammarPanel(x, y) {
   hideGrammarPanel();
   hideFloatingButton();
 
+  // Calculate initial stats
+  const stats = getTextStats(selectedText);
+
   grammarPanel = document.createElement('div');
   grammarPanel.id = 'grammarwise-panel';
   grammarPanel.innerHTML = `
     <div class="grammarwise-header">
-      <h3>GrammarWise</h3>
+      <div class="grammarwise-header-left">
+        <h3>GrammarWise</h3>
+        <span class="grammarwise-stats">${stats.words} words, ${stats.chars} chars</span>
+      </div>
       <button id="grammarwise-close" class="grammarwise-close-btn">&times;</button>
     </div>
     <div class="grammarwise-tabs">
       <button class="grammarwise-tab active" data-tab="grammar">Grammar</button>
       <button class="grammarwise-tab" data-tab="tone">Tone</button>
       <button class="grammarwise-tab" data-tab="translate">Translate</button>
+      <button class="grammarwise-tab" data-tab="history">History</button>
+      <button class="grammarwise-tab" data-tab="more">More</button>
     </div>
     <div class="grammarwise-content">
       <!-- Grammar Tab -->
@@ -354,8 +1101,34 @@ async function showGrammarPanel(x, y) {
           <div class="grammarwise-text">${escapeHtml(selectedText)}</div>
         </div>
         <div id="grammarwise-result" class="grammarwise-result" style="display: none;">
-          <strong>Corrected:</strong>
+          <div class="grammarwise-result-header">
+            <strong>Corrected:</strong>
+            <div class="grammarwise-result-header-buttons">
+              <button id="grammarwise-diff-toggle" class="grammarwise-btn-small" title="Toggle diff view">Diff</button>
+              <button id="grammarwise-explain" class="grammarwise-btn-small" title="Explain the corrections">Explain</button>
+            </div>
+          </div>
           <div id="grammarwise-corrected-text" class="grammarwise-text"></div>
+          <div id="grammarwise-explanation-section" class="grammarwise-explanation-section" style="display: none;">
+            <div class="grammarwise-explanation-header">
+              <strong>Explanation:</strong>
+              <button id="grammarwise-close-explanation" class="grammarwise-btn-small" title="Close explanation">Close</button>
+            </div>
+            <div id="grammarwise-explanation-loading" class="grammarwise-explanation-loading" style="display: none;">
+              <span class="grammarwise-mini-spinner"></span> Analyzing corrections...
+            </div>
+            <div id="grammarwise-explanation-content" class="grammarwise-explanation-content"></div>
+          </div>
+          <div id="grammarwise-alternatives-section" class="grammarwise-alternatives-section" style="display: none;">
+            <div class="grammarwise-alternatives-header">
+              <strong>Alternatives:</strong>
+              <button id="grammarwise-get-alternatives" class="grammarwise-btn-small" title="Get alternative suggestions">Get More</button>
+            </div>
+            <div id="grammarwise-alternatives-loading" class="grammarwise-alternatives-loading" style="display: none;">
+              <span class="grammarwise-mini-spinner"></span> Loading alternatives...
+            </div>
+            <div id="grammarwise-alternatives-list" class="grammarwise-alternatives-list"></div>
+          </div>
           <div class="grammarwise-actions">
             <button id="grammarwise-copy" class="grammarwise-btn">Copy</button>
             <button id="grammarwise-replace" class="grammarwise-btn-primary">Replace</button>
@@ -370,6 +1143,9 @@ async function showGrammarPanel(x, y) {
 
       <!-- Tone Tab -->
       <div id="grammarwise-tab-tone" class="grammarwise-tab-content" style="display: none;">
+        <div class="grammarwise-tone-detected" id="grammarwise-detected-tone" style="display: none;">
+          <span>Detected: </span><strong id="grammarwise-detected-tone-value"></strong>
+        </div>
         <div class="grammarwise-controls">
           <label for="grammarwise-tone">Tone:</label>
           <select id="grammarwise-tone" class="grammarwise-select">
@@ -380,6 +1156,7 @@ async function showGrammarPanel(x, y) {
             <option value="concise">Concise</option>
             <option value="clear">Clear & Improved</option>
           </select>
+          <button id="grammarwise-detect-tone" class="grammarwise-btn-small" title="Auto-detect tone">Detect</button>
           <button id="grammarwise-rewrite-tone" class="grammarwise-btn-primary">Rewrite</button>
         </div>
         <div class="grammarwise-original">
@@ -461,11 +1238,72 @@ async function showGrammarPanel(x, y) {
         </div>
         <div id="grammarwise-translate-error" class="grammarwise-error" style="display: none;"></div>
       </div>
+
+      <!-- History Tab -->
+      <div id="grammarwise-tab-history" class="grammarwise-tab-content" style="display: none;">
+        <div class="grammarwise-history-header">
+          <span>Recent corrections</span>
+          <button id="grammarwise-clear-history" class="grammarwise-btn-small">Clear</button>
+        </div>
+        <div id="grammarwise-history-list" class="grammarwise-history-list">
+          <p class="grammarwise-history-empty">No history yet</p>
+        </div>
+      </div>
+
+      <!-- More Tab -->
+      <div id="grammarwise-tab-more" class="grammarwise-tab-content" style="display: none;">
+        <div class="grammarwise-section">
+          <div class="grammarwise-section-title">Writing Statistics</div>
+          <div id="grammarwise-writing-stats" class="grammarwise-writing-stats">
+            ${renderWritingStats(selectedText)}
+          </div>
+        </div>
+
+        <div class="grammarwise-divider"></div>
+
+        <div class="grammarwise-section">
+          <div class="grammarwise-section-title">Quick Presets</div>
+          <p class="grammarwise-section-desc">Save your favorite language + tone combinations for quick access.</p>
+          <div class="grammarwise-presets-manage">
+            <div class="grammarwise-preset-create">
+              <select id="grammarwise-preset-lang" class="grammarwise-select">
+                <option value="auto">Auto-detect</option>
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+                <option value="it">Italian</option>
+                <option value="pt">Portuguese</option>
+                <option value="ru">Russian</option>
+                <option value="ja">Japanese</option>
+                <option value="ko">Korean</option>
+                <option value="zh">Chinese</option>
+                <option value="ar">Arabic</option>
+                <option value="hi">Hindi</option>
+                <option value="tr">Turkish</option>
+                <option value="nl">Dutch</option>
+                <option value="pl">Polish</option>
+              </select>
+              <select id="grammarwise-preset-tone" class="grammarwise-select">
+                <option value="professional">Professional</option>
+                <option value="casual">Casual</option>
+                <option value="friendly">Friendly</option>
+                <option value="formal">Formal</option>
+                <option value="concise">Concise</option>
+              </select>
+              <button id="grammarwise-save-preset" class="grammarwise-btn-small" title="Save as preset">Save</button>
+            </div>
+            <div id="grammarwise-presets-list" class="grammarwise-presets-list">
+              <p class="grammarwise-presets-empty">No presets saved yet</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 
   // Position panel at top center of viewport
-  const panelWidth = 400;
+  const panelWidth = 450;
   const padding = 20;
 
   const viewportHeight = window.innerHeight;
@@ -486,13 +1324,17 @@ async function showGrammarPanel(x, y) {
     left: ${panelX}px !important;
     top: ${panelY}px !important;
     max-height: ${maxHeight}px !important;
-    width: 400px !important;
+    width: 450px !important;
     display: flex !important;
     flex-direction: column !important;
   `;
 
+  // Apply current theme
+  if (currentTheme === 'dark') {
+    grammarPanel.classList.add('dark-theme');
+  }
+
   document.body.appendChild(grammarPanel);
-  console.log('GrammarWise: Panel added to DOM at top center', panelX, panelY, 'with max-height', maxHeight);
 
   // Load default settings with error handling
   // Check if extension context is valid before accessing storage
@@ -552,7 +1394,6 @@ async function showGrammarPanel(x, y) {
   closeBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     e.preventDefault();
-    console.log('GrammarWise: Close button clicked');
     hideGrammarPanel();
   });
 
@@ -562,12 +1403,41 @@ async function showGrammarPanel(x, y) {
 
   const copyBtn = document.getElementById('grammarwise-copy');
   const replaceBtn = document.getElementById('grammarwise-replace');
+  const diffToggleBtn = document.getElementById('grammarwise-diff-toggle');
 
   if (copyBtn) copyBtn.addEventListener('click', copyToClipboard);
   if (replaceBtn) replaceBtn.addEventListener('click', replaceText);
+  if (diffToggleBtn) diffToggleBtn.addEventListener('click', toggleDiffView);
+
+  // Alternatives event listener
+  const getAlternativesBtn = document.getElementById('grammarwise-get-alternatives');
+  if (getAlternativesBtn) getAlternativesBtn.addEventListener('click', handleGetAlternatives);
+
+  // Explain errors event listeners
+  const explainBtn = document.getElementById('grammarwise-explain');
+  const closeExplanationBtn = document.getElementById('grammarwise-close-explanation');
+  if (explainBtn) explainBtn.addEventListener('click', handleExplainErrors);
+  if (closeExplanationBtn) closeExplanationBtn.addEventListener('click', closeExplanation);
+
+  // Presets event listeners (in More tab)
+  const savePresetBtn = document.getElementById('grammarwise-save-preset');
+  if (savePresetBtn) {
+    savePresetBtn.addEventListener('click', handleSavePresetNew);
+  }
+
+  // Load presets list when More tab is clicked
+  const moreTab = grammarPanel.querySelector('[data-tab="more"]');
+  if (moreTab) {
+    moreTab.addEventListener('click', () => {
+      renderPresetsList();
+    });
+  }
 
   // Tone rewrite event listeners
   document.getElementById('grammarwise-rewrite-tone').addEventListener('click', rewriteWithTone);
+
+  const detectToneBtn = document.getElementById('grammarwise-detect-tone');
+  if (detectToneBtn) detectToneBtn.addEventListener('click', handleDetectTone);
 
   const toneCopyBtn = document.getElementById('grammarwise-tone-copy');
   const toneReplaceBtn = document.getElementById('grammarwise-tone-replace');
@@ -584,15 +1454,27 @@ async function showGrammarPanel(x, y) {
   if (translateCopyBtn) translateCopyBtn.addEventListener('click', copyTranslation);
   if (translateReplaceBtn) translateReplaceBtn.addEventListener('click', replaceWithTranslation);
 
+  // History tab event listeners
+  const clearHistoryBtn = document.getElementById('grammarwise-clear-history');
+  if (clearHistoryBtn) {
+    clearHistoryBtn.addEventListener('click', async () => {
+      await clearHistory();
+      renderHistoryList();
+    });
+  }
+
+  // Load history when history tab is clicked
+  const historyTab = grammarPanel.querySelector('[data-tab="history"]');
+  if (historyTab) {
+    historyTab.addEventListener('click', () => {
+      renderHistoryList();
+    });
+  }
+
   // Click outside to close (with small delay to prevent immediate closing)
   setTimeout(() => {
     document.addEventListener('click', handleOutsideClick);
   }, 100);
-
-  // Automatically trigger grammar check when panel opens
-  setTimeout(() => {
-    checkGrammar();
-  }, 150);
 }
 
 function handleOutsideClick(event) {
@@ -613,11 +1495,9 @@ function hideGrammarPanel() {
 async function checkGrammar() {
   // Prevent multiple simultaneous operations
   if (isProcessing) {
-    console.log('GrammarWise: Already processing, ignoring request');
     return;
   }
 
-  console.log('GrammarWise: Checking grammar...');
   isProcessing = true;
 
   const language = document.getElementById('grammarwise-language').value;
@@ -638,24 +1518,50 @@ async function checkGrammar() {
       language: language
     });
 
-    console.log('GrammarWise: Received response:', response);
     loadingDiv.style.display = 'none';
 
     if (response && response.success) {
       if (response.noChanges) {
         // Show success message when no changes needed
         const resultContent = document.getElementById('grammarwise-corrected-text');
-        resultContent.innerHTML = `<div style="color: #059669; font-weight: 500; padding: 12px; background: #d1fae5; border-radius: 6px; text-align: center;">✓ ${response.message}</div>`;
-        // Hide the action buttons since there's nothing to copy/replace
+        resultContent.innerHTML = `<div style="color: var(--gw-success-text); font-weight: 500; padding: 12px; background: var(--gw-success-bg); border-radius: 6px; text-align: center;">✓ ${response.message}</div>`;
+        // Hide the action buttons and diff toggle since there's nothing to copy/replace
         const actions = resultDiv.querySelector('.grammarwise-actions');
+        const diffBtn = document.getElementById('grammarwise-diff-toggle');
         if (actions) actions.style.display = 'none';
+        if (diffBtn) diffBtn.style.display = 'none';
+        lastCorrectedText = '';
         resultDiv.style.display = 'block';
       } else {
+        // Reset diff view state
+        showDiffView = false;
+        lastCorrectedText = response.correctedText;
+
         // Show corrected text with action buttons
         document.getElementById('grammarwise-corrected-text').textContent = response.correctedText;
         const actions = resultDiv.querySelector('.grammarwise-actions');
+        const diffBtn = document.getElementById('grammarwise-diff-toggle');
         if (actions) actions.style.display = 'flex';
+        if (diffBtn) {
+          diffBtn.style.display = 'inline-block';
+          diffBtn.classList.remove('active');
+          diffBtn.textContent = 'Diff';
+        }
+
+        // Show alternatives section (reset state)
+        const altSection = document.getElementById('grammarwise-alternatives-section');
+        const altList = document.getElementById('grammarwise-alternatives-list');
+        const altLoading = document.getElementById('grammarwise-alternatives-loading');
+        if (altSection) {
+          altSection.style.display = 'block';
+          if (altList) altList.innerHTML = '';
+          if (altLoading) altLoading.style.display = 'none';
+        }
+
         resultDiv.style.display = 'block';
+
+        // Save to history
+        saveToHistory(selectedText, response.correctedText, 'grammar');
       }
     } else if (response && response.error) {
       showError(response.error);
@@ -663,7 +1569,6 @@ async function checkGrammar() {
       showError('Failed to check grammar. Please refresh the page and try again.');
     }
   } catch (error) {
-    console.error('GrammarWise: Error during grammar check:', error);
     loadingDiv.style.display = 'none';
     showError(error.message || 'An error occurred');
   } finally {
@@ -674,11 +1579,9 @@ async function checkGrammar() {
 async function improveText() {
   // Prevent multiple simultaneous operations
   if (isProcessing) {
-    console.log('GrammarWise: Already processing, ignoring request');
     return;
   }
 
-  console.log('GrammarWise: Improving text...');
   isProcessing = true;
 
   const loadingDiv = document.getElementById('grammarwise-loading');
@@ -702,29 +1605,40 @@ async function improveText() {
       tone: 'clear'
     });
 
-    console.log('GrammarWise: Received improve response:', response);
     loadingDiv.style.display = 'none';
 
     // Reset loading text
     if (loadingText) loadingText.textContent = 'Checking grammar...';
 
     if (response && response.success) {
+      // Reset diff view state
+      showDiffView = false;
+      lastCorrectedText = response.rewrittenText;
+
       // Show improved text with action buttons
       document.getElementById('grammarwise-corrected-text').textContent = response.rewrittenText;
       const actions = resultDiv.querySelector('.grammarwise-actions');
+      const diffBtn = document.getElementById('grammarwise-diff-toggle');
       if (actions) actions.style.display = 'flex';
+      if (diffBtn) {
+        diffBtn.style.display = 'inline-block';
+        diffBtn.classList.remove('active');
+        diffBtn.textContent = 'Diff';
+      }
       resultDiv.style.display = 'block';
 
       // Update the label to show "Improved:" instead of "Corrected:"
-      const strongLabel = resultDiv.querySelector('strong');
+      const strongLabel = resultDiv.querySelector('.grammarwise-result-header strong');
       if (strongLabel) strongLabel.textContent = 'Improved:';
+
+      // Save to history
+      saveToHistory(selectedText, response.rewrittenText, 'improve');
     } else if (response && response.error) {
       showError(response.error);
     } else {
       showError('Failed to improve text. Please refresh the page and try again.');
     }
   } catch (error) {
-    console.error('GrammarWise: Error during text improvement:', error);
     loadingDiv.style.display = 'none';
     showError(error.message || 'An error occurred');
   } finally {
@@ -732,14 +1646,169 @@ async function improveText() {
   }
 }
 
-async function rewriteWithTone() {
-  // Prevent multiple simultaneous operations
-  if (isProcessing) {
-    console.log('GrammarWise: Already processing, ignoring request');
+async function handleGetAlternatives() {
+  const altLoading = document.getElementById('grammarwise-alternatives-loading');
+  const altList = document.getElementById('grammarwise-alternatives-list');
+  const altBtn = document.getElementById('grammarwise-get-alternatives');
+  const correctedText = document.getElementById('grammarwise-corrected-text').textContent;
+  const language = document.getElementById('grammarwise-language').value;
+
+  if (!correctedText || !selectedText) {
     return;
   }
 
-  console.log('GrammarWise: Rewriting with tone...');
+  // Show loading state
+  if (altBtn) altBtn.disabled = true;
+  if (altLoading) altLoading.style.display = 'block';
+  if (altList) altList.innerHTML = '';
+
+  try {
+    const response = await sendMessageWithRetry({
+      action: 'getAlternatives',
+      text: selectedText,
+      correctedText: correctedText,
+      language: language
+    });
+
+    if (altLoading) altLoading.style.display = 'none';
+
+    if (response && response.success && response.alternatives.length > 0) {
+      renderAlternatives(response.alternatives);
+    } else if (response && response.error) {
+      if (altList) altList.innerHTML = `<div class="grammarwise-alternatives-error">Failed to get alternatives: ${escapeHtml(response.error)}</div>`;
+    } else {
+      if (altList) altList.innerHTML = '<div class="grammarwise-alternatives-error">No alternatives available.</div>';
+    }
+  } catch (error) {
+    if (altLoading) altLoading.style.display = 'none';
+    if (altList) altList.innerHTML = `<div class="grammarwise-alternatives-error">Error: ${escapeHtml(error.message)}</div>`;
+  } finally {
+    if (altBtn) altBtn.disabled = false;
+  }
+}
+
+function renderAlternatives(alternatives) {
+  const altList = document.getElementById('grammarwise-alternatives-list');
+  if (!altList) return;
+
+  altList.innerHTML = alternatives.map((alt, index) => `
+    <div class="grammarwise-alternative-item" data-index="${index}">
+      <div class="grammarwise-alternative-text">${escapeHtml(alt)}</div>
+      <div class="grammarwise-alternative-actions">
+        <button class="grammarwise-btn-small grammarwise-alt-use" data-alt="${escapeHtml(alt)}" title="Use this version">Use</button>
+        <button class="grammarwise-btn-small grammarwise-alt-copy" data-alt="${escapeHtml(alt)}" title="Copy to clipboard">Copy</button>
+      </div>
+    </div>
+  `).join('');
+
+  // Add event listeners
+  altList.querySelectorAll('.grammarwise-alt-use').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const altText = btn.dataset.alt;
+      document.getElementById('grammarwise-corrected-text').textContent = altText;
+      lastCorrectedText = altText;
+      // Reset diff if active
+      showDiffView = false;
+      const diffBtn = document.getElementById('grammarwise-diff-toggle');
+      if (diffBtn) {
+        diffBtn.classList.remove('active');
+        diffBtn.textContent = 'Diff';
+      }
+    });
+  });
+
+  altList.querySelectorAll('.grammarwise-alt-copy').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const altText = btn.dataset.alt;
+      try {
+        await navigator.clipboard.writeText(altText);
+        const origText = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = origText; }, 1500);
+      } catch (err) {
+        btn.textContent = 'Failed';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+      }
+    });
+  });
+}
+
+async function handleExplainErrors() {
+  const explainSection = document.getElementById('grammarwise-explanation-section');
+  const explainLoading = document.getElementById('grammarwise-explanation-loading');
+  const explainContent = document.getElementById('grammarwise-explanation-content');
+  const explainBtn = document.getElementById('grammarwise-explain');
+  const correctedText = document.getElementById('grammarwise-corrected-text').textContent;
+  const language = document.getElementById('grammarwise-language').value;
+
+  if (!correctedText || !selectedText) {
+    return;
+  }
+
+  // Show section and loading state
+  if (explainSection) explainSection.style.display = 'block';
+  if (explainBtn) explainBtn.disabled = true;
+  if (explainLoading) explainLoading.style.display = 'block';
+  if (explainContent) explainContent.innerHTML = '';
+
+  try {
+    const response = await sendMessageWithRetry({
+      action: 'explainErrors',
+      text: selectedText,
+      correctedText: correctedText,
+      language: language
+    });
+
+    if (explainLoading) explainLoading.style.display = 'none';
+
+    if (response && response.success && response.explanation) {
+      // Format the explanation with proper line breaks
+      const formatted = formatExplanation(response.explanation);
+      if (explainContent) explainContent.innerHTML = formatted;
+    } else if (response && response.error) {
+      if (explainContent) explainContent.innerHTML = `<div class="grammarwise-explanation-error">${escapeHtml(response.error)}</div>`;
+    } else {
+      if (explainContent) explainContent.innerHTML = '<div class="grammarwise-explanation-error">Unable to generate explanation.</div>';
+    }
+  } catch (error) {
+    if (explainLoading) explainLoading.style.display = 'none';
+    if (explainContent) explainContent.innerHTML = `<div class="grammarwise-explanation-error">${escapeHtml(error.message)}</div>`;
+  } finally {
+    if (explainBtn) explainBtn.disabled = false;
+  }
+}
+
+function formatExplanation(text) {
+  // Convert bullet points and line breaks to HTML
+  const lines = text.split('\n').filter(line => line.trim());
+  const formatted = lines.map(line => {
+    const trimmed = line.trim();
+    // Check if it's a bullet point
+    if (trimmed.startsWith('•') || trimmed.startsWith('-') || trimmed.startsWith('*')) {
+      const content = trimmed.replace(/^[•\-\*]\s*/, '');
+      return `<div class="grammarwise-explanation-bullet">${escapeHtml(content)}</div>`;
+    }
+    // Check if it's a numbered item
+    if (/^\d+[\.\)]\s/.test(trimmed)) {
+      const content = trimmed.replace(/^\d+[\.\)]\s*/, '');
+      return `<div class="grammarwise-explanation-bullet">${escapeHtml(content)}</div>`;
+    }
+    return `<div class="grammarwise-explanation-line">${escapeHtml(trimmed)}</div>`;
+  });
+  return formatted.join('');
+}
+
+function closeExplanation() {
+  const explainSection = document.getElementById('grammarwise-explanation-section');
+  if (explainSection) explainSection.style.display = 'none';
+}
+
+async function rewriteWithTone() {
+  // Prevent multiple simultaneous operations
+  if (isProcessing) {
+    return;
+  }
+
   isProcessing = true;
 
   const tone = document.getElementById('grammarwise-tone').value;
@@ -760,19 +1829,20 @@ async function rewriteWithTone() {
       tone: tone
     });
 
-    console.log('GrammarWise: Received tone rewrite response:', response);
     loadingDiv.style.display = 'none';
 
     if (response && response.success) {
       document.getElementById('grammarwise-rewritten-text').textContent = response.rewrittenText;
       resultDiv.style.display = 'block';
+
+      // Save to history
+      saveToHistory(selectedText, response.rewrittenText, 'tone');
     } else if (response && response.error) {
       showToneError(response.error);
     } else {
       showToneError('Failed to rewrite with tone. Please refresh the page and try again.');
     }
   } catch (error) {
-    console.error('GrammarWise: Error during tone rewrite:', error);
     loadingDiv.style.display = 'none';
     showToneError(error.message || 'An error occurred');
   } finally {
@@ -802,28 +1872,23 @@ function copyToClipboard() {
       btn.textContent = originalText;
     }, 2000);
   }).catch(err => {
-    console.error('GrammarWise: Failed to copy text:', err);
     showError('Failed to copy to clipboard');
   });
 }
 
 function replaceText() {
   const correctedText = document.getElementById('grammarwise-corrected-text').textContent;
-  console.log('GrammarWise: Attempting to replace text');
-  console.log('GrammarWise: Original element:', originalElement);
 
   // Try multiple strategies to replace text
   let replaced = false;
 
   // Strategy 1: Use stored originalElement if it's editable
   if (originalElement && document.body.contains(originalElement)) {
-    console.log('GrammarWise: Trying strategy 1 - stored element');
 
     // Focus the element first
     try {
       originalElement.focus();
     } catch (e) {
-      console.log('GrammarWise: Could not focus original element');
     }
 
     // Check if it's a textarea or input
@@ -841,12 +1906,10 @@ function replaceText() {
         originalElement.dispatchEvent(new Event('input', { bubbles: true }));
         originalElement.dispatchEvent(new Event('change', { bubbles: true }));
 
-        console.log('GrammarWise: Successfully replaced in textarea/input');
         replaced = true;
         hideGrammarPanel();
         return;
       } catch (e) {
-        console.error('GrammarWise: Error replacing in textarea/input:', e);
       }
     }
 
@@ -863,20 +1926,17 @@ function replaceText() {
         // Use execCommand to insert text
         const success = document.execCommand('insertText', false, correctedText);
         if (success) {
-          console.log('GrammarWise: Successfully replaced in contentEditable');
           replaced = true;
           hideGrammarPanel();
           return;
         }
       } catch (e) {
-        console.error('GrammarWise: Error with execCommand:', e);
       }
     }
   }
 
   // Strategy 2: Try current activeElement
   if (!replaced) {
-    console.log('GrammarWise: Trying strategy 2 - current activeElement');
     const activeElement = document.activeElement;
 
     if (activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
@@ -891,12 +1951,10 @@ function replaceText() {
         activeElement.dispatchEvent(new Event('input', { bubbles: true }));
         activeElement.dispatchEvent(new Event('change', { bubbles: true }));
 
-        console.log('GrammarWise: Successfully replaced in current activeElement');
         replaced = true;
         hideGrammarPanel();
         return;
       } catch (e) {
-        console.error('GrammarWise: Error with activeElement:', e);
       }
     }
 
@@ -908,19 +1966,16 @@ function replaceText() {
           selection.addRange(selectionRange);
         }
         document.execCommand('insertText', false, correctedText);
-        console.log('GrammarWise: Successfully replaced in current contentEditable');
         replaced = true;
         hideGrammarPanel();
         return;
       } catch (e) {
-        console.error('GrammarWise: Error with current contentEditable:', e);
       }
     }
   }
 
   // Strategy 3: Try using selection range directly
   if (!replaced && selectionRange) {
-    console.log('GrammarWise: Trying strategy 3 - selection range');
     try {
       const selection = window.getSelection();
       selection.removeAllRanges();
@@ -929,23 +1984,19 @@ function replaceText() {
       // Try execCommand one more time
       const success = document.execCommand('insertText', false, correctedText);
       if (success) {
-        console.log('GrammarWise: Successfully replaced using selection range');
         replaced = true;
         hideGrammarPanel();
         return;
       }
     } catch (e) {
-      console.error('GrammarWise: Error with selection range:', e);
     }
   }
 
   // Strategy 4: Google Docs specific handling
   if (!replaced && isGoogleDocs) {
-    console.log('GrammarWise: Trying strategy 4 - Google Docs specific');
     try {
       // Copy corrected text to clipboard
       navigator.clipboard.writeText(correctedText).then(() => {
-        console.log('GrammarWise: Text copied, attempting to paste in Google Docs');
 
         // Try to restore the selection first
         if (selectionRange) {
@@ -966,22 +2017,18 @@ function replaceText() {
         const editor = document.querySelector('.kix-canvas-tile-content, [contenteditable="true"]');
         if (editor) {
           editor.dispatchEvent(pasteEvent);
-          console.log('GrammarWise: Paste event dispatched to Google Docs editor');
           replaced = true;
           hideGrammarPanel();
           return;
         }
       }).catch(err => {
-        console.error('GrammarWise: Clipboard error:', err);
       });
     } catch (e) {
-      console.error('GrammarWise: Google Docs paste error:', e);
     }
   }
 
   // If all strategies failed, fallback to clipboard
   if (!replaced) {
-    console.log('GrammarWise: All replace strategies failed, copying to clipboard');
     copyToClipboard();
 
     if (isGoogleDocs) {
@@ -1002,14 +2049,12 @@ function copyToneResult() {
       btn.textContent = originalText;
     }, 2000);
   }).catch(err => {
-    console.error('GrammarWise: Failed to copy tone result:', err);
     showToneError('Failed to copy to clipboard');
   });
 }
 
 function replaceToneResult() {
   const rewrittenText = document.getElementById('grammarwise-rewritten-text').textContent;
-  console.log('GrammarWise: Attempting to replace with rewritten text');
 
   // Use the same replacement logic as replaceText
   let replaced = false;
@@ -1019,7 +2064,6 @@ function replaceToneResult() {
     try {
       originalElement.focus();
     } catch (e) {
-      console.log('GrammarWise: Could not focus original element');
     }
 
     if (originalElement.tagName === 'TEXTAREA' || originalElement.tagName === 'INPUT') {
@@ -1034,12 +2078,10 @@ function replaceToneResult() {
         originalElement.dispatchEvent(new Event('input', { bubbles: true }));
         originalElement.dispatchEvent(new Event('change', { bubbles: true }));
 
-        console.log('GrammarWise: Successfully replaced with rewritten text');
         replaced = true;
         hideGrammarPanel();
         return;
       } catch (e) {
-        console.error('GrammarWise: Error replacing text:', e);
       }
     }
 
@@ -1052,20 +2094,17 @@ function replaceToneResult() {
         }
         const success = document.execCommand('insertText', false, rewrittenText);
         if (success) {
-          console.log('GrammarWise: Successfully replaced with rewritten text in contentEditable');
           replaced = true;
           hideGrammarPanel();
           return;
         }
       } catch (e) {
-        console.error('GrammarWise: Error with execCommand:', e);
       }
     }
   }
 
   // Fallback to clipboard
   if (!replaced) {
-    console.log('GrammarWise: Replace failed, copying to clipboard');
     copyToneResult();
     showToneError('Text copied to clipboard. Paste it manually in the desired location.');
   }
@@ -1074,11 +2113,9 @@ function replaceToneResult() {
 async function translateText() {
   // Prevent multiple simultaneous operations
   if (isProcessing) {
-    console.log('GrammarWise: Already processing, ignoring request');
     return;
   }
 
-  console.log('GrammarWise: Translating text...');
   isProcessing = true;
 
   const fromLang = document.getElementById('grammarwise-from-lang').value;
@@ -1101,19 +2138,20 @@ async function translateText() {
       toLang: toLang
     });
 
-    console.log('GrammarWise: Received translation response:', response);
     loadingDiv.style.display = 'none';
 
     if (response && response.success) {
       document.getElementById('grammarwise-translated-text').textContent = response.translatedText;
       resultDiv.style.display = 'block';
+
+      // Save to history
+      saveToHistory(selectedText, response.translatedText, 'translate');
     } else if (response && response.error) {
       showTranslateError(response.error);
     } else {
       showTranslateError('Failed to translate. Please refresh the page and try again.');
     }
   } catch (error) {
-    console.error('GrammarWise: Error during translation:', error);
     loadingDiv.style.display = 'none';
     showTranslateError(error.message || 'An error occurred');
   } finally {
@@ -1137,14 +2175,12 @@ function copyTranslation() {
       btn.textContent = originalText;
     }, 2000);
   }).catch(err => {
-    console.error('GrammarWise: Failed to copy translation:', err);
     showTranslateError('Failed to copy to clipboard');
   });
 }
 
 function replaceWithTranslation() {
   const translatedText = document.getElementById('grammarwise-translated-text').textContent;
-  console.log('GrammarWise: Attempting to replace with translation');
 
   // Use the same replace logic as grammar correction
   let replaced = false;
@@ -1154,7 +2190,6 @@ function replaceWithTranslation() {
     try {
       originalElement.focus();
     } catch (e) {
-      console.log('GrammarWise: Could not focus original element');
     }
 
     if (originalElement.tagName === 'TEXTAREA' || originalElement.tagName === 'INPUT') {
@@ -1169,12 +2204,10 @@ function replaceWithTranslation() {
         originalElement.dispatchEvent(new Event('input', { bubbles: true }));
         originalElement.dispatchEvent(new Event('change', { bubbles: true }));
 
-        console.log('GrammarWise: Successfully replaced with translation');
         replaced = true;
         hideGrammarPanel();
         return;
       } catch (e) {
-        console.error('GrammarWise: Error replacing with translation:', e);
       }
     }
 
@@ -1187,23 +2220,19 @@ function replaceWithTranslation() {
         }
         const success = document.execCommand('insertText', false, translatedText);
         if (success) {
-          console.log('GrammarWise: Successfully replaced with translation in contentEditable');
           replaced = true;
           hideGrammarPanel();
           return;
         }
       } catch (e) {
-        console.error('GrammarWise: Error with execCommand for translation:', e);
       }
     }
   }
 
   // Google Docs specific handling
   if (!replaced && isGoogleDocs) {
-    console.log('GrammarWise: Trying Google Docs specific handling for translation');
     try {
       navigator.clipboard.writeText(translatedText).then(() => {
-        console.log('GrammarWise: Translation copied, attempting to paste in Google Docs');
 
         if (selectionRange) {
           const selection = window.getSelection();
@@ -1221,22 +2250,18 @@ function replaceWithTranslation() {
         const editor = document.querySelector('.kix-canvas-tile-content, [contenteditable="true"]');
         if (editor) {
           editor.dispatchEvent(pasteEvent);
-          console.log('GrammarWise: Translation paste event dispatched to Google Docs');
           replaced = true;
           hideGrammarPanel();
           return;
         }
       }).catch(err => {
-        console.error('GrammarWise: Clipboard error for translation:', err);
       });
     } catch (e) {
-      console.error('GrammarWise: Google Docs translation paste error:', e);
     }
   }
 
   // Fallback to clipboard
   if (!replaced) {
-    console.log('GrammarWise: Replace failed, copying translation to clipboard');
     copyTranslation();
 
     if (isGoogleDocs) {

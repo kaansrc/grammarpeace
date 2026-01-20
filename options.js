@@ -2,13 +2,21 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   loadSettings();
+  loadDictionary();
   document.getElementById('apiProvider').addEventListener('change', handleProviderChange);
+  document.getElementById('addWordBtn').addEventListener('click', handleAddWord);
+  document.getElementById('newDictWord').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddWord();
+    }
+  });
 });
 document.getElementById('settingsForm').addEventListener('submit', saveSettings);
 document.getElementById('testBtn').addEventListener('click', testAPI);
 
 function loadSettings() {
-  chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens', 'defaultGrammarLang', 'defaultTone', 'defaultFromLang', 'defaultToLang'], (result) => {
+  chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens', 'theme', 'defaultGrammarLang', 'defaultTone', 'defaultFromLang', 'defaultToLang'], (result) => {
     // Set provider (default to claude if not set)
     const provider = result.apiProvider || 'claude';
     document.getElementById('apiProvider').value = provider;
@@ -31,6 +39,11 @@ function loadSettings() {
           Math.abs(curr - storedMaxTokens) < Math.abs(prev - storedMaxTokens) ? curr : prev
         );
     document.getElementById('maxTokens').value = maxTokens;
+
+    // Load theme preference
+    if (result.theme) {
+      document.getElementById('theme').value = result.theme;
+    }
 
     // Load preferences
     if (result.defaultGrammarLang) {
@@ -80,6 +93,7 @@ function saveSettings(event) {
   const claudeApiKey = document.getElementById('claudeApiKey').value.trim();
   const openaiApiKey = document.getElementById('openaiApiKey').value.trim();
   const maxTokens = parseInt(document.getElementById('maxTokens').value);
+  const theme = document.getElementById('theme').value;
   const defaultGrammarLang = document.getElementById('defaultGrammarLang').value;
   const defaultTone = document.getElementById('defaultTone').value;
   const defaultFromLang = document.getElementById('defaultFromLang').value;
@@ -104,6 +118,7 @@ function saveSettings(event) {
       showStatus('Invalid OpenAI API key format. Key should start with "sk-"', 'error');
       return;
     }
+    // Note: OpenAI keys can have various formats (sk-..., sk-proj-..., etc.)
   }
 
   // Validate max tokens (dropdown ensures valid values, but double-check)
@@ -118,6 +133,7 @@ function saveSettings(event) {
     claudeApiKey: claudeApiKey,
     openaiApiKey: openaiApiKey,
     maxTokens: maxTokens,
+    theme: theme,
     defaultGrammarLang: defaultGrammarLang,
     defaultTone: defaultTone,
     defaultFromLang: defaultFromLang,
@@ -191,7 +207,7 @@ async function testOpenAIAPI(apiKey) {
       'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: 'gpt-4.1-nano-2025-04-14',
+      model: 'gpt-4.1-nano',
       max_tokens: 50,
       messages: [{
         role: 'user',
@@ -218,4 +234,92 @@ function showStatus(message, type) {
   setTimeout(() => {
     statusDiv.style.display = 'none';
   }, 5000);
+}
+
+// Custom Dictionary Functions
+async function loadDictionary() {
+  const result = await chrome.storage.sync.get(['customDictionary']);
+  const dictionary = result.customDictionary || [];
+  renderDictionary(dictionary);
+}
+
+function renderDictionary(dictionary) {
+  const container = document.getElementById('dictionaryWords');
+
+  if (dictionary.length === 0) {
+    container.innerHTML = '<p class="empty-dictionary">No custom words added yet.</p>';
+    return;
+  }
+
+  container.innerHTML = dictionary.map(word => `
+    <span class="dictionary-word">
+      ${escapeHtml(word)}
+      <span class="remove-word" data-word="${escapeHtml(word)}" title="Remove word">&times;</span>
+    </span>
+  `).join('');
+
+  // Add click handlers for remove buttons
+  container.querySelectorAll('.remove-word').forEach(btn => {
+    btn.addEventListener('click', () => handleRemoveWord(btn.dataset.word));
+  });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+async function handleAddWord() {
+  const input = document.getElementById('newDictWord');
+  const word = input.value.trim();
+
+  if (!word) {
+    showStatus('Please enter a word to add', 'error');
+    return;
+  }
+
+  // Validate word (no spaces, reasonable length)
+  if (word.includes(' ')) {
+    showStatus('Please enter single words only (no spaces)', 'error');
+    return;
+  }
+
+  if (word.length > 50) {
+    showStatus('Word is too long (max 50 characters)', 'error');
+    return;
+  }
+
+  const result = await chrome.storage.sync.get(['customDictionary']);
+  const dictionary = result.customDictionary || [];
+
+  // Check if word already exists (case-insensitive)
+  if (dictionary.some(w => w.toLowerCase() === word.toLowerCase())) {
+    showStatus('This word is already in your dictionary', 'error');
+    return;
+  }
+
+  // Limit dictionary size
+  if (dictionary.length >= 100) {
+    showStatus('Dictionary is full (max 100 words). Remove some words first.', 'error');
+    return;
+  }
+
+  dictionary.push(word);
+  await chrome.storage.sync.set({ customDictionary: dictionary });
+
+  input.value = '';
+  renderDictionary(dictionary);
+  showStatus(`"${word}" added to dictionary`, 'success');
+}
+
+async function handleRemoveWord(word) {
+  const result = await chrome.storage.sync.get(['customDictionary']);
+  const dictionary = result.customDictionary || [];
+
+  const updatedDictionary = dictionary.filter(w => w !== word);
+  await chrome.storage.sync.set({ customDictionary: updatedDictionary });
+
+  renderDictionary(updatedDictionary);
+  showStatus(`"${word}" removed from dictionary`, 'success');
 }
