@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrammarPeace - Free AI Grammar Checker & Translator</title>
+    <meta name="description" content="Free AI-powered grammar checker & translator. Grammarly alternative with Claude & OpenAI. 15+ languages, instant corrections.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✌️</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --orange: #e85d04;
+            --orange-dark: #d45303;
+            --dark: #1a1a1a;
+            --dark-light: #2a2a2a;
+            --white: #ffffff;
+            --gray: #f5f5f5;
+            --text-muted: #666;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--white);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: var(--white);
+            border-bottom: 1px solid #eee;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--dark);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--orange);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--orange);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background: var(--orange);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--orange-dark);
+        }
+
+        .btn-secondary {
+            background: var(--dark);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: var(--dark-light);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 80px 0 100px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--white) 0%, var(--gray) 100%);
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .hero h1 span {
+            color: var(--orange);
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-image {
+            margin-top: 60px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-image img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Features */
+        .features {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 40px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-title p {
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border: 1px solid #eee;
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--orange);
+            box-shadow: 0 10px 40px rgba(232, 93, 4, 0.1);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--orange);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+        }
+
+        /* How it works */
+        .how-it-works {
+            padding: 100px 0;
+            background: var(--dark);
+            color: var(--white);
+        }
+
+        .how-it-works .section-title h2 {
+            color: var(--white);
+        }
+
+        .how-it-works .section-title p {
+            color: #999;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .step {
+            text-align: center;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 auto 20px;
+        }
+
+        .step h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .step p {
+            color: #999;
+        }
+
+        /* Pricing */
+        .pricing {
+            padding: 100px 0;
+        }
+
+        .pricing-card {
+            max-width: 500px;
+            margin: 0 auto;
+            background: var(--white);
+            border: 2px solid var(--orange);
+            border-radius: 24px;
+            padding: 48px;
+            text-align: center;
+        }
+
+        .pricing-badge {
+            display: inline-block;
+            background: var(--orange);
+            color: var(--white);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .pricing-card h3 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .pricing-card .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .pricing-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            color: var(--orange);
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: var(--white);
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+
+        .footer-brand .logo {
+            color: var(--white);
+            margin-bottom: 16px;
+        }
+
+        .footer-brand p {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .footer-links h4 {
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .footer-links a {
+            display: block;
+            color: #999;
+            text-decoration: none;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+            color: var(--orange);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .features-grid,
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <a href="/" class="logo">
+                <div class="logo-icon">✌️</div>
+                <span class="logo-text">GrammarPeace</span>
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="https://chromewebstore.google.com/detail/grammarpeace" class="btn btn-primary">Add to Chrome</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Write with <span>Confidence</span></h1>
+                <p>Free AI-powered grammar checker that works everywhere. Powered by Claude and OpenAI. No subscriptions, no limits.</p>
+                <div class="hero-buttons">
+                    <a href="https://chromewebstore.google.com/detail/grammarpeace" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0 1 12 6.545h10.691A12 12 0 0 0 12 0zM1.931 5.47A11.943 11.943 0 0 0 0 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 0 1-6.865-2.29zm13.342 2.166a5.446 5.446 0 0 1 1.45 7.09l.002.001h-.002l-3.953 6.848c.062.003.124.005.187.005 6.627 0 12-5.373 12-12 0-1.164-.166-2.289-.475-3.354z"/></svg>
+                        Add to Chrome — It's Free
+                    </a>
+                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features" id="features">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Everything You Need</h2>
+                    <p>Powerful features to help you write better, faster</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">✓</div>
+                        <h3>Grammar Check</h3>
+                        <p>Instant grammar and spelling corrections with detailed explanations. Fix errors with one click.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">✨</div>
+                        <h3>Tone Rewriting</h3>
+                        <p>Transform your text to any tone — professional, casual, friendly, or formal. Keep your voice, improve your impact.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌍</div>
+                        <h3>Translation</h3>
+                        <p>Translate to 15+ languages instantly. Perfect for multilingual communication and learning.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Works Everywhere</h3>
+                        <p>Gmail, Google Docs, social media, forms — GrammarPeace works on any website you visit.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Privacy First</h3>
+                        <p>Your text is never stored. We only send what you select to AI providers. No tracking, no data collection.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3>Best AI Models</h3>
+                        <p>Choose between Claude (Anthropic) and OpenAI. Use your own API key for unlimited access.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="how-it-works" id="how-it-works">
+            <div class="container">
+                <div class="section-title">
+                    <h2>How It Works</h2>
+                    <p>Get started in seconds</p>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Install Extension</h3>
+                        <p>Add GrammarPeace to Chrome from the Web Store. It's free and takes 2 seconds.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Select Text</h3>
+                        <p>Highlight any text on any website. The ✌️ button appears automatically.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Click & Fix</h3>
+                        <p>Choose Check, Improve, or Translate. Apply corrections with one click.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pricing" id="pricing">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Simple Pricing</h2>
+                    <p>No subscriptions. No hidden fees.</p>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-badge">Forever Free</div>
+                    <h3>$0</h3>
+                    <p class="subtitle">Use your own API key</p>
+                    <ul class="pricing-features">
+                        <li><span class="check-icon">✓</span> Unlimited grammar checks</li>
+                        <li><span class="check-icon">✓</span> Unlimited translations</li>
+                        <li><span class="check-icon">✓</span> All tone options</li>
+                        <li><span class="check-icon">✓</span> 15+ languages</li>
+                        <li><span class="check-icon">✓</span> Claude & OpenAI support</li>
+                        <li><span class="check-icon">✓</span> Works everywhere</li>
+                        <li><span class="check-icon">✓</span> No data collection</li>
+                    </ul>
+                    <a href="https://chromewebstore.google.com/detail/grammarpeace" class="btn btn-primary" style="width: 100%;">Get GrammarPeace Free</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="/" class="logo">
+                        <div class="logo-icon">✌️</div>
+                        <span class="logo-text">GrammarPeace</span>
+                    </a>
+                    <p>Free AI-powered grammar checker & translator. Your privacy-first Grammarly alternative.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Links</h4>
+                    <a href="https://chromewebstore.google.com/detail/grammarpeace">Chrome Web Store</a>
+                    <a href="privacy.html">Privacy Policy</a>
+                    <a href="https://github.com/kaansrc/grammarwise">GitHub</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <a href="https://github.com/kaansrc/grammarwise/issues">Report an Issue</a>
+                    <a href="https://github.com/kaansrc/grammarwise">Source Code</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 GrammarPeace. Open source and free forever.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
