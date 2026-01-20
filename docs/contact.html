@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - GrammarPeace</title>
+    <meta name="description" content="Contact the GrammarPeace team. Get support, report bugs, or send feedback.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✌️</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --orange: #e85d04;
+            --orange-dark: #d45303;
+            --dark: #1a1a1a;
+            --white: #ffffff;
+            --gray: #f5f5f5;
+            --text-muted: #666;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--white);
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: var(--white);
+            border-bottom: 1px solid #eee;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--dark);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--orange);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            background: var(--orange);
+            color: var(--white);
+        }
+
+        .btn:hover {
+            background: var(--orange-dark);
+        }
+
+        /* Content */
+        .content {
+            padding: 60px 0 100px;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            font-size: 18px;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            color: var(--dark);
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: #444;
+        }
+
+        strong {
+            color: var(--dark);
+        }
+
+        a {
+            color: var(--orange);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .contact-card {
+            background: var(--gray);
+            border-radius: 12px;
+            padding: 32px;
+            margin: 24px 0;
+        }
+
+        .contact-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-card p {
+            margin-bottom: 16px;
+        }
+
+        .contact-card .btn {
+            margin-top: 8px;
+        }
+
+        .email-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--orange);
+        }
+
+        .response-time {
+            background: var(--white);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-top: 16px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: var(--white);
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        footer p {
+            color: #999;
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--orange);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .contact-card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">
+                <div class="logo-icon">✌️</div>
+                <span class="logo-text">GrammarPeace</span>
+            </a>
+            <a href="https://chromewebstore.google.com/detail/grammarpeace" class="btn">Add to Chrome</a>
+        </nav>
+    </header>
+
+    <main class="content">
+        <div class="container">
+            <h1>Contact Us</h1>
+            <p class="subtitle">Have questions, feedback, or need help? We'd love to hear from you.</p>
+
+            <div class="contact-card">
+                <h3>Email Support</h3>
+                <p>For general inquiries, feedback, or support questions, send us an email:</p>
+                <a href="mailto:support@grammarpeace.com" class="email-link">
+                    support@grammarpeace.com
+                </a>
+                <div class="response-time">
+                    We typically respond within 24-48 hours.
+                </div>
+            </div>
+
+            <div class="contact-card">
+                <h3>Report a Bug</h3>
+                <p>Found a bug or technical issue? Open an issue on our GitHub repository for faster resolution:</p>
+                <a href="https://github.com/kaansrc/grammarpeace/issues" target="_blank" class="btn">
+                    Open GitHub Issue
+                </a>
+            </div>
+
+            <div class="contact-card">
+                <h3>Feature Requests</h3>
+                <p>Have an idea for a new feature? We welcome suggestions! Submit your idea on GitHub:</p>
+                <a href="https://github.com/kaansrc/grammarpeace/issues" target="_blank" class="btn">
+                    Suggest a Feature
+                </a>
+            </div>
+
+            <h2>Before Contacting Us</h2>
+            <p>For common questions, check these resources first:</p>
+            <ul style="padding-left: 24px; margin-bottom: 16px;">
+                <li style="margin-bottom: 8px; color: #444;"><strong>API Key Setup:</strong> Make sure you've entered a valid API key from <a href="https://console.anthropic.com/" target="_blank">Anthropic</a> or <a href="https://platform.openai.com/" target="_blank">OpenAI</a></li>
+                <li style="margin-bottom: 8px; color: #444;"><strong>Extension Not Working:</strong> Try refreshing the page or restarting Chrome</li>
+                <li style="margin-bottom: 8px; color: #444;"><strong>Privacy Questions:</strong> See our <a href="/privacy.html">Privacy Policy</a></li>
+            </ul>
+
+            <h2>Open Source</h2>
+            <p>GrammarPeace is open source. You can view the code, contribute, or fork the project:</p>
+            <p><a href="https://github.com/kaansrc/grammarpeace" target="_blank">https://github.com/kaansrc/grammarpeace</a></p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 GrammarPeace. <a href="/">Back to Home</a></p>
+        </div>
+    </footer>
+</body>
+</html>
