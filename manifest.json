@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GrammarPeace - AI Grammar Checker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Free AI-powered grammar checker & translator. Grammarly alternative with Claude & OpenAI. 15+ languages, instant corrections.",
   "permissions": [
     "storage",
