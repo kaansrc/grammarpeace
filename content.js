@@ -173,7 +173,13 @@ document.addEventListener('keyup', (event) => {
           selectedText = text;
           selectionRange = range;
           originalElement = document.activeElement;
-          showFloatingButton(rect.right, rect.bottom);
+          // Position at the end of the selection (where cursor is)
+          // Use the focus node to determine cursor position
+          const isForwardSelection = selection.anchorOffset <= selection.focusOffset ||
+            (selection.anchorNode !== selection.focusNode);
+          const x = isForwardSelection ? rect.right : rect.left;
+          const y = rect.bottom;
+          showFloatingButton(x, y);
         }
       } catch (e) {
         // Fallback - show at a default position near the active element
@@ -301,18 +307,46 @@ function showFloatingButton(x, y) {
   floatingButton = document.createElement('div');
   floatingButton.id = 'grammarpeace-floating-button';
 
+  // Button dimensions
+  const buttonSize = 28;
+  const buttonOffset = 10;
+  const edgePadding = 10;
+
+  // Calculate position with viewport bounds checking
+  let posX = x + buttonOffset;
+  let posY = y + buttonOffset;
+
+  // Keep button within viewport
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  // Check right edge - if button would go off screen, position it to the left of the selection
+  if (posX + buttonSize > viewportWidth - edgePadding) {
+    posX = Math.max(edgePadding, x - buttonSize - buttonOffset);
+  }
+
+  // Check bottom edge - if button would go off screen, position it above the selection
+  if (posY + buttonSize > viewportHeight - edgePadding) {
+    posY = Math.max(edgePadding, y - buttonSize - buttonOffset);
+  }
+
+  // Ensure minimum distance from left edge
+  posX = Math.max(edgePadding, posX);
+
+  // Ensure minimum distance from top edge
+  posY = Math.max(edgePadding, posY);
+
   // Force inline styles to ensure visibility
-  // Making it EXTRA visible for debugging
   floatingButton.style.cssText = `
     position: fixed !important;
-    left: ${x + 10}px !important;
-    top: ${y + 10}px !important;
+    left: ${posX}px !important;
+    top: ${posY}px !important;
     z-index: 2147483647 !important;
     background: white !important;
     color: black !important;
     border-radius: 50% !important;
-    width: 28px !important;
-    height: 28px !important;
+    width: ${buttonSize}px !important;
+    height: ${buttonSize}px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
