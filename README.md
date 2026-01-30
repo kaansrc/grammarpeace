@@ -30,7 +30,7 @@ Stop paying $144/year for Grammarly. GrammarPeace gives you the same features �
 - **Quick Presets** — Save your favorite language + tone combinations
 - **History** — Access your recent corrections
 - **Dark Mode** — Easy on the eyes
-- **Works Everywhere** — Gmail, Google Docs, Twitter, LinkedIn, any website
+- **Works Everywhere** — Gmail, Twitter, LinkedIn, any website
 
 ## How It Works
 
