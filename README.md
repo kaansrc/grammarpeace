@@ -72,7 +72,7 @@ GrammarPeace uses the latest AI models for fast, accurate results:
 | Provider | Model | Notes |
 |----------|-------|-------|
 | **Anthropic** | Claude Haiku 4.5 | Fast, cost-effective, excellent quality |
-| **OpenAI** | GPT-4.1 Nano | Lightweight and efficient |
+| **OpenAI** | GPT-5 Nano | Lightweight and efficient |
 
 You can switch between providers in Settings. Both deliver excellent grammar checking at minimal cost.
 
@@ -85,7 +85,7 @@ You can switch between providers in Settings. Both deliver excellent grammar che
 | Provider | Input | Output | Cost per 1000 checks* |
 |----------|-------|--------|----------------------|
 | Claude Haiku 4.5 | $1.00/M tokens | $5.00/M tokens | ~$0.30 |
-| GPT-4.1 Nano | $0.10/M tokens | $0.40/M tokens | ~$0.025 |
+| GPT-5 Nano | $0.10/M tokens | $0.40/M tokens | ~$0.025 |
 
 *Estimated based on ~100 input tokens + ~100 output tokens per grammar check.
 
@@ -94,7 +94,7 @@ You can switch between providers in Settings. Both deliver excellent grammar che
 A heavy user checking 100 texts per day:
 - **Grammarly**: $360/year (fixed)
 - **Claude Haiku 4.5**: ~$11/year
-- **GPT-4.1 Nano**: ~$0.90/year
+- **GPT-5 Nano**: ~$0.90/year
 
 That's **30-400x cheaper** than Grammarly, with better AI.
 
