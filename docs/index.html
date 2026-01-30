@@ -142,6 +142,79 @@
             padding: 8px 16px;
         }
 
+        /* Mobile Menu */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-right: -10px;
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 18px;
+            height: 1.5px;
+            background: var(--gray-200);
+            transition: all 0.3s;
+        }
+
+        .menu-toggle span:nth-child(1) {
+            margin-bottom: 5px;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(2.5px, 2.5px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            transform: rotate(-45deg) translate(2px, -2px);
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 48px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 32px 24px;
+            z-index: 99;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            color: var(--gray-200);
+            text-decoration: none;
+            font-size: 17px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--gray-800);
+            transition: color 0.2s;
+        }
+
+        .mobile-menu a:hover {
+            color: var(--white);
+        }
+
+        .mobile-menu .btn {
+            margin-top: 24px;
+            width: 100%;
+            justify-content: center;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -605,39 +678,97 @@
         @media (max-width: 768px) {
             .hero {
                 min-height: auto;
-                padding: 140px 0 100px;
+                padding: 120px 0 80px;
             }
 
             .hero h1 {
-                font-size: 40px;
+                font-size: 36px;
             }
 
             .hero .subtitle {
-                font-size: 22px;
+                font-size: 20px;
             }
 
             .hero p {
-                font-size: 16px;
+                font-size: 15px;
             }
 
             .section-header h2 {
-                font-size: 32px;
+                font-size: 28px;
+            }
+
+            .section-header p {
+                font-size: 17px;
             }
 
             .nav-links {
                 display: none;
             }
 
+            .menu-toggle {
+                display: flex;
+            }
+
             .footer-content {
                 flex-direction: column;
-                gap: 40px;
+                gap: 32px;
+                text-align: center;
+            }
+
+            .footer-brand {
+                max-width: 100%;
+            }
+
+            .footer-brand .logo {
+                justify-content: center;
+            }
+
+            .footer-links {
+                width: 100%;
+            }
+
+            .footer-links h4 {
+                margin-bottom: 12px;
+            }
+
+            .footer-links a {
+                display: inline-block;
+                margin: 0 8px 8px;
             }
 
             .features,
             .how-it-works,
             .pricing,
             .cost-comparison {
-                padding: 80px 0;
+                padding: 64px 0;
+            }
+
+            .section-header {
+                margin-bottom: 48px;
+            }
+
+            .feature-card {
+                padding: 28px 24px;
+            }
+
+            .feature-card h3 {
+                font-size: 20px;
+            }
+
+            .pricing-card {
+                padding: 32px 24px;
+            }
+
+            .pricing-card .price {
+                font-size: 48px;
+            }
+
+            .comparison-card {
+                padding: 24px;
+            }
+
+            .comparison-card .price {
+                font-size: 32px;
             }
         }
     </style>
@@ -656,8 +787,20 @@
                 <a href="https://github.com/kaansrc/grammarpeace">GitHub</a>
                 <a href="https://chromewebstore.google.com/detail/grammarpeace-ai-grammar-c/llbcjpcjioapecjbkibpacpjhfjknhgh" class="btn btn-primary">Get Extension</a>
             </div>
+            <button class="menu-toggle" aria-label="Menu" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+            </button>
         </nav>
     </header>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#features" onclick="closeMenu()">Features</a>
+        <a href="#how-it-works" onclick="closeMenu()">How It Works</a>
+        <a href="#pricing" onclick="closeMenu()">Pricing</a>
+        <a href="https://github.com/kaansrc/grammarpeace" onclick="closeMenu()">GitHub</a>
+        <a href="https://chromewebstore.google.com/detail/grammarpeace-ai-grammar-c/llbcjpcjioapecjbkibpacpjhfjknhgh" class="btn btn-primary" onclick="closeMenu()">Get Extension</a>
+    </div>
 
     <main>
         <section class="hero">
@@ -831,5 +974,23 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const toggle = document.querySelector('.menu-toggle');
+            menu.classList.toggle('active');
+            toggle.classList.toggle('active');
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
+        }
+
+        function closeMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const toggle = document.querySelector('.menu-toggle');
+            menu.classList.remove('active');
+            toggle.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    </script>
 </body>
 </html>
