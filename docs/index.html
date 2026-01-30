@@ -4,8 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GrammarPeace - Free AI Grammar Checker & Translator</title>
-    <meta name="description" content="Free AI-powered grammar checker & translator. Grammarly alternative with Claude & OpenAI. 15+ languages, instant corrections.">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✌️</text></svg>">
+    <meta name="description" content="Free AI-powered grammar checker & translator. Grammarly alternative with Claude & OpenAI. 15+ languages, instant corrections. Open source.">
+    <meta name="keywords" content="grammar checker, Grammarly alternative, AI writing assistant, free grammar tool, Claude AI, OpenAI, spell checker, translation, Chrome extension">
+    <meta name="author" content="GrammarPeace">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://grammarpeace.com/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://grammarpeace.com/">
+    <meta property="og:title" content="GrammarPeace - Free AI Grammar Checker">
+    <meta property="og:description" content="Stop paying $144/year for Grammarly. Free, open-source grammar checker powered by Claude & OpenAI.">
+    <meta property="og:image" content="https://grammarpeace.com/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="GrammarPeace">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://grammarpeace.com/">
+    <meta name="twitter:title" content="GrammarPeace - Free AI Grammar Checker">
+    <meta name="twitter:description" content="Stop paying $144/year for Grammarly. Free, open-source grammar checker powered by Claude & OpenAI.">
+    <meta name="twitter:image" content="https://grammarpeace.com/og-image.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23fff'/><text x='50' y='50' font-size='60' text-anchor='middle' dominant-baseline='central'>✌️</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23fff'/><text x='50' y='50' font-size='60' text-anchor='middle' dominant-baseline='central'>✌️</text></svg>">
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#000000">
+    <meta name="msapplication-TileColor" content="#000000">
+
     <style>
         * {
             margin: 0;
@@ -14,139 +44,276 @@
         }
 
         :root {
-            --orange: #e85d04;
-            --orange-dark: #d45303;
-            --dark: #1a1a1a;
-            --dark-light: #2a2a2a;
+            --black: #000000;
             --white: #ffffff;
-            --gray: #f5f5f5;
-            --text-muted: #666;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #e5e5e5;
+            --gray-300: #d4d4d4;
+            --gray-400: #a3a3a3;
+            --gray-500: #737373;
+            --gray-600: #525252;
+            --gray-700: #404040;
+            --gray-800: #262626;
+            --gray-900: #171717;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--white);
-            color: var(--dark);
-            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: var(--black);
+            color: var(--white);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1120px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 24px;
         }
 
         /* Header */
         header {
-            background: var(--white);
-            border-bottom: 1px solid #eee;
-            padding: 16px 0;
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 100;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
         }
 
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            height: 48px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 22px;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             text-decoration: none;
-            color: var(--dark);
+            color: var(--gray-200);
+            transition: color 0.3s;
+        }
+
+        .logo:hover {
+            color: var(--white);
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--orange);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
         }
 
         .logo-text {
-            font-size: 22px;
-            font-weight: 700;
+            font-size: 17px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
         }
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 28px;
             align-items: center;
         }
 
         .nav-links a {
-            color: var(--dark);
+            color: var(--gray-200);
             text-decoration: none;
-            font-weight: 500;
+            font-size: 12px;
+            font-weight: 400;
+            transition: color 0.3s;
         }
 
         .nav-links a:hover {
-            color: var(--orange);
+            color: var(--white);
+        }
+
+        .nav-links .btn {
+            color: var(--black);
+            font-size: 12px;
+            padding: 8px 16px;
+        }
+
+        /* Mobile Menu */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-right: -10px;
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 18px;
+            height: 1.5px;
+            background: var(--gray-200);
+            transition: all 0.3s;
+        }
+
+        .menu-toggle span:nth-child(1) {
+            margin-bottom: 5px;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(2.5px, 2.5px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            transform: rotate(-45deg) translate(2px, -2px);
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 48px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 32px 24px;
+            z-index: 99;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            color: var(--gray-200);
+            text-decoration: none;
+            font-size: 17px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--gray-800);
+            transition: color 0.2s;
+        }
+
+        .mobile-menu a:hover {
+            color: var(--white);
+        }
+
+        .mobile-menu .btn {
+            margin-top: 24px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+            color: var(--black);
+            border-bottom: none;
+            padding: 14px 20px;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 980px;
+            font-weight: 500;
+            font-size: 14px;
             text-decoration: none;
             transition: all 0.2s;
             cursor: pointer;
             border: none;
-            font-size: 16px;
         }
 
         .btn-primary {
-            background: var(--orange);
-            color: var(--white);
+            background: var(--white);
+            color: var(--black);
         }
 
         .btn-primary:hover {
-            background: var(--orange-dark);
+            background: var(--gray-100);
         }
 
         .btn-secondary {
-            background: var(--dark);
+            background: transparent;
             color: var(--white);
+            border: 1px solid var(--gray-600);
         }
 
         .btn-secondary:hover {
-            background: var(--dark-light);
+            border-color: var(--gray-400);
+        }
+
+        .btn-link {
+            background: transparent;
+            color: #2997ff;
+            padding: 0;
+            font-size: 17px;
+        }
+
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+
+        .btn-link svg {
+            width: 14px;
+            height: 14px;
         }
 
         /* Hero */
         .hero {
-            padding: 80px 0 100px;
+            padding: 180px 0 140px;
             text-align: center;
-            background: linear-gradient(180deg, var(--white) 0%, var(--gray) 100%);
+            background: linear-gradient(180deg, var(--black) 0%, var(--gray-900) 100%);
+            overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero .container {
+            width: 100%;
         }
 
         .hero h1 {
-            font-size: 56px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            line-height: 1.1;
+            font-size: 72px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 24px;
+            line-height: 1.05;
         }
 
-        .hero h1 span {
-            color: var(--orange);
+        .hero h1 .highlight {
+            background: linear-gradient(90deg, #fff 0%, #888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .subtitle {
+            font-size: 32px;
+            font-weight: 400;
+            color: var(--gray-400);
+            margin-bottom: 24px;
+            letter-spacing: -0.01em;
         }
 
         .hero p {
-            font-size: 20px;
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto 40px;
+            font-size: 19px;
+            color: var(--gray-500);
+            max-width: 640px;
+            margin: 0 auto 48px;
+            line-height: 1.6;
         }
 
         .hero-buttons {
@@ -154,102 +321,93 @@
             gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-bottom: 24px;
         }
 
-        .hero-image {
-            margin-top: 60px;
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .hero-image img {
-            width: 100%;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        .hero-note {
+            font-size: 14px;
+            color: var(--gray-600);
         }
 
         /* Features */
         .features {
-            padding: 100px 0;
+            padding: 120px 0;
+            background: var(--black);
         }
 
-        .section-title {
+        .section-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 80px;
         }
 
-        .section-title h2 {
-            font-size: 40px;
-            font-weight: 700;
+        .section-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             margin-bottom: 16px;
         }
 
-        .section-title p {
-            color: var(--text-muted);
-            font-size: 18px;
+        .section-header h2 {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            font-size: 21px;
+            color: var(--gray-400);
         }
 
         .features-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
+            gap: 24px;
         }
 
         .feature-card {
-            background: var(--white);
-            border: 1px solid #eee;
-            border-radius: 16px;
-            padding: 32px;
+            background: var(--gray-900);
+            border: 1px solid var(--gray-800);
+            border-radius: 24px;
+            padding: 40px 32px;
             transition: all 0.3s;
         }
 
         .feature-card:hover {
-            border-color: var(--orange);
-            box-shadow: 0 10px 40px rgba(232, 93, 4, 0.1);
+            border-color: var(--gray-700);
+            transform: translateY(-4px);
         }
 
         .feature-icon {
-            width: 56px;
-            height: 56px;
-            background: var(--orange);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin-bottom: 20px;
+            font-size: 40px;
+            margin-bottom: 24px;
         }
 
         .feature-card h3 {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 600;
             margin-bottom: 12px;
+            letter-spacing: -0.02em;
         }
 
         .feature-card p {
-            color: var(--text-muted);
+            color: var(--gray-400);
+            font-size: 15px;
+            line-height: 1.6;
         }
 
         /* How it works */
         .how-it-works {
-            padding: 100px 0;
-            background: var(--dark);
-            color: var(--white);
-        }
-
-        .how-it-works .section-title h2 {
-            color: var(--white);
-        }
-
-        .how-it-works .section-title p {
-            color: #999;
+            padding: 120px 0;
+            background: var(--gray-900);
         }
 
         .steps {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
+            gap: 48px;
         }
 
         .step {
@@ -257,37 +415,42 @@
         }
 
         .step-number {
-            width: 60px;
-            height: 60px;
-            background: var(--orange);
+            width: 64px;
+            height: 64px;
+            background: var(--white);
+            color: var(--black);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            font-weight: 700;
-            margin: 0 auto 20px;
+            font-weight: 600;
+            margin: 0 auto 24px;
         }
 
         .step h3 {
-            font-size: 20px;
+            font-size: 24px;
+            font-weight: 600;
             margin-bottom: 12px;
+            letter-spacing: -0.02em;
         }
 
         .step p {
-            color: #999;
+            color: var(--gray-400);
+            font-size: 15px;
         }
 
         /* Pricing */
         .pricing {
-            padding: 100px 0;
+            padding: 120px 0;
+            background: var(--black);
         }
 
         .pricing-card {
-            max-width: 500px;
+            max-width: 480px;
             margin: 0 auto;
-            background: var(--white);
-            border: 2px solid var(--orange);
+            background: var(--gray-900);
+            border: 1px solid var(--gray-800);
             border-radius: 24px;
             padding: 48px;
             text-align: center;
@@ -295,38 +458,44 @@
 
         .pricing-badge {
             display: inline-block;
-            background: var(--orange);
-            color: var(--white);
+            background: var(--white);
+            color: var(--black);
             padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 14px;
+            border-radius: 980px;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 24px;
         }
 
-        .pricing-card h3 {
-            font-size: 48px;
-            font-weight: 800;
+        .pricing-card .price {
+            font-size: 64px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
             margin-bottom: 8px;
         }
 
-        .pricing-card .subtitle {
-            color: var(--text-muted);
-            margin-bottom: 30px;
+        .pricing-card .price-note {
+            color: var(--gray-500);
+            font-size: 15px;
+            margin-bottom: 32px;
         }
 
         .pricing-features {
             list-style: none;
             text-align: left;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
         }
 
         .pricing-features li {
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--gray-800);
             display: flex;
             align-items: center;
             gap: 12px;
+            font-size: 15px;
+            color: var(--gray-300);
         }
 
         .pricing-features li:last-child {
@@ -334,168 +503,277 @@
         }
 
         .check-icon {
-            color: var(--orange);
-            font-weight: bold;
+            color: var(--white);
+            font-weight: 600;
         }
 
         /* Cost Comparison */
         .cost-comparison {
-            padding: 100px 0;
-            background: var(--gray);
+            padding: 120px 0;
+            background: var(--gray-900);
         }
 
         .comparison-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            margin-bottom: 50px;
+            gap: 24px;
+            margin-bottom: 48px;
         }
 
         .comparison-card {
-            background: var(--white);
-            border-radius: 16px;
+            background: var(--gray-800);
+            border-radius: 20px;
             padding: 32px;
             text-align: center;
-            border: 2px solid transparent;
+            border: 1px solid transparent;
+            transition: all 0.3s;
         }
 
         .comparison-card.grammarly {
-            opacity: 0.7;
+            opacity: 0.6;
         }
 
         .comparison-card.highlight {
-            border-color: var(--orange);
-            box-shadow: 0 10px 40px rgba(232, 93, 4, 0.15);
+            border-color: var(--white);
+            background: var(--black);
         }
 
         .comparison-card h3 {
-            font-size: 20px;
+            font-size: 17px;
+            font-weight: 600;
             margin-bottom: 8px;
         }
 
         .comparison-card .price {
-            font-size: 36px;
-            font-weight: 800;
-            color: var(--dark);
+            font-size: 40px;
+            font-weight: 700;
             margin-bottom: 8px;
+            letter-spacing: -0.02em;
         }
 
         .comparison-card.grammarly .price {
             text-decoration: line-through;
-            color: #999;
+            color: var(--gray-500);
         }
 
         .comparison-card .price-detail {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--gray-500);
+            margin-bottom: 16px;
         }
 
         .comparison-card .savings {
-            background: var(--orange);
-            color: var(--white);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
+            background: var(--white);
+            color: var(--black);
+            padding: 6px 14px;
+            border-radius: 980px;
+            font-size: 12px;
             font-weight: 600;
             display: inline-block;
         }
 
         .cost-note {
             text-align: center;
-            max-width: 700px;
+            max-width: 640px;
             margin: 0 auto;
-            padding: 24px;
-            background: var(--white);
-            border-radius: 12px;
-            border-left: 4px solid var(--orange);
+            padding: 24px 32px;
+            background: var(--gray-800);
+            border-radius: 16px;
         }
 
         .cost-note p {
-            color: var(--text-muted);
+            color: var(--gray-400);
+            font-size: 15px;
             margin: 0;
         }
 
         .cost-note strong {
-            color: var(--dark);
+            color: var(--white);
         }
 
         /* Footer */
         footer {
-            background: var(--dark);
+            background: var(--black);
             color: var(--white);
-            padding: 60px 0 30px;
+            padding: 48px 0 24px;
+            border-top: 1px solid var(--gray-800);
         }
 
         .footer-content {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 40px;
+            margin-bottom: 48px;
         }
 
         .footer-brand {
-            max-width: 300px;
+            max-width: 280px;
         }
 
         .footer-brand .logo {
-            color: var(--white);
             margin-bottom: 16px;
         }
 
         .footer-brand p {
-            color: #999;
+            color: var(--gray-500);
             font-size: 14px;
         }
 
         .footer-links h4 {
-            margin-bottom: 16px;
+            font-size: 12px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gray-500);
+            margin-bottom: 16px;
         }
 
         .footer-links a {
             display: block;
-            color: #999;
+            color: var(--gray-400);
             text-decoration: none;
             margin-bottom: 10px;
             font-size: 14px;
+            transition: color 0.2s;
         }
 
         .footer-links a:hover {
-            color: var(--orange);
+            color: var(--white);
         }
 
         .footer-bottom {
-            border-top: 1px solid #333;
-            padding-top: 30px;
+            border-top: 1px solid var(--gray-800);
+            padding-top: 24px;
             text-align: center;
-            color: #666;
-            font-size: 14px;
+            color: var(--gray-600);
+            font-size: 12px;
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 36px;
+        @media (max-width: 1024px) {
+            .hero {
+                min-height: auto;
+                padding: 160px 0 120px;
             }
 
-            .hero p {
-                font-size: 18px;
+            .hero h1 {
+                font-size: 56px;
+            }
+
+            .hero .subtitle {
+                font-size: 26px;
+            }
+
+            .section-header h2 {
+                font-size: 40px;
             }
 
             .features-grid,
             .steps,
             .comparison-grid {
                 grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .steps {
+                gap: 48px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                min-height: auto;
+                padding: 120px 0 80px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero .subtitle {
+                font-size: 20px;
+            }
+
+            .hero p {
+                font-size: 15px;
+            }
+
+            .section-header h2 {
+                font-size: 28px;
+            }
+
+            .section-header p {
+                font-size: 17px;
             }
 
             .nav-links {
                 display: none;
             }
 
+            .menu-toggle {
+                display: flex;
+            }
+
             .footer-content {
                 flex-direction: column;
-                gap: 40px;
+                gap: 32px;
+                text-align: center;
+            }
+
+            .footer-brand {
+                max-width: 100%;
+            }
+
+            .footer-brand .logo {
+                justify-content: center;
+            }
+
+            .footer-links {
+                width: 100%;
+            }
+
+            .footer-links h4 {
+                margin-bottom: 12px;
+            }
+
+            .footer-links a {
+                display: inline-block;
+                margin: 0 8px 8px;
+            }
+
+            .features,
+            .how-it-works,
+            .pricing,
+            .cost-comparison {
+                padding: 64px 0;
+            }
+
+            .section-header {
+                margin-bottom: 48px;
+            }
+
+            .feature-card {
+                padding: 28px 24px;
+            }
+
+            .feature-card h3 {
+                font-size: 20px;
+            }
+
+            .pricing-card {
+                padding: 32px 24px;
+            }
+
+            .pricing-card .price {
+                font-size: 48px;
+            }
+
+            .comparison-card {
+                padding: 24px;
+            }
+
+            .comparison-card .price {
+                font-size: 32px;
             }
         }
     </style>
@@ -504,69 +782,86 @@
     <header>
         <nav class="container">
             <a href="/" class="logo">
-                <div class="logo-icon">✌️</div>
+                <span class="logo-icon">✌️</span>
                 <span class="logo-text">GrammarPeace</span>
             </a>
             <div class="nav-links">
                 <a href="#features">Features</a>
                 <a href="#how-it-works">How It Works</a>
-                <a href="privacy.html">Privacy</a>
-                <a href="https://chromewebstore.google.com/detail/grammarpeace/llbcjpcjioapecjbkibpacpjhfjknhgh" class="btn btn-primary">Add to Chrome</a>
+                <a href="#pricing">Pricing</a>
+                <a href="https://github.com/kaansrc/grammarpeace">GitHub</a>
+                <a href="https://chromewebstore.google.com/detail/grammarpeace/llbcjpcjioapecjbkibpacpjhfjknhgh" class="btn btn-primary">Get Extension</a>
             </div>
+            <button class="menu-toggle" aria-label="Menu" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+            </button>
         </nav>
     </header>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#features" onclick="closeMenu()">Features</a>
+        <a href="#how-it-works" onclick="closeMenu()">How It Works</a>
+        <a href="#pricing" onclick="closeMenu()">Pricing</a>
+        <a href="https://github.com/kaansrc/grammarpeace" onclick="closeMenu()">GitHub</a>
+        <a href="https://chromewebstore.google.com/detail/grammarpeace/llbcjpcjioapecjbkibpacpjhfjknhgh" class="btn btn-primary" onclick="closeMenu()">Get Extension</a>
+    </div>
 
     <main>
         <section class="hero">
             <div class="container">
-                <h1>Stop Paying for <span>Grammarly</span></h1>
-                <p>Free, open-source grammar checker powered by Claude & OpenAI. No $30/month subscriptions. No word limits. No data harvesting.</p>
+                <h1>Stop paying for <span class="highlight">Grammarly</span></h1>
+                <p class="subtitle">Free AI grammar checker. Open source.</p>
+                <p>Powered by Claude and OpenAI. No subscriptions. No word limits. No tracking. Your API key, your data.</p>
                 <div class="hero-buttons">
                     <a href="https://chromewebstore.google.com/detail/grammarpeace/llbcjpcjioapecjbkibpacpjhfjknhgh" class="btn btn-primary">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0 1 12 6.545h10.691A12 12 0 0 0 12 0zM1.931 5.47A11.943 11.943 0 0 0 0 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 0 1-6.865-2.29zm13.342 2.166a5.446 5.446 0 0 1 1.45 7.09l.002.001h-.002l-3.953 6.848c.062.003.124.005.187.005 6.627 0 12-5.373 12-12 0-1.164-.166-2.289-.475-3.354z"/></svg>
-                        Ditch Grammarly — Get It Free
+                        Add to Chrome - Free
                     </a>
-                    <a href="#features" class="btn btn-secondary">Learn More</a>
+                    <a href="https://github.com/kaansrc/grammarpeace" class="btn btn-secondary">
+                        View on GitHub
+                    </a>
                 </div>
+                <p class="hero-note">Works on every website. Requires your own API key.</p>
             </div>
         </section>
 
         <section class="features" id="features">
             <div class="container">
-                <div class="section-title">
-                    <h2>Everything Grammarly Charges $360/year For</h2>
-                    <p>Same features. Better AI. Actually free.</p>
+                <div class="section-header">
+                    <p class="section-label">Features</p>
+                    <h2>Everything you need</h2>
+                    <p>All the features Grammarly charges $144/year for.</p>
                 </div>
                 <div class="features-grid">
                     <div class="feature-card">
                         <div class="feature-icon">✓</div>
                         <h3>Grammar Check</h3>
-                        <p>Instant grammar and spelling corrections with detailed explanations. Fix errors with one click.</p>
+                        <p>Instant grammar and spelling corrections. Detailed explanations. One-click fixes.</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">✨</div>
                         <h3>Tone Rewriting</h3>
-                        <p>Transform your text to any tone — professional, casual, friendly, or formal. Keep your voice, improve your impact.</p>
+                        <p>Transform text to any tone. Professional, casual, friendly, formal. Your voice, better impact.</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🌍</div>
                         <h3>Translation</h3>
-                        <p>Translate to 15+ languages instantly. Perfect for multilingual communication and learning.</p>
+                        <p>15+ languages. Instant translation. Perfect for multilingual communication.</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">⚡</div>
                         <h3>Works Everywhere</h3>
-                        <p>Gmail, Google Docs, social media, forms — GrammarPeace works on any website you visit.</p>
+                        <p>Gmail, Twitter, LinkedIn, any website. Select text, click, done.</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🔒</div>
-                        <h3>Your Data Stays Yours</h3>
-                        <p>Unlike Grammarly, we don't harvest your writing to train AI. No tracking. No data collection. Ever.</p>
+                        <h3>Privacy First</h3>
+                        <p>No servers. No tracking. No data collection. Your text goes directly to the AI API.</p>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">🤖</div>
-                        <h3>Better AI Than Grammarly</h3>
-                        <p>Powered by Claude & OpenAI — the best AI models available. Not some outdated proprietary model.</p>
+                        <h3>Best AI Models</h3>
+                        <p>Claude and GPT-5 Nano. The most advanced AI available. Not some proprietary model.</p>
                     </div>
                 </div>
             </div>
@@ -574,25 +869,26 @@
 
         <section class="how-it-works" id="how-it-works">
             <div class="container">
-                <div class="section-title">
-                    <h2>How It Works</h2>
-                    <p>Get started in seconds</p>
+                <div class="section-header">
+                    <p class="section-label">How It Works</p>
+                    <h2>Three steps</h2>
+                    <p>Get started in seconds.</p>
                 </div>
                 <div class="steps">
                     <div class="step">
                         <div class="step-number">1</div>
-                        <h3>Install Extension</h3>
-                        <p>Add GrammarPeace to Chrome from the Web Store. It's free and takes 2 seconds.</p>
+                        <h3>Install</h3>
+                        <p>Add GrammarPeace to Chrome. Free. Two seconds.</p>
                     </div>
                     <div class="step">
                         <div class="step-number">2</div>
-                        <h3>Select Text</h3>
-                        <p>Highlight any text on any website. The ✌️ button appears automatically.</p>
+                        <h3>Select</h3>
+                        <p>Highlight any text. The ✌️ button appears.</p>
                     </div>
                     <div class="step">
                         <div class="step-number">3</div>
-                        <h3>Click & Fix</h3>
-                        <p>Choose Check, Improve, or Translate. Apply corrections with one click.</p>
+                        <h3>Fix</h3>
+                        <p>Check, improve, or translate. Apply with one click.</p>
                     </div>
                 </div>
             </div>
@@ -600,55 +896,57 @@
 
         <section class="pricing" id="pricing">
             <div class="container">
-                <div class="section-title">
-                    <h2>Stop Wasting Money</h2>
-                    <p>Grammarly: $360/year. Wordtune: $120/year. GrammarPeace: $0. Forever.</p>
+                <div class="section-header">
+                    <p class="section-label">Pricing</p>
+                    <h2>Free forever</h2>
+                    <p>Grammarly: $144/year. GrammarPeace: $0.</p>
                 </div>
                 <div class="pricing-card">
-                    <div class="pricing-badge">100% Free & Open Source</div>
-                    <h3>$0</h3>
-                    <p class="subtitle">Bring your own API key (costs pennies)</p>
+                    <div class="pricing-badge">Open Source</div>
+                    <div class="price">$0</div>
+                    <p class="price-note">Bring your own API key. Pay pennies for usage.</p>
                     <ul class="pricing-features">
                         <li><span class="check-icon">✓</span> Unlimited grammar checks</li>
                         <li><span class="check-icon">✓</span> Unlimited translations</li>
                         <li><span class="check-icon">✓</span> All tone rewriting options</li>
                         <li><span class="check-icon">✓</span> 15+ languages</li>
                         <li><span class="check-icon">✓</span> Claude & OpenAI powered</li>
-                        <li><span class="check-icon">✓</span> No tracking, no ads, no BS</li>
-                        <li><span class="check-icon">✓</span> Open source — verify yourself</li>
+                        <li><span class="check-icon">✓</span> No tracking, no ads</li>
+                        <li><span class="check-icon">✓</span> Open source</li>
                     </ul>
-                    <a href="https://chromewebstore.google.com/detail/grammarpeace/llbcjpcjioapecjbkibpacpjhfjknhgh" class="btn btn-primary" style="width: 100%;">Cancel Grammarly. Get This.</a>
+                    <a href="https://chromewebstore.google.com/detail/grammarpeace/llbcjpcjioapecjbkibpacpjhfjknhgh" class="btn btn-primary" style="width: 100%;">Get GrammarPeace</a>
                 </div>
             </div>
         </section>
 
         <section class="cost-comparison" id="cost">
             <div class="container">
-                <div class="section-title">
-                    <h2>Real Cost Comparison</h2>
-                    <p>Based on 100 grammar checks per day (heavy user)</p>
+                <div class="section-header">
+                    <p class="section-label">Cost Comparison</p>
+                    <h2>Real numbers</h2>
+                    <p>Based on 100 grammar checks per day.</p>
                 </div>
                 <div class="comparison-grid">
                     <div class="comparison-card grammarly">
                         <h3>Grammarly Premium</h3>
-                        <div class="price">$360/yr</div>
-                        <div class="price-detail">$30/month, fixed price</div>
+                        <div class="price">$144/yr</div>
+                        <div class="price-detail">$12/month, fixed</div>
                     </div>
                     <div class="comparison-card highlight">
                         <h3>GrammarPeace + Claude</h3>
                         <div class="price">~$11/yr</div>
-                        <div class="price-detail">Claude Haiku 4.5 API</div>
-                        <div class="savings">Save 97%</div>
+                        <div class="price-detail">Claude Haiku 4.5</div>
+                        <div class="savings">Save 92%</div>
                     </div>
                     <div class="comparison-card highlight">
                         <h3>GrammarPeace + OpenAI</h3>
                         <div class="price">~$0.90/yr</div>
-                        <div class="price-detail">GPT-4.1 Nano API</div>
-                        <div class="savings">Save 99.7%</div>
+                        <div class="price-detail">GPT-5 Nano</div>
+                        <div class="savings">Save 99%</div>
                     </div>
                 </div>
                 <div class="cost-note">
-                    <p><strong>How it works:</strong> You bring your own API key from Anthropic or OpenAI. You pay only for what you use — typically a few cents per month. No subscriptions, no minimums, no BS.</p>
+                    <p><strong>How it works:</strong> Bring your own API key from Anthropic or OpenAI. Pay only for what you use. No subscriptions.</p>
                 </div>
             </div>
         </section>
@@ -659,28 +957,45 @@
             <div class="footer-content">
                 <div class="footer-brand">
                     <a href="/" class="logo">
-                        <div class="logo-icon">✌️</div>
+                        <span class="logo-icon">✌️</span>
                         <span class="logo-text">GrammarPeace</span>
                     </a>
-                    <p>The free, open-source Grammarly killer. Stop paying for grammar checks.</p>
+                    <p>Free, open-source grammar checker. Stop paying for Grammarly.</p>
                 </div>
                 <div class="footer-links">
-                    <h4>Links</h4>
+                    <h4>Product</h4>
                     <a href="https://chromewebstore.google.com/detail/grammarpeace/llbcjpcjioapecjbkibpacpjhfjknhgh">Chrome Web Store</a>
-                    <a href="privacy.html">Privacy Policy</a>
-                    <a href="https://github.com/kaansrc/grammarpeace">GitHub</a>
+                    <a href="https://github.com/kaansrc/grammarpeace">Source Code</a>
+                    <a href="https://github.com/kaansrc/grammarpeace/issues">Report Issue</a>
                 </div>
                 <div class="footer-links">
-                    <h4>Support</h4>
-                    <a href="contact.html">Contact Us</a>
-                    <a href="https://github.com/kaansrc/grammarpeace/issues">Report an Issue</a>
-                    <a href="https://github.com/kaansrc/grammarpeace">Source Code</a>
+                    <h4>Legal</h4>
+                    <a href="privacy.html">Privacy Policy</a>
+                    <a href="contact.html">Contact</a>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 GrammarPeace. Open source. Free forever. No VC funding. No corporate overlords.</p>
+                <p>© 2025 GrammarPeace. Open source. Free forever. Built by <a href="https://x.com/Kaantyping" style="color: var(--gray-400); text-decoration: none;">@Kaantyping</a></p>
             </div>
         </div>
     </footer>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const toggle = document.querySelector('.menu-toggle');
+            menu.classList.toggle('active');
+            toggle.classList.toggle('active');
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
+        }
+
+        function closeMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const toggle = document.querySelector('.menu-toggle');
+            menu.classList.remove('active');
+            toggle.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    </script>
 </body>
 </html>

@@ -2,9 +2,9 @@
 
 **Free, open-source grammar checker powered by Claude & OpenAI.**
 
-Stop paying $360/year for Grammarly. GrammarPeace gives you the same features — grammar checking, tone rewriting, and translation — using the best AI models available, for free.
+Stop paying $144/year for Grammarly. GrammarPeace gives you the same features — grammar checking, tone rewriting, and translation — using the best AI models available, for free.
 
-[Website](https://grammarpeace.com) · [Chrome Web Store](https://chromewebstore.google.com/detail/grammarpeace) · [Report Bug](https://github.com/kaansrc/grammarpeace/issues)
+[Website](https://grammarpeace.com) · [Chrome Web Store](https://chromewebstore.google.com/detail/grammarpeace-ai-grammar-c/llbcjpcjioapecjbkibpacpjhfjknhgh) · [Report Bug](https://github.com/kaansrc/grammarpeace/issues)
 
 ---
 
@@ -12,7 +12,7 @@ Stop paying $360/year for Grammarly. GrammarPeace gives you the same features �
 
 | Feature | Grammarly | GrammarPeace |
 |---------|-----------|--------------|
-| Price | $360/year | **Free** |
+| Price | $144/year | **Free** |
 | AI Model | Proprietary | Claude & OpenAI (state-of-the-art) |
 | Data Privacy | Collects your writing | **Your data stays yours** |
 | Open Source | No | **Yes** |
@@ -30,7 +30,7 @@ Stop paying $360/year for Grammarly. GrammarPeace gives you the same features �
 - **Quick Presets** — Save your favorite language + tone combinations
 - **History** — Access your recent corrections
 - **Dark Mode** — Easy on the eyes
-- **Works Everywhere** — Gmail, Google Docs, Twitter, LinkedIn, any website
+- **Works Everywhere** — Gmail, Twitter, LinkedIn, any website
 
 ## How It Works
 
@@ -44,7 +44,7 @@ Stop paying $360/year for Grammarly. GrammarPeace gives you the same features �
 ## Installation
 
 ### Chrome Web Store (Recommended)
-[Install from Chrome Web Store](https://chromewebstore.google.com/detail/grammarpeace)
+[Install from Chrome Web Store](https://chromewebstore.google.com/detail/grammarpeace-ai-grammar-c/llbcjpcjioapecjbkibpacpjhfjknhgh)
 
 ### Manual Installation
 1. Download or clone this repository
@@ -63,7 +63,7 @@ GrammarPeace requires an API key from Anthropic or OpenAI:
    - **OpenAI**: [platform.openai.com](https://platform.openai.com/)
 3. Paste your API key and save
 
-**API Cost**: Typical usage costs a few cents per month. Much cheaper than $30/month subscriptions.
+**API Cost**: Typical usage costs a few cents per month. Much cheaper than $12/month subscriptions.
 
 ## Supported AI Models
 
@@ -72,31 +72,31 @@ GrammarPeace uses the latest AI models for fast, accurate results:
 | Provider | Model | Notes |
 |----------|-------|-------|
 | **Anthropic** | Claude Haiku 4.5 | Fast, cost-effective, excellent quality |
-| **OpenAI** | GPT-4.1 Nano | Lightweight and efficient |
+| **OpenAI** | GPT-5 Nano | Lightweight and efficient |
 
 You can switch between providers in Settings. Both deliver excellent grammar checking at minimal cost.
 
 ## Cost Comparison
 
-**Grammarly Premium**: $360/year ($30/month)
+**Grammarly Premium**: $144/year ($12/month)
 
 **GrammarPeace**: Pay only for what you use
 
 | Provider | Input | Output | Cost per 1000 checks* |
 |----------|-------|--------|----------------------|
 | Claude Haiku 4.5 | $1.00/M tokens | $5.00/M tokens | ~$0.30 |
-| GPT-4.1 Nano | $0.10/M tokens | $0.40/M tokens | ~$0.025 |
+| GPT-5 Nano | $0.10/M tokens | $0.40/M tokens | ~$0.025 |
 
 *Estimated based on ~100 input tokens + ~100 output tokens per grammar check.
 
 ### Real-world example
 
 A heavy user checking 100 texts per day:
-- **Grammarly**: $360/year (fixed)
+- **Grammarly**: $144/year (fixed)
 - **Claude Haiku 4.5**: ~$11/year
-- **GPT-4.1 Nano**: ~$0.90/year
+- **GPT-5 Nano**: ~$0.90/year
 
-That's **30-400x cheaper** than Grammarly, with better AI.
+That's **13-160x cheaper** than Grammarly, with better AI.
 
 ## Supported Languages
 

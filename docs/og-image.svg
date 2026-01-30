@@ -1,0 +1,27 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#000000"/>
+
+  <!-- Subtle gradient overlay -->
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#grad)"/>
+
+  <!-- Peace sign emoji as logo -->
+  <text x="600" y="200" font-size="120" text-anchor="middle" dominant-baseline="middle">✌️</text>
+
+  <!-- Main title -->
+  <text x="600" y="320" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="72" font-weight="700" fill="#ffffff" text-anchor="middle">GrammarPeace</text>
+
+  <!-- Tagline -->
+  <text x="600" y="400" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="32" font-weight="400" fill="#888888" text-anchor="middle">Free AI Grammar Checker. Stop Paying for Grammarly.</text>
+
+  <!-- Powered by line -->
+  <text x="600" y="480" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif" font-size="24" font-weight="400" fill="#555555" text-anchor="middle">Powered by Claude &amp; OpenAI</text>
+
+  <!-- Bottom accent line -->
+  <rect x="500" y="540" width="200" height="4" rx="2" fill="#ffffff"/>
+</svg>

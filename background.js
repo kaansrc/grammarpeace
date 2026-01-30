@@ -281,7 +281,7 @@ async function callOpenAIAPI(apiKey, prompt, maxTokens) {
       'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: 'gpt-4.1-nano',
+      model: 'gpt-5-nano',
       max_tokens: maxTokens,
       messages: [{
         role: 'user',

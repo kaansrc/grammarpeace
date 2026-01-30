@@ -12,37 +12,46 @@
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: #1a1a1a;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+      background: #000000;
       min-height: 100vh;
       padding: 40px 20px;
+      color: #ffffff;
+      -webkit-font-smoothing: antialiased;
     }
 
     .container {
       max-width: 600px;
       margin: 0 auto;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      background: #000000;
+      border: 1px solid #262626;
+      border-radius: 20px;
       overflow: hidden;
     }
 
     .header {
-      background: #1a1a1a;
-      color: white;
-      padding: 32px;
+      background: #000000;
+      color: #ffffff;
+      padding: 40px 32px;
       text-align: center;
+      border-bottom: 1px solid #262626;
+    }
+
+    .header-logo {
+      font-size: 48px;
+      margin-bottom: 12px;
     }
 
     .header h1 {
-      font-size: 32px;
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
       margin-bottom: 8px;
-      font-weight: 700;
     }
 
     .header p {
-      font-size: 16px;
-      opacity: 0.9;
+      font-size: 15px;
+      color: #737373;
     }
 
     .content {
@@ -58,10 +67,10 @@
     }
 
     .section-title {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
-      color: #111827;
-      margin-bottom: 16px;
+      color: #ffffff;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -69,7 +78,7 @@
 
     .section-description {
       font-size: 14px;
-      color: #6b7280;
+      color: #737373;
       margin-bottom: 16px;
       line-height: 1.6;
     }
@@ -82,7 +91,7 @@
       display: block;
       font-size: 14px;
       font-weight: 500;
-      color: #374151;
+      color: #a3a3a3;
       margin-bottom: 8px;
     }
 
@@ -90,35 +99,56 @@
     input[type="password"],
     select {
       width: 100%;
-      padding: 12px;
-      border: 2px solid #e5e7eb;
-      border-radius: 8px;
+      padding: 12px 16px;
+      border: 1px solid #404040;
+      border-radius: 10px;
       font-size: 14px;
       transition: all 0.2s ease;
       font-family: inherit;
+      background: #171717;
+      color: #ffffff;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder {
+      color: #525252;
     }
 
     input[type="text"]:focus,
     input[type="password"]:focus,
     select:focus {
       outline: none;
-      border-color: #e85d04;
-      box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.1);
+      border-color: #ffffff;
+      background: #1a1a1a;
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23737373' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    select option {
+      background: #171717;
+      color: #ffffff;
     }
 
     .help-text {
       font-size: 13px;
-      color: #6b7280;
-      margin-top: 6px;
+      color: #525252;
+      margin-top: 8px;
     }
 
     .help-text a {
-      color: #e85d04;
+      color: #a3a3a3;
       text-decoration: none;
     }
 
     .help-text a:hover {
-      text-decoration: underline;
+      color: #ffffff;
     }
 
     .button-group {
@@ -128,10 +158,10 @@
     }
 
     button {
-      padding: 12px 24px;
-      border-radius: 8px;
+      padding: 14px 24px;
+      border-radius: 980px;
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
       border: none;
@@ -139,30 +169,30 @@
     }
 
     .btn-primary {
-      background: #e85d04;
-      color: white;
+      background: #ffffff;
+      color: #000000;
       flex: 1;
     }
 
     .btn-primary:hover {
-      background: #d45303;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(232, 93, 4, 0.4);
+      background: #f5f5f5;
     }
 
     .btn-secondary {
-      background: #f3f4f6;
-      color: #374151;
-      padding: 12px 20px;
+      background: transparent;
+      color: #ffffff;
+      border: 1px solid #404040;
+      padding: 14px 20px;
     }
 
     .btn-secondary:hover {
-      background: #e5e7eb;
+      border-color: #525252;
+      background: #171717;
     }
 
     .status-message {
-      padding: 12px 16px;
-      border-radius: 8px;
+      padding: 14px 16px;
+      border-radius: 10px;
       font-size: 14px;
       margin-top: 16px;
       display: none;
@@ -170,21 +200,21 @@
     }
 
     .status-message.success {
-      background: #d1fae5;
-      color: #065f46;
-      border: 1px solid #6ee7b7;
+      background: rgba(34, 197, 94, 0.1);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
     }
 
     .status-message.error {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fecaca;
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
     }
 
     .info-box {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      border-radius: 8px;
+      background: #171717;
+      border: 1px solid #262626;
+      border-radius: 12px;
       padding: 16px;
       margin-top: 16px;
     }
@@ -192,13 +222,13 @@
     .info-box h4 {
       font-size: 14px;
       font-weight: 600;
-      color: #1e40af;
-      margin-bottom: 8px;
+      color: #ffffff;
+      margin-bottom: 10px;
     }
 
     .info-box p {
       font-size: 13px;
-      color: #1e3a8a;
+      color: #a3a3a3;
       line-height: 1.6;
     }
 
@@ -209,8 +239,17 @@
 
     .info-box li {
       font-size: 13px;
-      color: #1e3a8a;
-      margin-bottom: 4px;
+      color: #a3a3a3;
+      margin-bottom: 6px;
+    }
+
+    .info-box a {
+      color: #d4d4d4;
+      text-decoration: none;
+    }
+
+    .info-box a:hover {
+      color: #ffffff;
     }
 
     @keyframes slideIn {
@@ -226,7 +265,7 @@
 
     .divider {
       height: 1px;
-      background: #e5e7eb;
+      background: #262626;
       margin: 32px 0;
     }
 
@@ -241,6 +280,7 @@
 
     .dictionary-input-row button {
       white-space: nowrap;
+      padding: 12px 16px;
     }
 
     .dictionary-words {
@@ -249,42 +289,42 @@
       gap: 8px;
       margin-top: 12px;
       min-height: 40px;
-      padding: 12px;
-      background: #f9fafb;
-      border-radius: 8px;
-      border: 1px solid #e5e7eb;
+      padding: 16px;
+      background: #171717;
+      border-radius: 10px;
+      border: 1px solid #262626;
     }
 
     .dictionary-word {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 10px;
-      background: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
+      padding: 6px 12px;
+      background: #262626;
+      border: 1px solid #404040;
+      border-radius: 980px;
       font-size: 13px;
-      color: #374151;
+      color: #d4d4d4;
     }
 
     .dictionary-word:hover {
-      border-color: #d1d5db;
+      border-color: #525252;
     }
 
     .dictionary-word .remove-word {
       cursor: pointer;
-      color: #9ca3af;
-      font-size: 16px;
+      color: #737373;
+      font-size: 14px;
       line-height: 1;
       transition: color 0.2s;
     }
 
     .dictionary-word .remove-word:hover {
-      color: #ef4444;
+      color: #f87171;
     }
 
     .empty-dictionary {
-      color: #9ca3af;
+      color: #525252;
       font-size: 13px;
       margin: 0;
       width: 100%;
@@ -295,7 +335,8 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>GrammarPeace Settings</h1>
+      <div class="header-logo">✌️</div>
+      <h1>Settings</h1>
       <p>Configure your AI-powered grammar checker</p>
     </div>
 
@@ -311,7 +352,7 @@
           </div>
 
           <div class="form-group">
-            <label for="apiProvider">AI Provider *</label>
+            <label for="apiProvider">AI Provider</label>
             <select id="apiProvider" required>
               <option value="claude">Anthropic Claude</option>
               <option value="openai">OpenAI</option>
@@ -319,7 +360,7 @@
           </div>
 
           <div class="form-group" id="claudeKeyGroup">
-            <label for="claudeApiKey">Claude API Key *</label>
+            <label for="claudeApiKey">Claude API Key</label>
             <input type="password" id="claudeApiKey" placeholder="sk-ant-...">
             <div class="help-text">
               Get your API key from <a href="https://console.anthropic.com/" target="_blank">Anthropic Console</a>
@@ -327,7 +368,7 @@
           </div>
 
           <div class="form-group" id="openaiKeyGroup" style="display: none;">
-            <label for="openaiApiKey">OpenAI API Key *</label>
+            <label for="openaiApiKey">OpenAI API Key</label>
             <input type="password" id="openaiApiKey" placeholder="sk-proj-...">
             <div class="help-text">
               Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
@@ -342,7 +383,7 @@
               <li>Navigate to API Keys section</li>
               <li>Create a new API key and copy it here</li>
             </ul>
-            <p style="margin-top: 8px;"><strong>Model used:</strong> Claude Haiku 4.5 (fast and cost-effective)</p>
+            <p style="margin-top: 10px;"><strong>Model:</strong> Claude Haiku 4.5 (fast and cost-effective)</p>
           </div>
 
           <div class="info-box" id="openaiInfo" style="display: none;">
@@ -353,7 +394,7 @@
               <li>Navigate to API Keys section</li>
               <li>Create a new API key and copy it here</li>
             </ul>
-            <p style="margin-top: 8px;"><strong>Model used:</strong> GPT-4.1 Nano (fast and cost-effective)</p>
+            <p style="margin-top: 10px;"><strong>Model:</strong> GPT-5 Nano (fast and cost-effective)</p>
           </div>
         </div>
 
@@ -365,34 +406,22 @@
             <span>Response Length</span>
           </div>
           <div class="section-description">
-            Control how much text the AI can generate in response. Higher values allow longer corrections/translations but cost more and take longer.
+            Control how much text the AI can generate. Higher values allow longer corrections but cost more.
           </div>
 
           <div class="form-group">
             <label for="maxTokens">Max Completion Tokens</label>
             <select id="maxTokens">
-              <option value="512">512 tokens (~375 words - Short texts)</option>
-              <option value="1024" selected>1024 tokens (~750 words - Default)</option>
-              <option value="2048">2048 tokens (~1,500 words - Long texts)</option>
-              <option value="4096">4096 tokens (~3,000 words - Articles)</option>
-              <option value="8192">8192 tokens (~6,000 words - Documents)</option>
-              <option value="16384">16384 tokens (~12,000 words - Large documents)</option>
+              <option value="512">512 tokens (~375 words)</option>
+              <option value="1024" selected>1024 tokens (~750 words)</option>
+              <option value="2048">2048 tokens (~1,500 words)</option>
+              <option value="4096">4096 tokens (~3,000 words)</option>
+              <option value="8192">8192 tokens (~6,000 words)</option>
+              <option value="16384">16384 tokens (~12,000 words)</option>
             </select>
             <div class="help-text">
               Choose based on typical text length. Higher values cost more.
             </div>
-          </div>
-
-          <div class="info-box">
-            <h4>What are tokens?</h4>
-            <p>Tokens are pieces of words that AI models use to process text. Think of them as building blocks:</p>
-            <ul>
-              <li><strong>1024 tokens</strong> ≈ 750-800 words (emails, posts, paragraphs)</li>
-              <li><strong>2048 tokens</strong> ≈ 1,500-1,600 words (articles, long documents)</li>
-              <li><strong>4096 tokens</strong> ≈ 3,000-3,200 words (very long content)</li>
-              <li><strong>8192 tokens</strong> ≈ 6,000-6,400 words (full documents)</li>
-            </ul>
-            <p style="margin-top: 8px;"><strong>Note:</strong> Higher values = more API costs. Increase only if you regularly work with longer text.</p>
           </div>
         </div>
 
@@ -414,9 +443,6 @@
               <option value="light">Light</option>
               <option value="dark">Dark</option>
             </select>
-            <div class="help-text">
-              Choose your preferred theme or let GrammarPeace follow your system settings.
-            </div>
           </div>
         </div>
 
@@ -428,11 +454,11 @@
             <span>Default Preferences</span>
           </div>
           <div class="section-description">
-            Set your default tone and language preferences. You can change these for each check.
+            Set your default tone and language preferences.
           </div>
 
           <div class="form-group">
-            <label for="defaultGrammarLang">Default Grammar Check Language</label>
+            <label for="defaultGrammarLang">Grammar Check Language</label>
             <select id="defaultGrammarLang">
               <option value="auto">Auto-detect</option>
               <option value="en">English</option>
@@ -465,7 +491,7 @@
           </div>
 
           <div class="form-group">
-            <label for="defaultFromLang">Default "Translate From" Language</label>
+            <label for="defaultFromLang">Translate From</label>
             <select id="defaultFromLang">
               <option value="auto">Auto-detect</option>
               <option value="en">English</option>
@@ -487,7 +513,7 @@
           </div>
 
           <div class="form-group">
-            <label for="defaultToLang">Default "Translate To" Language</label>
+            <label for="defaultToLang">Translate To</label>
             <select id="defaultToLang">
               <option value="en">English</option>
               <option value="es">Spanish</option>
@@ -516,7 +542,7 @@
             <span>Custom Dictionary</span>
           </div>
           <div class="section-description">
-            Add words that should not be flagged as errors (e.g., names, technical terms, brand names).
+            Add words that should not be flagged as errors (names, technical terms, etc.).
           </div>
 
           <div class="form-group">
@@ -529,17 +555,6 @@
 
           <div class="dictionary-words" id="dictionaryWords">
             <p class="empty-dictionary">No custom words added yet.</p>
-          </div>
-
-          <div class="info-box">
-            <h4>How it works:</h4>
-            <p>Words in your custom dictionary will be ignored during grammar checks. This is useful for:</p>
-            <ul>
-              <li>Names (people, companies, products)</li>
-              <li>Technical terms and acronyms</li>
-              <li>Words specific to your industry</li>
-              <li>Intentional stylistic choices</li>
-            </ul>
           </div>
         </div>
 
