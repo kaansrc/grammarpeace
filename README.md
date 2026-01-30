@@ -2,7 +2,7 @@
 
 **Free, open-source grammar checker powered by Claude & OpenAI.**
 
-Stop paying $360/year for Grammarly. GrammarPeace gives you the same features — grammar checking, tone rewriting, and translation — using the best AI models available, for free.
+Stop paying $144/year for Grammarly. GrammarPeace gives you the same features — grammar checking, tone rewriting, and translation — using the best AI models available, for free.
 
 [Website](https://grammarpeace.com) · [Chrome Web Store](https://chromewebstore.google.com/detail/grammarpeace-ai-grammar-c/llbcjpcjioapecjbkibpacpjhfjknhgh) · [Report Bug](https://github.com/kaansrc/grammarpeace/issues)
 
@@ -12,7 +12,7 @@ Stop paying $360/year for Grammarly. GrammarPeace gives you the same features �
 
 | Feature | Grammarly | GrammarPeace |
 |---------|-----------|--------------|
-| Price | $360/year | **Free** |
+| Price | $144/year | **Free** |
 | AI Model | Proprietary | Claude & OpenAI (state-of-the-art) |
 | Data Privacy | Collects your writing | **Your data stays yours** |
 | Open Source | No | **Yes** |
@@ -63,7 +63,7 @@ GrammarPeace requires an API key from Anthropic or OpenAI:
    - **OpenAI**: [platform.openai.com](https://platform.openai.com/)
 3. Paste your API key and save
 
-**API Cost**: Typical usage costs a few cents per month. Much cheaper than $30/month subscriptions.
+**API Cost**: Typical usage costs a few cents per month. Much cheaper than $12/month subscriptions.
 
 ## Supported AI Models
 
@@ -78,7 +78,7 @@ You can switch between providers in Settings. Both deliver excellent grammar che
 
 ## Cost Comparison
 
-**Grammarly Premium**: $360/year ($30/month)
+**Grammarly Premium**: $144/year ($12/month)
 
 **GrammarPeace**: Pay only for what you use
 
@@ -92,11 +92,11 @@ You can switch between providers in Settings. Both deliver excellent grammar che
 ### Real-world example
 
 A heavy user checking 100 texts per day:
-- **Grammarly**: $360/year (fixed)
+- **Grammarly**: $144/year (fixed)
 - **Claude Haiku 4.5**: ~$11/year
 - **GPT-5 Nano**: ~$0.90/year
 
-That's **30-400x cheaper** than Grammarly, with better AI.
+That's **13-160x cheaper** than Grammarly, with better AI.
 
 ## Supported Languages
 
