@@ -185,17 +185,24 @@
 
         /* Hero */
         .hero {
-            padding: 140px 0 100px;
+            padding: 180px 0 140px;
             text-align: center;
             background: linear-gradient(180deg, var(--black) 0%, var(--gray-900) 100%);
             overflow: hidden;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero .container {
+            width: 100%;
         }
 
         .hero h1 {
-            font-size: 64px;
+            font-size: 72px;
             font-weight: 700;
             letter-spacing: -0.03em;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
             line-height: 1.05;
         }
 
@@ -207,18 +214,19 @@
         }
 
         .hero .subtitle {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 400;
             color: var(--gray-400);
-            margin-bottom: 32px;
+            margin-bottom: 24px;
             letter-spacing: -0.01em;
         }
 
         .hero p {
-            font-size: 17px;
+            font-size: 19px;
             color: var(--gray-500);
-            max-width: 600px;
-            margin: 0 auto 40px;
+            max-width: 640px;
+            margin: 0 auto 48px;
+            line-height: 1.6;
         }
 
         .hero-buttons {
@@ -226,11 +234,11 @@
             gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
         }
 
         .hero-note {
-            font-size: 12px;
+            font-size: 14px;
             color: var(--gray-600);
         }
 
@@ -556,12 +564,17 @@
 
         /* Responsive */
         @media (max-width: 1024px) {
+            .hero {
+                min-height: auto;
+                padding: 160px 0 120px;
+            }
+
             .hero h1 {
-                font-size: 48px;
+                font-size: 56px;
             }
 
             .hero .subtitle {
-                font-size: 24px;
+                font-size: 26px;
             }
 
             .section-header h2 {
@@ -582,19 +595,20 @@
 
         @media (max-width: 768px) {
             .hero {
-                padding: 120px 0 80px;
+                min-height: auto;
+                padding: 140px 0 100px;
             }
 
             .hero h1 {
-                font-size: 36px;
+                font-size: 40px;
             }
 
             .hero .subtitle {
-                font-size: 20px;
+                font-size: 22px;
             }
 
             .hero p {
-                font-size: 15px;
+                font-size: 16px;
             }
 
             .section-header h2 {
