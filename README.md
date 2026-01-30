@@ -4,7 +4,7 @@
 
 Stop paying $360/year for Grammarly. GrammarPeace gives you the same features — grammar checking, tone rewriting, and translation — using the best AI models available, for free.
 
-[Website](https://grammarpeace.com) · [Chrome Web Store](https://chromewebstore.google.com/detail/grammarpeace) · [Report Bug](https://github.com/kaansrc/grammarpeace/issues)
+[Website](https://grammarpeace.com) · [Chrome Web Store](https://chromewebstore.google.com/detail/grammarpeace-ai-grammar-c/llbcjpcjioapecjbkibpacpjhfjknhgh) · [Report Bug](https://github.com/kaansrc/grammarpeace/issues)
 
 ---
 
@@ -44,7 +44,7 @@ Stop paying $360/year for Grammarly. GrammarPeace gives you the same features �
 ## Installation
 
 ### Chrome Web Store (Recommended)
-[Install from Chrome Web Store](https://chromewebstore.google.com/detail/grammarpeace)
+[Install from Chrome Web Store](https://chromewebstore.google.com/detail/grammarpeace-ai-grammar-c/llbcjpcjioapecjbkibpacpjhfjknhgh)
 
 ### Manual Installation
 1. Download or clone this repository
