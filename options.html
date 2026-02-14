@@ -348,12 +348,13 @@
             <span>API Configuration</span>
           </div>
           <div class="section-description">
-            Choose your AI provider and enter your API key. Your key is stored locally and never shared.
+            Choose your AI provider and enter your API key. Your key is stored locally and never shared. OpenRouter offers free models!
           </div>
 
           <div class="form-group">
             <label for="apiProvider">AI Provider</label>
             <select id="apiProvider" required>
+              <option value="openrouter">OpenRouter (Free models available!)</option>
               <option value="claude">Anthropic Claude</option>
               <option value="openai">OpenAI</option>
             </select>
@@ -375,7 +376,27 @@
             </div>
           </div>
 
-          <div class="info-box" id="claudeInfo">
+          <div class="form-group" id="openrouterKeyGroup">
+            <label for="openrouterApiKey">OpenRouter API Key</label>
+            <input type="password" id="openrouterApiKey" placeholder="sk-or-v1-...">
+            <div class="help-text">
+              Get your free API key from <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a>
+            </div>
+          </div>
+
+          <div class="info-box" id="openrouterInfo">
+            <h4>Why OpenRouter? It's FREE!</h4>
+            <p>OpenRouter gives you access to free AI models, making GrammarPeace completely free to use.</p>
+            <ul>
+              <li>Visit <a href="https://openrouter.ai/" target="_blank">openrouter.ai</a> and create a free account</li>
+              <li>Go to <a href="https://openrouter.ai/keys" target="_blank">Keys</a> and create a new API key</li>
+              <li>Paste your key above - that's it!</li>
+            </ul>
+            <p style="margin-top: 10px;"><strong>Model:</strong> Auto-routed to best available free model</p>
+            <p style="margin-top: 6px;"><strong>Note:</strong> Free models have rate limits (20-1000 requests/day). For heavier usage, you can add credits to your OpenRouter account.</p>
+          </div>
+
+          <div class="info-box" id="claudeInfo" style="display: none;">
             <h4>How to get Claude API key:</h4>
             <ul>
               <li>Visit <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a></li>
