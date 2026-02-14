@@ -282,7 +282,7 @@ async function callOpenAIAPI(apiKey, prompt, maxTokens) {
     },
     body: JSON.stringify({
       model: 'gpt-5-nano',
-      max_tokens: maxTokens,
+      max_completion_tokens: maxTokens,
       messages: [{
         role: 'user',
         content: prompt
