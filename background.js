@@ -110,17 +110,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 async function checkGrammar(text, language) {
   try {
     // Get API settings from storage
-    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens', 'customDictionary']);
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'openrouterApiKey', 'maxTokens', 'customDictionary']);
 
     const provider = result.apiProvider || 'claude';
-    const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+    const apiKey = getApiKey(provider, result);
     const maxTokens = result.maxTokens || 1024;
     const customDictionary = result.customDictionary || [];
 
     if (!apiKey) {
       return {
         success: false,
-        error: `Please set your ${provider === 'claude' ? 'Claude' : 'OpenAI'} API key in the extension settings.`
+        error: `Please set your ${getProviderName(provider)} API key in the extension settings.`
       };
     }
 
@@ -129,11 +129,7 @@ async function checkGrammar(text, language) {
 
     // Call appropriate API
     let correctedText;
-    if (provider === 'claude') {
-      correctedText = await callClaudeAPI(apiKey, prompt, maxTokens);
-    } else {
-      correctedText = await callOpenAIAPI(apiKey, prompt, maxTokens);
-    }
+    correctedText = await callProviderAPI(provider, apiKey, prompt, maxTokens);
 
     // Check if the text was actually changed
     const originalTrimmed = text.trim();
@@ -163,16 +159,16 @@ async function checkGrammar(text, language) {
 async function rewriteWithTone(text, tone) {
   try {
     // Get API settings from storage
-    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens']);
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'openrouterApiKey', 'maxTokens']);
 
     const provider = result.apiProvider || 'claude';
-    const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+    const apiKey = getApiKey(provider, result);
     const maxTokens = result.maxTokens || 1024;
 
     if (!apiKey) {
       return {
         success: false,
-        error: `Please set your ${provider === 'claude' ? 'Claude' : 'OpenAI'} API key in the extension settings.`
+        error: `Please set your ${getProviderName(provider)} API key in the extension settings.`
       };
     }
 
@@ -181,11 +177,7 @@ async function rewriteWithTone(text, tone) {
 
     // Call appropriate API
     let rewrittenText;
-    if (provider === 'claude') {
-      rewrittenText = await callClaudeAPI(apiKey, prompt, maxTokens);
-    } else {
-      rewrittenText = await callOpenAIAPI(apiKey, prompt, maxTokens);
-    }
+    rewrittenText = await callProviderAPI(provider, apiKey, prompt, maxTokens);
 
     return {
       success: true,
@@ -203,16 +195,16 @@ async function rewriteWithTone(text, tone) {
 async function translateText(text, fromLang, toLang) {
   try {
     // Get API settings from storage
-    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens']);
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'openrouterApiKey', 'maxTokens']);
 
     const provider = result.apiProvider || 'claude';
-    const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+    const apiKey = getApiKey(provider, result);
     const maxTokens = result.maxTokens || 1024;
 
     if (!apiKey) {
       return {
         success: false,
-        error: `Please set your ${provider === 'claude' ? 'Claude' : 'OpenAI'} API key in the extension settings.`
+        error: `Please set your ${getProviderName(provider)} API key in the extension settings.`
       };
     }
 
@@ -221,11 +213,7 @@ async function translateText(text, fromLang, toLang) {
 
     // Call appropriate API
     let translatedText;
-    if (provider === 'claude') {
-      translatedText = await callClaudeAPI(apiKey, prompt, maxTokens);
-    } else {
-      translatedText = await callOpenAIAPI(apiKey, prompt, maxTokens);
-    }
+    translatedText = await callProviderAPI(provider, apiKey, prompt, maxTokens);
 
     return {
       success: true,
@@ -273,16 +261,21 @@ async function callClaudeAPI(apiKey, prompt, maxTokens) {
   return data.content[0].text.trim();
 }
 
-async function callOpenAIAPI(apiKey, prompt, maxTokens) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+async function callOpenAIAPI(apiKey, prompt, maxTokens, baseUrl, model) {
+  const endpoint = baseUrl || 'https://api.openai.com/v1';
+  const modelName = model || 'gpt-5-nano';
+  const isNativeOpenAI = endpoint === 'https://api.openai.com/v1';
+  const tokenParam = isNativeOpenAI ? 'max_completion_tokens' : 'max_tokens';
+
+  const response = await fetch(`${endpoint}/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: 'gpt-5-nano',
-      max_tokens: maxTokens,
+      model: modelName,
+      [tokenParam]: maxTokens,
       messages: [{
         role: 'user',
         content: prompt
@@ -314,6 +307,67 @@ async function callOpenAIAPI(apiKey, prompt, maxTokens) {
   }
 
   return message.content.trim();
+}
+
+async function callOpenRouterAPI(apiKey, prompt, maxTokens) {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'openrouter/free',
+      max_tokens: maxTokens,
+      messages: [{
+        role: 'user',
+        content: prompt
+      }]
+    })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || `OpenRouter API request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    throw new Error(`Invalid response from OpenRouter API. Response: ${JSON.stringify(data).substring(0, 200)}`);
+  }
+
+  const message = data.choices[0].message;
+
+  if (!message.content || message.content.trim() === '') {
+    throw new Error('OpenRouter returned an empty response. Please try again.');
+  }
+
+  return message.content.trim();
+}
+
+function getApiKey(provider, storageResult) {
+  if (provider === 'claude') return storageResult.claudeApiKey;
+  if (provider === 'openai') return storageResult.openaiApiKey;
+  if (provider === 'openrouter') return storageResult.openrouterApiKey;
+  return null;
+}
+
+function getProviderName(provider) {
+  if (provider === 'claude') return 'Claude';
+  if (provider === 'openai') return 'OpenAI';
+  if (provider === 'openrouter') return 'OpenRouter';
+  return provider;
+}
+
+async function callProviderAPI(provider, apiKey, prompt, maxTokens) {
+  if (provider === 'claude') return callClaudeAPI(apiKey, prompt, maxTokens);
+  if (provider === 'openai') {
+    const settings = await chrome.storage.sync.get(['openaiBaseUrl', 'openaiModel']);
+    return callOpenAIAPI(apiKey, prompt, maxTokens, settings.openaiBaseUrl, settings.openaiModel);
+  }
+  if (provider === 'openrouter') return callOpenRouterAPI(apiKey, prompt, maxTokens);
+  throw new Error(`Unknown provider: ${provider}`);
 }
 
 function createGrammarPrompt(text, language, customDictionary = []) {
@@ -512,15 +566,15 @@ Translation in ${toLanguage}:`;
 async function detectTone(text) {
   try {
     // Get API settings from storage
-    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey']);
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'openrouterApiKey']);
 
     const provider = result.apiProvider || 'claude';
-    const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+    const apiKey = getApiKey(provider, result);
 
     if (!apiKey) {
       return {
         success: false,
-        error: `Please set your ${provider === 'claude' ? 'Claude' : 'OpenAI'} API key in the extension settings.`
+        error: `Please set your ${getProviderName(provider)} API key in the extension settings.`
       };
     }
 
@@ -528,11 +582,7 @@ async function detectTone(text) {
 
     // Call appropriate API with minimal tokens
     let detectedTone;
-    if (provider === 'claude') {
-      detectedTone = await callClaudeAPI(apiKey, prompt, 50);
-    } else {
-      detectedTone = await callOpenAIAPI(apiKey, prompt, 50);
-    }
+    detectedTone = await callProviderAPI(provider, apiKey, prompt, 50);
 
     // Parse the response to get tone
     const tone = detectedTone.toLowerCase().trim();
@@ -564,16 +614,16 @@ Tone:`;
 async function getAlternatives(originalText, correctedText, language) {
   try {
     // Get API settings from storage
-    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens']);
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'openrouterApiKey', 'maxTokens']);
 
     const provider = result.apiProvider || 'claude';
-    const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+    const apiKey = getApiKey(provider, result);
     const maxTokens = result.maxTokens || 1024;
 
     if (!apiKey) {
       return {
         success: false,
-        error: `Please set your ${provider === 'claude' ? 'Claude' : 'OpenAI'} API key in the extension settings.`
+        error: `Please set your ${getProviderName(provider)} API key in the extension settings.`
       };
     }
 
@@ -581,11 +631,7 @@ async function getAlternatives(originalText, correctedText, language) {
 
     // Call appropriate API
     let response;
-    if (provider === 'claude') {
-      response = await callClaudeAPI(apiKey, prompt, maxTokens);
-    } else {
-      response = await callOpenAIAPI(apiKey, prompt, maxTokens);
-    }
+    response = await callProviderAPI(provider, apiKey, prompt, maxTokens);
 
     // Parse the alternatives from response
     const alternatives = parseAlternatives(response);
@@ -668,16 +714,16 @@ function parseAlternatives(response) {
 async function explainErrors(originalText, correctedText, language) {
   try {
     // Get API settings from storage
-    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens']);
+    const result = await chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'openrouterApiKey', 'maxTokens']);
 
     const provider = result.apiProvider || 'claude';
-    const apiKey = provider === 'claude' ? result.claudeApiKey : result.openaiApiKey;
+    const apiKey = getApiKey(provider, result);
     const maxTokens = result.maxTokens || 1024;
 
     if (!apiKey) {
       return {
         success: false,
-        error: `Please set your ${provider === 'claude' ? 'Claude' : 'OpenAI'} API key in the extension settings.`
+        error: `Please set your ${getProviderName(provider)} API key in the extension settings.`
       };
     }
 
@@ -685,11 +731,7 @@ async function explainErrors(originalText, correctedText, language) {
 
     // Call appropriate API
     let response;
-    if (provider === 'claude') {
-      response = await callClaudeAPI(apiKey, prompt, maxTokens);
-    } else {
-      response = await callOpenAIAPI(apiKey, prompt, maxTokens);
-    }
+    response = await callProviderAPI(provider, apiKey, prompt, maxTokens);
 
     return {
       success: true,

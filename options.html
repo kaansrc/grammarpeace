@@ -355,7 +355,8 @@
             <label for="apiProvider">AI Provider</label>
             <select id="apiProvider" required>
               <option value="claude">Anthropic Claude</option>
-              <option value="openai">OpenAI</option>
+              <option value="openai">OpenAI Compatible</option>
+              <option value="openrouter">OpenRouter (Free)</option>
             </select>
           </div>
 
@@ -368,10 +369,26 @@
           </div>
 
           <div class="form-group" id="openaiKeyGroup" style="display: none;">
-            <label for="openaiApiKey">OpenAI API Key</label>
+            <label for="openaiApiKey">API Key</label>
             <input type="password" id="openaiApiKey" placeholder="sk-proj-...">
             <div class="help-text">
-              Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
+              Get your API key from your provider (e.g. <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a>, <a href="https://console.groq.com/keys" target="_blank">Groq</a>, <a href="https://cloud.cerebras.ai/" target="_blank">Cerebras</a>)
+            </div>
+          </div>
+
+          <div class="form-group" id="openaiBaseUrlGroup" style="display: none;">
+            <label for="openaiBaseUrl">Base URL (optional)</label>
+            <input type="text" id="openaiBaseUrl" placeholder="https://api.openai.com/v1">
+            <div class="help-text">
+              Leave empty for OpenAI. For other providers: Groq = https://api.groq.com/openai/v1, Cerebras = https://api.cerebras.ai/v1
+            </div>
+          </div>
+
+          <div class="form-group" id="openaiModelGroup" style="display: none;">
+            <label for="openaiModel">Model Name (optional)</label>
+            <input type="text" id="openaiModel" placeholder="gpt-5-nano">
+            <div class="help-text">
+              Leave empty for default (gpt-5-nano). Examples: llama-3.3-70b-versatile (Groq), llama3.1-8b (Cerebras)
             </div>
           </div>
 
@@ -387,14 +404,34 @@
           </div>
 
           <div class="info-box" id="openaiInfo" style="display: none;">
-            <h4>How to get OpenAI API key:</h4>
+            <h4>OpenAI Compatible providers:</h4>
             <ul>
-              <li>Visit <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></li>
-              <li>Sign in or create an account</li>
-              <li>Navigate to API Keys section</li>
-              <li>Create a new API key and copy it here</li>
+              <li><strong>OpenAI</strong> - Use default settings, just add your API key</li>
+              <li><strong>Groq</strong> (free) - Base URL: https://api.groq.com/openai/v1</li>
+              <li><strong>Cerebras</strong> (free) - Base URL: https://api.cerebras.ai/v1</li>
+              <li><strong>Ollama</strong> (local) - Base URL: http://localhost:11434/v1</li>
             </ul>
-            <p style="margin-top: 10px;"><strong>Model:</strong> GPT-5 Nano (fast and cost-effective)</p>
+            <p style="margin-top: 10px;">Any provider with an OpenAI-compatible API will work. Just set the Base URL and Model Name.</p>
+          </div>
+
+          <div class="form-group" id="openrouterKeyGroup" style="display: none;">
+            <label for="openrouterApiKey">OpenRouter API Key</label>
+            <input type="password" id="openrouterApiKey" placeholder="sk-or-...">
+            <div class="help-text">
+              Get your free API key from <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a>
+            </div>
+          </div>
+
+          <div class="info-box" id="openrouterInfo" style="display: none;">
+            <h4>How to get OpenRouter API key (free):</h4>
+            <ul>
+              <li>Visit <a href="https://openrouter.ai/" target="_blank">openrouter.ai</a></li>
+              <li>Sign up for a free account (no credit card needed)</li>
+              <li>Go to <a href="https://openrouter.ai/keys" target="_blank">Keys</a> and create a new API key</li>
+              <li>Copy the key and paste it here</li>
+            </ul>
+            <p style="margin-top: 10px;"><strong>Model:</strong> openrouter/free (auto-routes to best available free model)</p>
+            <p style="margin-top: 5px;"><strong>Note:</strong> Free models have lower rate limits (50-1000 requests/day) and may have higher latency.</p>
           </div>
         </div>
 

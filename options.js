@@ -16,7 +16,7 @@ document.getElementById('settingsForm').addEventListener('submit', saveSettings)
 document.getElementById('testBtn').addEventListener('click', testAPI);
 
 function loadSettings() {
-  chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'maxTokens', 'theme', 'defaultGrammarLang', 'defaultTone', 'defaultFromLang', 'defaultToLang'], (result) => {
+  chrome.storage.sync.get(['apiProvider', 'claudeApiKey', 'openaiApiKey', 'openaiBaseUrl', 'openaiModel', 'openrouterApiKey', 'maxTokens', 'theme', 'defaultGrammarLang', 'defaultTone', 'defaultFromLang', 'defaultToLang'], (result) => {
     // Set provider (default to claude if not set)
     const provider = result.apiProvider || 'claude';
     document.getElementById('apiProvider').value = provider;
@@ -27,6 +27,15 @@ function loadSettings() {
     }
     if (result.openaiApiKey) {
       document.getElementById('openaiApiKey').value = result.openaiApiKey;
+    }
+    if (result.openaiBaseUrl) {
+      document.getElementById('openaiBaseUrl').value = result.openaiBaseUrl;
+    }
+    if (result.openaiModel) {
+      document.getElementById('openaiModel').value = result.openaiModel;
+    }
+    if (result.openrouterApiKey) {
+      document.getElementById('openrouterApiKey').value = result.openrouterApiKey;
     }
 
     // Load max tokens (default to 1024)
@@ -68,21 +77,20 @@ function handleProviderChange() {
   const provider = document.getElementById('apiProvider').value;
 
   // Show/hide API key fields
-  const claudeKeyGroup = document.getElementById('claudeKeyGroup');
-  const openaiKeyGroup = document.getElementById('openaiKeyGroup');
-  const claudeInfo = document.getElementById('claudeInfo');
-  const openaiInfo = document.getElementById('openaiInfo');
+  const groups = ['claudeKeyGroup', 'openaiKeyGroup', 'openaiBaseUrlGroup', 'openaiModelGroup', 'openrouterKeyGroup', 'claudeInfo', 'openaiInfo', 'openrouterInfo'];
+  groups.forEach(id => document.getElementById(id).style.display = 'none');
 
   if (provider === 'claude') {
-    claudeKeyGroup.style.display = 'block';
-    openaiKeyGroup.style.display = 'none';
-    claudeInfo.style.display = 'block';
-    openaiInfo.style.display = 'none';
-  } else {
-    claudeKeyGroup.style.display = 'none';
-    openaiKeyGroup.style.display = 'block';
-    claudeInfo.style.display = 'none';
-    openaiInfo.style.display = 'block';
+    document.getElementById('claudeKeyGroup').style.display = 'block';
+    document.getElementById('claudeInfo').style.display = 'block';
+  } else if (provider === 'openai') {
+    document.getElementById('openaiKeyGroup').style.display = 'block';
+    document.getElementById('openaiBaseUrlGroup').style.display = 'block';
+    document.getElementById('openaiModelGroup').style.display = 'block';
+    document.getElementById('openaiInfo').style.display = 'block';
+  } else if (provider === 'openrouter') {
+    document.getElementById('openrouterKeyGroup').style.display = 'block';
+    document.getElementById('openrouterInfo').style.display = 'block';
   }
 }
 
@@ -92,6 +100,9 @@ function saveSettings(event) {
   const provider = document.getElementById('apiProvider').value;
   const claudeApiKey = document.getElementById('claudeApiKey').value.trim();
   const openaiApiKey = document.getElementById('openaiApiKey').value.trim();
+  const openaiBaseUrl = document.getElementById('openaiBaseUrl').value.trim();
+  const openaiModel = document.getElementById('openaiModel').value.trim();
+  const openrouterApiKey = document.getElementById('openrouterApiKey').value.trim();
   const maxTokens = parseInt(document.getElementById('maxTokens').value);
   const theme = document.getElementById('theme').value;
   const defaultGrammarLang = document.getElementById('defaultGrammarLang').value;
@@ -109,16 +120,20 @@ function saveSettings(event) {
       showStatus('Invalid Claude API key format. Key should start with "sk-ant-"', 'error');
       return;
     }
-  } else {
+  } else if (provider === 'openai') {
     if (!openaiApiKey) {
-      showStatus('Please enter your OpenAI API key', 'error');
+      showStatus('Please enter your API key', 'error');
       return;
     }
-    if (!openaiApiKey.startsWith('sk-')) {
-      showStatus('Invalid OpenAI API key format. Key should start with "sk-"', 'error');
+  } else if (provider === 'openrouter') {
+    if (!openrouterApiKey) {
+      showStatus('Please enter your OpenRouter API key', 'error');
       return;
     }
-    // Note: OpenAI keys can have various formats (sk-..., sk-proj-..., etc.)
+    if (!openrouterApiKey.startsWith('sk-or-')) {
+      showStatus('Invalid OpenRouter API key format. Key should start with "sk-or-"', 'error');
+      return;
+    }
   }
 
   // Validate max tokens (dropdown ensures valid values, but double-check)
@@ -132,6 +147,9 @@ function saveSettings(event) {
     apiProvider: provider,
     claudeApiKey: claudeApiKey,
     openaiApiKey: openaiApiKey,
+    openaiBaseUrl: openaiBaseUrl,
+    openaiModel: openaiModel,
+    openrouterApiKey: openrouterApiKey,
     maxTokens: maxTokens,
     theme: theme,
     defaultGrammarLang: defaultGrammarLang,
@@ -147,8 +165,9 @@ async function testAPI() {
   const provider = document.getElementById('apiProvider').value;
   const claudeApiKey = document.getElementById('claudeApiKey').value.trim();
   const openaiApiKey = document.getElementById('openaiApiKey').value.trim();
+  const openrouterApiKey = document.getElementById('openrouterApiKey').value.trim();
 
-  const apiKey = provider === 'claude' ? claudeApiKey : openaiApiKey;
+  const apiKey = provider === 'claude' ? claudeApiKey : provider === 'openai' ? openaiApiKey : openrouterApiKey;
 
   if (!apiKey) {
     showStatus('Please enter your API key first', 'error');
@@ -161,8 +180,12 @@ async function testAPI() {
   try {
     if (provider === 'claude') {
       await testClaudeAPI(apiKey);
-    } else {
-      await testOpenAIAPI(apiKey);
+    } else if (provider === 'openai') {
+      const baseUrl = document.getElementById('openaiBaseUrl').value.trim() || 'https://api.openai.com/v1';
+      const model = document.getElementById('openaiModel').value.trim() || 'gpt-5-nano';
+      await testOpenAIAPI(apiKey, baseUrl, model);
+    } else if (provider === 'openrouter') {
+      await testOpenRouterAPI(apiKey);
     }
   } catch (error) {
     showStatus(`API test failed: ${error.message}`, 'error');
@@ -199,15 +222,45 @@ async function testClaudeAPI(apiKey) {
   }
 }
 
-async function testOpenAIAPI(apiKey) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+async function testOpenAIAPI(apiKey, baseUrl, model) {
+  const isNativeOpenAI = baseUrl === 'https://api.openai.com/v1';
+  const tokenParam = isNativeOpenAI ? 'max_completion_tokens' : 'max_tokens';
+  const body = {
+    model: model,
+    [tokenParam]: 50,
+    messages: [{
+      role: 'user',
+      content: 'Say "API test successful" if you can read this.'
+    }]
+  };
+
+  const response = await fetch(`${baseUrl}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (response.ok) {
+    showStatus('OpenAI API test successful! Your key is working.', 'success');
+  } else {
+    const errorData = await response.json().catch(() => ({}));
+    const errorMessage = errorData.error?.message || `Error ${response.status}`;
+    showStatus(`OpenAI API test failed: ${errorMessage}`, 'error');
+  }
+}
+
+async function testOpenRouterAPI(apiKey) {
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: 'gpt-5-nano',
+      model: 'openrouter/free',
       max_tokens: 50,
       messages: [{
         role: 'user',
@@ -217,11 +270,11 @@ async function testOpenAIAPI(apiKey) {
   });
 
   if (response.ok) {
-    showStatus('OpenAI API test successful! Your key is working.', 'success');
+    showStatus('OpenRouter API test successful! Your key is working.', 'success');
   } else {
     const errorData = await response.json().catch(() => ({}));
     const errorMessage = errorData.error?.message || `Error ${response.status}`;
-    showStatus(`OpenAI API test failed: ${errorMessage}`, 'error');
+    showStatus(`OpenRouter API test failed: ${errorMessage}`, 'error');
   }
 }
 
