@@ -53,6 +53,9 @@ Stop paying $144/year for Grammarly. GrammarPeace gives you the same features �
 4. Click **Load unpacked** → select this folder
 5. Done!
 
+### iPhone Keyboard (beta)
+A GrammarPeace keyboard for iOS lives in [`ios/`](ios/README.md). Type in any app, tap ✌️ to fix grammar, or use Improve, Tone and Translate from the bar above the keys. Build it with Xcode by following [ios/README.md](ios/README.md).
+
 ## Setup
 
 GrammarPeace requires an API key from Anthropic or OpenAI:

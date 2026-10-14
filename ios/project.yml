@@ -1,0 +1,94 @@
+# XcodeGen spec. Generate the Xcode project with:
+#   brew install xcodegen
+#   cd ios && xcodegen
+#
+# Set DEVELOPMENT_TEAM to your team ID. If the bundle IDs or the App Group are taken,
+# change BUNDLE_ID_PREFIX and replace every "group.com.grammarpeace.shared" in this file.
+
+name: GrammarPeace
+
+options:
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: "5C8VPASL5D"
+    BUNDLE_ID_PREFIX: com.grammarpeace
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    TARGETED_DEVICE_FAMILY: "1"
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+  GrammarPeace:
+    type: application
+    platform: iOS
+    sources:
+      - App
+      - Shared
+    dependencies:
+      - target: GrammarPeaceKeyboard
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: GrammarPeace
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        GPAppGroup: group.com.grammarpeace.shared
+        LSRequiresIPhoneOS: true
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        # App Store validation asks for every orientation on iPad, even for an iPhone-only app.
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        ITSAppUsesNonExemptEncryption: false
+    entitlements:
+      path: App/GrammarPeace.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.grammarpeace.shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).app
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # XcodeGen's target defaults would otherwise make it iPhone + iPad.
+        TARGETED_DEVICE_FAMILY: "1"
+
+  GrammarPeaceKeyboard:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Keyboard
+      - Shared
+    info:
+      path: Keyboard/Info.plist
+      properties:
+        CFBundleDisplayName: GrammarPeace
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        GPAppGroup: group.com.grammarpeace.shared
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.keyboard-service
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).KeyboardViewController
+          NSExtensionAttributes:
+            IsASCIICapable: false
+            PrefersRightToLeft: false
+            PrimaryLanguage: mul
+            RequestsOpenAccess: true
+    entitlements:
+      path: Keyboard/GrammarPeaceKeyboard.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.grammarpeace.shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).app.keyboard
+        TARGETED_DEVICE_FAMILY: "1"
