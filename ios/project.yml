@@ -43,6 +43,12 @@ targets:
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
+        # App Store validation asks for every orientation on iPad, even for an iPhone-only app.
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         ITSAppUsesNonExemptEncryption: false
     entitlements:
       path: App/GrammarPeace.entitlements
@@ -53,6 +59,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).app
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # XcodeGen's target defaults would otherwise make it iPhone + iPad.
+        TARGETED_DEVICE_FAMILY: "1"
 
   GrammarPeaceKeyboard:
     type: app-extension
@@ -83,3 +91,4 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).app.keyboard
+        TARGETED_DEVICE_FAMILY: "1"
