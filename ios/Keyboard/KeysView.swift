@@ -157,7 +157,8 @@ struct KeyButton<Label: View>: View {
     var onLongPress: (() -> Void)?
     let label: () -> Label
 
-    @State private var pressed = false
+    // GestureState resets by itself if the system cancels the touch, so a key can't get stuck down.
+    @GestureState private var pressed = false
     @State private var longPressFired = false
     @State private var holdTask: Task<Void, Never>?
 
@@ -189,18 +190,23 @@ struct KeyButton<Label: View>: View {
         .contentShape(Rectangle())
         .gesture(
             DragGesture(minimumDistance: 0)
-                .onChanged { _ in
-                    guard !pressed else { return }
-                    pressed = true
-                    longPressFired = false
-                    startTimer()
-                }
+                .updating($pressed) { _, isPressed, _ in isPressed = true }
                 .onEnded { _ in
-                    pressed = false
                     stopTimer()
                     if !longPressFired { onTap() }
+                    // Reset here too, a very fast tap may never show up in onChange.
+                    longPressFired = false
                 }
         )
+        .onChange(of: pressed) { isPressed in
+            if isPressed {
+                longPressFired = false
+                startTimer()
+            } else {
+                // Also runs when the touch is cancelled, which stops delete from repeating forever.
+                stopTimer()
+            }
+        }
         .onDisappear { stopTimer() }
     }
 

@@ -7,7 +7,10 @@ final class SettingsModel: ObservableObject {
     private let store = SharedSettings.shared
 
     @Published var provider: Provider { didSet { store.provider = provider; loadKey() } }
-    @Published var apiKey = ""
+    /// Saved as you type so switching provider or leaving the app never loses it. Save/Test validate it.
+    @Published var apiKey = "" {
+        didSet { if apiKey != oldValue { store.setAPIKey(apiKey, for: provider) } }
+    }
     @Published var claudeModel: String { didSet { store.claudeModel = claudeModel } }
     @Published var openaiBaseURL: String { didSet { store.openaiBaseURL = openaiBaseURL } }
     @Published var openaiModel: String { didSet { store.openaiModel = openaiModel } }

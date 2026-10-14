@@ -56,6 +56,16 @@ Run `xcodegen` again whenever you add or remove files.
 3. Tap GrammarPeace and turn on **Allow Full Access**. Without it iOS blocks network access, so the AI buttons can't work.
 4. In any app, hold the 🌐 key and pick GrammarPeace.
 
+## Test checklist
+
+Things worth trying on a real phone, since they depend on how each app talks to the keyboard:
+
+- A long message (a few paragraphs) in Messages, Notes, Mail and WhatsApp
+- A message with emoji in the middle, then Fix and Undo
+- Selected text in the middle of a message, then Replace and Undo
+- Hold delete, then lift your finger, it should stop right away
+- Fast typing with overlapping taps
+
 ## Providers
 
 | Provider | Default model | Notes |

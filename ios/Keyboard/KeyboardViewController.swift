@@ -10,6 +10,8 @@ final class KeyboardViewController: UIInputViewController {
 
         let host = UIHostingController(rootView: KeyboardRootView(state: state))
         host.view.backgroundColor = .clear
+        // Fast typists press the next key before lifting the last one.
+        host.view.isMultipleTouchEnabled = true
         host.view.translatesAutoresizingMaskIntoConstraints = false
 
         addChild(host)

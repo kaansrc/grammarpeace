@@ -38,12 +38,20 @@ final class KeyboardState: ObservableObject {
     /// Accent options shown in the toolbar after a long press on a letter.
     @Published var alternates: [String] = []
     /// Set after a replace so the user can put the old text back.
-    @Published var undo: (inserted: String, original: String)? = nil
+    @Published var undo: UndoInfo? = nil
+
+    struct UndoInfo {
+        let inserted: String
+        let original: String
+        let isSelection: Bool
+    }
 
     private weak var controller: KeyboardViewController?
     private let settings = SharedSettings.shared
     private var aiTask: Task<Void, Never>?
     private var lastShiftTap = Date.distantPast
+    /// True while text is being replaced, so a second tap can't start another cursor walk on top.
+    private var isEditingDocument = false
 
     init(controller: KeyboardViewController) {
         self.controller = controller
@@ -60,7 +68,8 @@ final class KeyboardState: ObservableObject {
     }
 
     func textDidChange() {
-        returnKeyLabel = Self.label(for: proxy?.returnKeyType)
+        let label = Self.label(for: proxy?.returnKeyType)
+        if returnKeyLabel != label { returnKeyLabel = label }
         updateAutoShift()
     }
 
@@ -80,20 +89,20 @@ final class KeyboardState: ObservableObject {
     // MARK: Typing
 
     func type(_ text: String) {
-        guard let proxy else { return }
+        guard let proxy, !isEditingDocument else { return }
         clearTransientUI()
         playClick(1104)
 
         let output = shouldUppercase ? text.uppercased() : text
         proxy.insertText(output)
 
-        if shift == .on { shift = .off }
+        if shift == .on { setShift(.off) }
         if layer != .letters, text == "'" { layer = .letters }
         updateAutoShift()
     }
 
     func space() {
-        guard let proxy else { return }
+        guard let proxy, !isEditingDocument else { return }
         clearTransientUI()
         playClick(1104)
 
@@ -115,6 +124,7 @@ final class KeyboardState: ObservableObject {
     }
 
     func newline() {
+        guard !isEditingDocument else { return }
         clearTransientUI()
         playClick(1156)
         proxy?.insertText("\n")
@@ -122,6 +132,7 @@ final class KeyboardState: ObservableObject {
     }
 
     func backspace() {
+        guard !isEditingDocument else { return }
         clearTransientUI()
         playClick(1155)
         proxy?.deleteBackward()
@@ -151,10 +162,11 @@ final class KeyboardState: ObservableObject {
 
     /// Accent letters are already cased when shown, so insert them as-is.
     func insertAlternate(_ letter: String) {
+        guard !isEditingDocument else { return }
         playClick(1104)
         proxy?.insertText(letter)
         alternates = []
-        if shift == .on { shift = .off }
+        if shift == .on { setShift(.off) }
         updateAutoShift()
     }
 
@@ -165,15 +177,20 @@ final class KeyboardState: ObservableObject {
 
     var shouldUppercase: Bool { layer == .letters && shift != .off }
 
+    // Typing calls these on every key, so only publish real changes to avoid redrawing the whole keyboard.
     private func clearTransientUI() {
-        alternates = []
-        undo = nil
+        if !alternates.isEmpty { alternates = [] }
+        if undo != nil { undo = nil }
+    }
+
+    private func setShift(_ newValue: ShiftState) {
+        if shift != newValue { shift = newValue }
     }
 
     private func updateAutoShift() {
         guard shift != .locked, let proxy else { return }
         if proxy.autocapitalizationType == UITextAutocapitalizationType.none {
-            shift = .off
+            setShift(.off)
             return
         }
         let before = proxy.documentContextBeforeInput ?? ""
@@ -183,7 +200,7 @@ final class KeyboardState: ObservableObject {
         let startOfSentence = trimmed.isEmpty
             || before.hasSuffix("\n")
             || (before.hasSuffix(" ") && endsSentence)
-        shift = startOfSentence ? .on : .off
+        setShift(startOfSentence ? .on : .off)
     }
 
     private func playClick(_ sound: SystemSoundID) {
@@ -220,8 +237,11 @@ final class KeyboardState: ObservableObject {
     }
 
     func perform(_ action: WritingAction) {
+        guard !isEditingDocument else { return }
         alternates = []
         undo = nil
+        // Read it live, the user may have just turned Full Access on.
+        hasFullAccess = controller?.hasFullAccess ?? false
         guard hasFullAccess else {
             panel = .message("Turn on Full Access so GrammarPeace can reach the AI.\n\nSettings > General > Keyboard > Keyboards > GrammarPeace > Allow Full Access")
             return
@@ -230,10 +250,13 @@ final class KeyboardState: ObservableObject {
 
         panel = .loading(action)
         aiTask?.cancel()
+        // Block other edits while the cursor walks through the field.
+        isEditingDocument = true
         aiTask = Task { [weak self] in
             guard let self else { return }
-            let document = DocumentText(proxy: proxy)
-            let capture = await document.capture()
+            let capture = await DocumentText(proxy: proxy).capture()
+            self.isEditingDocument = false
+            if Task.isCancelled { return }
             let original = capture.text
 
             guard !original.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -242,8 +265,9 @@ final class KeyboardState: ObservableObject {
             }
 
             do {
-                let output = try await AIClient(settings: self.settings).run(action, on: original)
+                let answer = try await AIClient(settings: self.settings).run(action, on: original)
                 if Task.isCancelled { return }
+                let output = Self.keepingEdgeWhitespace(of: original, around: answer)
 
                 if output.trimmingCharacters(in: .whitespacesAndNewlines) == original.trimmingCharacters(in: .whitespacesAndNewlines) {
                     self.panel = .message(action == .fix ? "Looks good. No grammar issues found." : "No changes needed.")
@@ -271,15 +295,27 @@ final class KeyboardState: ObservableObject {
     }
 
     func apply(_ result: AIResult) async {
-        guard let proxy else { return }
+        guard let proxy, !isEditingDocument else { return }
+        isEditingDocument = true
+        defer { isEditingDocument = false }
+
         let replaced = await DocumentText(proxy: proxy).replace(result.original, with: result.output, isSelection: result.isSelection)
         if replaced {
             panel = .keys
-            undo = (inserted: result.output, original: result.original)
+            undo = UndoInfo(inserted: result.output, original: result.original, isSelection: result.isSelection)
             updateAutoShift()
         } else {
             panel = .message("The text changed since it was checked. Tap the button again.")
         }
+    }
+
+    /// The AI trims its answer, so put back the spaces or newlines the user had around the text.
+    /// Otherwise "hello " becomes "Hello." and the next word gets glued on.
+    private static func keepingEdgeWhitespace(of original: String, around answer: String) -> String {
+        let leading = String(original.prefix { $0.isWhitespace })
+        let trailing = String(original.reversed().prefix { $0.isWhitespace }.reversed())
+        let core = answer.trimmingCharacters(in: .whitespacesAndNewlines)
+        return leading + core + trailing
     }
 
     func copy(_ result: AIResult) {
@@ -288,10 +324,12 @@ final class KeyboardState: ObservableObject {
     }
 
     func undoLastReplace() {
-        guard let undo, let proxy else { return }
+        guard let undo, let proxy, !isEditingDocument else { return }
         self.undo = nil
+        isEditingDocument = true
         Task {
-            let restored = await DocumentText(proxy: proxy).replace(undo.inserted, with: undo.original, isSelection: false)
+            defer { isEditingDocument = false }
+            let restored = await DocumentText(proxy: proxy).replace(undo.inserted, with: undo.original, isSelection: undo.isSelection)
             if !restored {
                 panel = .message("Couldn't undo because the text changed.")
             }
