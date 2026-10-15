@@ -26,10 +26,19 @@ struct KeysView: View {
         case .letters: return Self.letterRows
         case .numbers: return Self.numberRows
         case .symbols: return Self.symbolRows
+        case .emoji: return Self.letterRows
         }
     }
 
     var body: some View {
+        if state.layer == .emoji {
+            EmojiView(state: state)
+        } else {
+            keys
+        }
+    }
+
+    private var keys: some View {
         GeometryReader { geo in
             let unit = geo.size.width / 10
             let rowHeight = (geo.size.height - 4) / 4
@@ -92,7 +101,7 @@ struct KeysView: View {
             KeyButton(style: .function, onTap: { state.switchLayer(.symbols) }) {
                 Text("#+=").font(.system(size: 15))
             }
-        case .symbols:
+        case .symbols, .emoji:
             KeyButton(style: .function, onTap: { state.switchLayer(.numbers) }) {
                 Text("123").font(.system(size: 15))
             }
@@ -123,6 +132,13 @@ struct KeysView: View {
                 }
                 .frame(width: unit * 1.25)
             }
+
+            KeyButton(style: .function, onTap: { state.switchLayer(.emoji) }) {
+                Image(systemName: "face.smiling")
+                    .font(.system(size: 19))
+            }
+            .frame(width: unit * 1.25)
+            .accessibilityLabel("Emoji")
 
             KeyButton(style: .character, onTap: { state.space() }) {
                 Text("space").font(.system(size: 15))

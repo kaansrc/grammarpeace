@@ -18,6 +18,8 @@ By default you get a preview with the changes highlighted, then tap **Replace**.
 
 Long press a letter for accents (ç, ğ, ı, ö, ş, ü, é, ñ...).
 
+The 😊 key next to 123 opens emoji, with your recent ones on the first page.
+
 ## Project layout
 
 ```

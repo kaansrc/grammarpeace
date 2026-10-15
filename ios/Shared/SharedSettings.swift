@@ -93,6 +93,12 @@ final class SharedSettings {
         set { defaults.set(newValue, forKey: "customDictionary") }
     }
 
+    /// Most recent first, shown as the "Frequently Used" emoji page.
+    var recentEmoji: [String] {
+        get { defaults.stringArray(forKey: "recentEmoji") ?? [] }
+        set { defaults.set(Array(newValue.prefix(32)), forKey: "recentEmoji") }
+    }
+
     private func nonEmpty(_ value: String?) -> String? {
         guard let value, !value.trimmingCharacters(in: .whitespaces).isEmpty else { return nil }
         return value

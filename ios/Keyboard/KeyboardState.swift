@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 
 enum KeyboardLayer {
-    case letters, numbers, symbols
+    case letters, numbers, symbols, emoji
 }
 
 enum ShiftState {
@@ -155,6 +155,16 @@ final class KeyboardState: ObservableObject {
         layer = newLayer
         if newLayer == .letters { updateAutoShift() }
     }
+
+    func insertEmoji(_ emoji: String) {
+        guard let proxy, !isEditingDocument else { return }
+        clearTransientUI()
+        playClick(1104)
+        proxy.insertText(emoji)
+        settings.recentEmoji = [emoji] + settings.recentEmoji.filter { $0 != emoji }
+    }
+
+    var recentEmoji: [String] { settings.recentEmoji }
 
     func nextKeyboard() {
         controller?.advanceToNextInputMode()
